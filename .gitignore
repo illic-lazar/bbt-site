@@ -1,0 +1,4 @@
+# Heavy video originals are not committed (exceed GitHub's 100MB limit).
+# They are hosted separately (Supabase Storage / compressed) — see DEPLOY.md.
+*.mp4
+.DS_Store
