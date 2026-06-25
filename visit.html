@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Us — Big Bad Thai · El Nido</title>
+<meta name="description" content="Visit Big Bad Thai on Hama Street, El Nido, Palawan. Open daily 11am–11pm. Reserve a table via Messenger.">
+<meta name="theme-color" content="#181818">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+.visit{display:grid;grid-template-columns:0.9fr 1.1fr;gap:clamp(32px,5vw,72px);align-items:start;}
+@media(max-width:820px){.visit{grid-template-columns:1fr;}}
+.info{display:flex;flex-direction:column;gap:34px;}
+.blk{display:flex;flex-direction:column;gap:9px;}
+.blk .ic{width:40px;height:40px;border:1px solid rgba(24,24,24,.16);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--night);margin-bottom:4px;}
+.blk .lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;font-size:19px;color:var(--night);}
+.blk p,.blk a{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:15.5px;color:var(--bamboo);line-height:1.8;}
+.blk a:hover{color:var(--clay);}
+.map{width:100%;aspect-ratio:4/3;border:0;border-radius:6px;box-shadow:0 12px 40px rgba(0,0,0,.12);min-height:340px;}
+.visit-cta{margin-top:8px;}
+.subnote{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;color:rgba(84,88,61,.5);text-transform:uppercase;margin-top:4px;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">Big Bad Thai</a>
+  <div class="nav-links" id="navlinks">
+    <a href="index.html">Home</a>
+    <a href="menu.html">Menu</a>
+    <a href="about.html">About</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="visit.html" class="active">Find Us</a>
+  </div>
+  <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" class="btn btn-clay nav-cta">Reserve</a>
+  <button class="nav-ham" aria-label="Menu" onclick="document.getElementById('navlinks').classList.toggle('open')"><span></span><span></span><span></span></button>
+</nav>
+
+<main class="page">
+  <div class="page-head">
+    <span class="mo">Visit</span>
+    <h1>Find Us</h1>
+    <p>Right in the heart of El Nido, on the Bacuit Bay waterfront. Walk-ins welcome — reservations recommended for peak hours.</p>
+  </div>
+
+  <div class="visit">
+    <div class="info">
+      <div class="blk">
+        <div class="ic"><i class="ti ti-map-pin" style="font-size:19px"></i></div>
+        <div class="lbl">Location</div>
+        <p>Hama Street, Barangay Masagana<br>El Nido, 5313 Palawan<br>Philippines</p>
+      </div>
+      <div class="blk">
+        <div class="ic"><i class="ti ti-clock" style="font-size:19px"></i></div>
+        <div class="lbl">Hours</div>
+        <p>Open daily<br>11:00 AM – 11:00 PM</p>
+      </div>
+      <div class="blk">
+        <div class="ic"><i class="ti ti-phone" style="font-size:19px"></i></div>
+        <div class="lbl">Reservations</div>
+        <p><a href="tel:+639452994225">+63 945 299 4225</a><br><a href="mailto:info.elnido@bigbadthai.com">info.elnido@bigbadthai.com</a></p>
+        <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" class="btn btn-clay visit-cta" style="color:var(--cream);align-self:flex-start">Message to Book</a>
+        <div class="subnote">Booking via Messenger · we reply fast</div>
+      </div>
+      <div class="blk">
+        <div class="ic"><i class="ti ti-brand-instagram" style="font-size:19px"></i></div>
+        <div class="lbl">Follow</div>
+        <p><a href="https://www.instagram.com/bigbadthairestaurant" target="_blank" rel="noopener">Instagram &mdash; @bigbadthairestaurant</a><br><a href="https://www.facebook.com/bigbadthai" target="_blank" rel="noopener">Facebook &mdash; Big Bad Thai</a></p>
+      </div>
+    </div>
+
+    <iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+      src="https://www.google.com/maps?q=Big%20Bad%20Thai%20Restaurant%20El%20Nido%20Hama%20Street&output=embed"
+      title="Big Bad Thai on the map"></iframe>
+  </div>
+</main>
+
+<footer class="footer">
+  <span class="footer-logo">Big Bad Thai</span>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="menu.html">Menu</a>
+    <a href="about.html">About</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="visit.html">Find Us</a>
+    <a href="https://www.instagram.com/bigbadthairestaurant" target="_blank" rel="noopener">Instagram</a>
+  </div>
+  <span class="footer-copy">© 2026 Big Bad Thai · El Nido</span>
+</footer>
+
+</body>
+</html>

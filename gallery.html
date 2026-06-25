@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery — Big Bad Thai · El Nido</title>
+<meta name="description" content="A look inside Big Bad Thai — the food, the bar and the room, on the El Nido waterfront.">
+<meta name="theme-color" content="#181818">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.grid{columns:3;column-gap:14px;}
+@media(max-width:900px){.grid{columns:2;}}
+@media(max-width:560px){.grid{columns:1;}}
+.grid figure{break-inside:avoid;margin:0 0 14px;border-radius:4px;overflow:hidden;cursor:zoom-in;background:var(--cream2);}
+.grid img{width:100%;height:auto;display:block;transition:transform .4s ease,opacity .3s;}
+.grid figure:hover img{transform:scale(1.04);}
+#lb{position:fixed;inset:0;background:rgba(15,10,5,.94);z-index:1000;display:none;align-items:center;justify-content:center;cursor:zoom-out;}
+#lb img{max-width:92vw;max-height:90vh;border-radius:4px;box-shadow:0 30px 80px rgba(0,0,0,.5);}
+#lb .x{position:absolute;top:20px;right:26px;color:var(--cream);font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.1em;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">Big Bad Thai</a>
+  <div class="nav-links" id="navlinks">
+    <a href="index.html">Home</a>
+    <a href="menu.html">Menu</a>
+    <a href="about.html">About</a>
+    <a href="gallery.html" class="active">Gallery</a>
+    <a href="visit.html">Find Us</a>
+  </div>
+  <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" class="btn btn-clay nav-cta">Reserve</a>
+  <button class="nav-ham" aria-label="Menu" onclick="document.getElementById('navlinks').classList.toggle('open')"><span></span><span></span><span></span></button>
+</nav>
+
+<main class="page">
+  <div class="page-head">
+    <span class="mo">A Look Inside</span>
+    <h1>Gallery</h1>
+    <p>The food, the bar and the room — on the El Nido waterfront.</p>
+  </div>
+
+  <div class="grid" id="grid">
+    <figure><img src="assets/gallery/TKC00443.jpg" alt="Big Bad Thai dining room" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC03572.jpg" alt="Seafood bowl" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC00532.jpg" alt="Diners overlooking Bacuit Bay" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC00632.jpg" alt="Pad Thai" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC01055.jpg" alt="Storefront at night" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC00888.jpg" alt="Green papaya salad" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC00467.jpg" alt="Restaurant interior" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC01354.jpg" alt="Thai iced tea" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC01170.jpg" alt="Service at the table" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC01832.jpg" alt="Grilled beef salad" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC00456.jpg" alt="Restaurant interior" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC03406.jpg" alt="Royal golden curry" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC01329.jpg" alt="Iced drink at the bar" loading="lazy"></figure>
+    <figure><img src="assets/gallery/TKC00764.jpg" alt="Fresh spring rolls" loading="lazy"></figure>
+  </div>
+</main>
+
+<div id="lb" onclick="this.style.display='none'"><span class="x">Close ✕</span><img src="" alt=""></div>
+
+<footer class="footer">
+  <span class="footer-logo">Big Bad Thai</span>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="menu.html">Menu</a>
+    <a href="about.html">About</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="visit.html">Find Us</a>
+    <a href="https://www.instagram.com/bigbadthairestaurant" target="_blank" rel="noopener">Instagram</a>
+  </div>
+  <span class="footer-copy">© 2026 Big Bad Thai · El Nido</span>
+</footer>
+
+<script>
+var lb=document.getElementById('lb'),lbimg=lb.querySelector('img');
+document.getElementById('grid').addEventListener('click',function(e){
+  var img=e.target.closest('img'); if(!img)return;
+  lbimg.src=img.src; lbimg.alt=img.alt; lb.style.display='flex';
+});
+</script>
+</body>
+</html>
