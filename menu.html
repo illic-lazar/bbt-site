@@ -55,6 +55,17 @@
   #dish-modal .sheet{left:0;right:0;bottom:0;top:auto;transform:none;width:100%;max-height:92vh;border-radius:18px 18px 0 0;animation:dm-up .26s ease;}
   @keyframes dm-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
 }
+/* category jump bar */
+.cat-title{scroll-margin-top:140px;}
+.catbar{position:sticky;top:72px;z-index:80;background:var(--cream);display:flex;gap:8px;overflow-x:auto;
+  padding:12px 0;margin:0 0 30px;border-bottom:1px solid rgba(24,24,24,.08);scrollbar-width:none;}
+.catbar::-webkit-scrollbar{display:none;}
+.catbar a{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--bamboo);padding:7px 14px;border:1px solid rgba(24,24,24,.16);border-radius:20px;white-space:nowrap;
+  transition:color .15s,background .15s,border-color .15s;}
+.catbar a:hover{border-color:var(--clay);color:var(--clay);}
+.catbar a.active{background:var(--clay);color:var(--cream);border-color:var(--clay);}
+@media(max-width:760px){.catbar{top:56px;}.cat-title{scroll-margin-top:112px;}}
 </style>
 </head>
 <body>
@@ -69,7 +80,7 @@
     <a href="visit.html">Find Us</a>
   </div>
   <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" class="btn btn-clay nav-cta nav-cta-d">Reserve</a>
-  <a href="menu.html" class="btn btn-clay nav-cta nav-cta-m">Menu</a>
+  <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" class="btn btn-clay nav-cta nav-cta-m">Reserve</a>
   <button class="nav-ham" aria-label="Menu" onclick="document.getElementById('navlinks').classList.toggle('open')"><span></span><span></span><span></span></button>
 </nav>
 
@@ -80,10 +91,25 @@
     <p>The dishes we grew up on — authentic Thai recipes, generous portions, cooked the way Mom taught us.</p>
   </div>
 
+  <nav class="catbar" id="catbar" aria-label="Menu categories">
+    <a href="#starters">Starters</a>
+    <a href="#salads">Salads</a>
+    <a href="#soups">Soups &amp; Curries</a>
+    <a href="#mains">Mains</a>
+    <a href="#vegetables">Vegetables</a>
+    <a href="#desserts">Desserts</a>
+    <a href="#cocktails">Cocktails</a>
+    <a href="#shakes">Shakes</a>
+    <a href="#wine">Wine</a>
+    <a href="#coffee">Coffee &amp; Tea</a>
+    <a href="#beer">Beer</a>
+    <a href="#spirits">Spirits</a>
+  </nav>
+
   <div class="menu-cols">
 
     <section class="cat">
-      <h2 class="cat-title">Starters</h2>
+      <h2 class="cat-title" id="starters">Starters</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Fried Shrimp Cakes</span><span class="m-price">420</span></div><div class="m-desc">Minced shrimp, crunchy crust, sweet chili dip.</div><div class="m-meta">Gluten, egg, soy</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Satay Chicken</span><span class="m-price">380</span></div><div class="m-desc">Grilled chicken skewers, turmeric marinade, peanut sauce, cucumber chili relish.</div><div class="m-meta"><span class="m-spice">Mild spicy</span> · Nuts, dairy, shellfish, gluten</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Seafood Skewers<span class="m-new">New</span></span><span class="m-price">490</span></div><div class="m-desc">Grilled prawns, squid, mussels, green chili dip.</div><div class="m-meta"><span class="m-spice">Medium spicy</span> · Fish, celery</div></div>
@@ -95,14 +121,14 @@
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Salads</h2>
+      <h2 class="cat-title" id="salads">Salads</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Grilled Beef Salad</span><span class="m-price">530</span></div><div class="m-desc">Grilled beef, mint, lemongrass, red onion, cucumber, toasted rice powder, fish sauce.</div><div class="m-meta"><span class="m-spice">Hot spicy</span> · Fish</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Chicken Lemongrass Salad</span><span class="m-price">420</span></div><div class="m-desc">Pulled chicken, banana blossom, lemongrass, red onion, roasted chili coconut dressing, soft-boiled egg, steamed rice.</div><div class="m-meta"><span class="m-spice">Mild spicy</span> · Fish, shellfish</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Green Papaya Salad</span><span class="m-price">290</span></div><div class="m-desc">Shredded green papaya, carrot, string beans, tomato, peanuts, calamansi, chili.</div><div class="m-meta"><span class="m-spice">Mild spicy</span> · Fish, nuts</div></div>
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Soups &amp; Curries</h2>
+      <h2 class="cat-title" id="soups">Soups &amp; Curries</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Tom Yum</span></div><div class="m-desc">Dairy milk, galangal, lemongrass, roasted chili paste, mushrooms, kaffir lime, coriander, steamed rice.</div><div class="m-prices">Shrimp 520 · Chicken 440</div><div class="m-meta"><span class="m-spice">Medium spicy</span> · Dairy, shellfish, soy, fish</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Tom Kha Gai</span><span class="m-price">420</span></div><div class="m-desc">Coconut milk, chicken, galangal, mushrooms, lemongrass, kaffir lime, calamansi, steamed rice.</div><div class="m-meta">Fish, gluten, soy</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Green Curry</span></div><div class="m-desc">Coconut milk, green chili paste, eggplant, string beans, sweet basil, kaffir lime zest, steamed rice.</div><div class="m-prices">Shrimp 520 · Beef 490 · Chicken 440 · Veggie 340</div><div class="m-meta"><span class="m-spice">Mild spicy</span> · Fish</div></div>
@@ -112,7 +138,7 @@
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Mains &amp; Specialties</h2>
+      <h2 class="cat-title" id="mains">Mains &amp; Specialties</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Seafood Bucket<span class="m-new">New</span></span><span class="m-price">2,290</span></div><div class="m-desc">Steamed crabs, clams, mussels, squid &amp; prawns, green chili dip — served with steamed rice for two.</div><div class="m-meta"><span class="m-spice">Medium spicy</span> · For two · Fish</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Royal Golden Curry</span></div><div class="m-desc">Yellow curry powder, milk, egg, celery, onion, oyster sauce, steamed rice.</div><div class="m-prices">Prawn 950 · Crab 850</div><div class="m-meta">Dairy, gluten, egg, shellfish, celery</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Grilled Prawns</span><span class="m-price">890</span></div><div class="m-desc">Large prawns, lettuce, celery, cucumber, spicy seafood dip, steamed rice.</div><div class="m-meta"><span class="m-spice">Medium spicy</span> · Shellfish, celery</div></div>
@@ -124,7 +150,7 @@
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Vegetables</h2>
+      <h2 class="cat-title" id="vegetables">Vegetables</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Garlic Bok Choy<span class="m-new">New</span></span><span class="m-price">320</span></div><div class="m-desc">Bok choy, garlic, sea salt, steamed rice.</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Morning Glory</span><span class="m-price">290</span></div><div class="m-desc">Water spinach, garlic, oyster sauce, chili, steamed rice.</div><div class="m-meta"><span class="m-spice">Mild spicy</span> · Shellfish, gluten, soy</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Mushroom Trio<span class="m-new">New</span></span><span class="m-price">380</span></div><div class="m-desc">Three kinds of mushrooms, spring onion, soy garlic sauce, steamed rice.</div><div class="m-meta">Soy, gluten</div></div>
@@ -132,14 +158,14 @@
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Desserts</h2>
+      <h2 class="cat-title" id="desserts">Desserts</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Mango Sticky Rice</span><span class="m-price">380</span></div><div class="m-desc">Sweet ripe mango, coconut sticky rice, sesame, coconut cream.</div><div class="m-meta">Nuts</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Fried Banana with Ice Cream</span><span class="m-price">340</span></div><div class="m-desc">Banana fritter, crispy rice batter, coconut milk, chocolate drizzle, ice cream, crushed peanuts.</div><div class="m-meta">Nuts, dairy</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Coconut Pancakes<span class="m-new">New</span></span><span class="m-price">260</span></div><div class="m-desc">Pan-grilled coconut cake, young coconut meat, black sticky rice flour.</div></div>
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Cocktails</h2>
+      <h2 class="cat-title" id="cocktails">Cocktails</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Thairita</span><span class="m-price">380</span></div><div class="m-desc">Silver tequila, triple sec, mango, lime juice, chili-salted rim.</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Sabai Sabai<span class="m-new">New</span></span><span class="m-price">360</span></div><div class="m-desc">White rum, mint, lime juice, passionfruit purée.</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">White Elephant</span><span class="m-price">360</span></div><div class="m-desc">Vodka, coconut rum, lime juice.</div></div>
@@ -147,18 +173,18 @@
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Shakes &amp; Smoothies</h2>
+      <h2 class="cat-title" id="shakes">Shakes &amp; Smoothies</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Fruit Shakes</span></div><div class="m-desc">Freshly blended fruit.</div><div class="m-prices">Mixed Fruit 300 · Mango 290 · Banana 280 · Lychee 280 · Pineapple 260</div></div>
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Wine</h2>
+      <h2 class="cat-title" id="wine">Wine</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">White</span></div><div class="m-prices">Chardonnay 390/1,850 · Pinot Grigio 330/1,550 · Sauvignon Blanc 250/1,150</div><div class="m-meta">Glass / Bottle</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Red</span></div><div class="m-prices">Pinot Noir 420/1,950 · Merlot 360/1,550 · Cabernet Sauvignon 250/1,150</div><div class="m-meta">Glass / Bottle</div></div>
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Coffee &amp; Tea</h2>
+      <h2 class="cat-title" id="coffee">Coffee &amp; Tea</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Espresso</span><span class="m-price">80</span></div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Double Espresso</span><span class="m-price">100</span></div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Macchiato</span><span class="m-price">120</span></div></div>
@@ -172,7 +198,7 @@
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Beer &amp; Refreshment</h2>
+      <h2 class="cat-title" id="beer">Beer &amp; Refreshment</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Singha</span><span class="m-price">280</span></div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Red Horse</span><span class="m-price">120</span></div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">San Miguel Pilsen / Light</span><span class="m-price">120</span></div></div>
@@ -182,7 +208,7 @@
     </section>
 
     <section class="cat">
-      <h2 class="cat-title">Spirits</h2>
+      <h2 class="cat-title" id="spirits">Spirits</h2>
       <div class="m-item"><div class="m-desc" style="margin-top:0">Served per shot.</div><div class="m-prices" style="line-height:1.95">Patrón Silver 780 · Don Julio 660 · Hendrick's 600 · Tanqueray 10 470 · Grey Goose 400 · Singleton 400 · Hennessy 400 · Don Papa 7yr 380 · Jack Daniel's 340 · Kraken 340 · Absolut Blue 260 · Jameson 260 · Carlos I 260 · Bombay Sapphire 250 · Jose Cuervo Gold 240 · Jose Cuervo Silver 220 · Jägermeister 220 · Johnnie Walker Black 220 · Baileys 200 · Smirnoff 200 · Malibu 180 · Jim Beam White 160 · Bacardi Superior 140 · Captain Morgan 140</div></div>
     </section>
 
@@ -246,6 +272,23 @@
   });
   modal.addEventListener('click',function(e){if(e.target.hasAttribute('data-close'))close();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+})();
+</script>
+<script>
+(function(){
+  var bar=document.getElementById('catbar'); if(!bar) return;
+  var links={}; [].forEach.call(bar.querySelectorAll('a'),function(a){links[a.getAttribute('href').slice(1)]=a;});
+  var cur=null;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var a=links[e.target.id]; if(!a||a===cur) return;
+      if(cur) cur.classList.remove('active');
+      a.classList.add('active'); cur=a;
+      bar.scrollTo({left:a.offsetLeft-bar.clientWidth/2+a.clientWidth/2,behavior:'smooth'});
+    });
+  },{rootMargin:'-140px 0px -68% 0px',threshold:0});
+  [].forEach.call(document.querySelectorAll('.cat-title'),function(h){ if(h.id) io.observe(h); });
 })();
 </script>
 <script src="assets/actionbar.js" defer></script>
