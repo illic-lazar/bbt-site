@@ -252,7 +252,13 @@ body {
 .d-footer { background:var(--night); padding:40px 88px; display:flex; align-items:center; justify-content:space-between; }
 
 /* ══ M: NAV ══════════════════════════════════════════════ */
-.m-nav { background:var(--cream); border-bottom:1px solid rgba(24,24,24,.07); display:flex; align-items:center; justify-content:space-between; padding:0 22px; height:56px; }
+.m-nav { background:var(--cream); border-bottom:1px solid rgba(24,24,24,.07); display:flex; align-items:center; justify-content:space-between; padding:0 22px; height:56px; position:sticky; top:0; z-index:300; }
+.ham { cursor:pointer; padding:4px; }
+.m-menu { position:fixed; top:56px; left:0; right:0; background:var(--cream); display:flex; flex-direction:column; max-height:0; overflow:hidden; transition:max-height .28s ease; z-index:290; box-shadow:0 14px 26px rgba(0,0,0,.14); }
+.m-menu.open { max-height:380px; border-bottom:1px solid rgba(24,24,24,.1); }
+.m-menu a { padding:16px 24px; font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--bamboo); text-decoration:none; border-top:1px solid rgba(24,24,24,.06); }
+.m-menu a:first-child { border-top:none; }
+.m-menu a.reserve { background:var(--clay); color:var(--cream); text-align:center; }
 .ham { display:flex; flex-direction:column; gap:4.5px; }
 .ham span { display:block; width:20px; height:1.5px; background:var(--night); border-radius:1px; }
 
@@ -600,9 +606,17 @@ body{padding:0!important;background:var(--cream)!important;}
 
     <!-- M: NAV -->
     <div class="m-nav">
-      <div class="ham"><span></span><span></span><span></span></div>
+      <div class="ham" onclick="document.getElementById('mMenu').classList.toggle('open')"><span></span><span></span><span></span></div>
       <span style="display:inline-flex;align-items:center;gap:9px"><img src="assets/elephant.png" alt="" style="height:24px;width:auto"><span class="bf" style="font-size:17px;color:var(--night)">BIG BAD THAI</span></span>
       <a class="btn btn-clay" style="height:32px;padding:0 14px;font-size:9px;text-decoration:none" href="menu.html">Menu</a>
+    </div>
+    <div class="m-menu" id="mMenu">
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="about.html">About</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="visit.html">Find Us</a>
+      <a class="reserve" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve a Table</a>
     </div>
 
     <!-- M: HERO — hero-video.mp4 (BBT RESTAURANT reel), autoplay/muted/loop -->
