@@ -346,11 +346,11 @@ body{padding:0!important;background:var(--cream)!important;}
         <div class="mo" style="font-size:9px;color:var(--bamboo);opacity:.55;margin-top:18px">— Angela Acosta · Google</div>
         <div class="scale-row" style="margin-top:48px">
           <div class="scale-cell" style="padding-left:0">
-            <div class="bc" style="font-size:36px;color:var(--clay)">2,008</div>
+            <div class="bc" data-rev-total style="font-size:36px;color:var(--clay)">2,008</div>
             <div class="mo" style="font-size:9px;color:var(--bamboo);margin-top:7px">Reviews</div>
           </div>
           <div class="scale-cell" style="padding-left:22px">
-            <div class="bc" style="font-size:36px;color:var(--clay)">4.4</div>
+            <div class="bc" data-rev-rating style="font-size:36px;color:var(--clay)">4.4</div>
             <div class="mo" style="font-size:9px;color:var(--bamboo);margin-top:7px">Stars</div>
           </div>
           <div class="scale-cell" style="padding-left:22px">
@@ -358,9 +358,9 @@ body{padding:0!important;background:var(--cream)!important;}
             <div class="mo" style="font-size:9px;color:var(--bamboo);margin-top:10px">Google</div>
           </div>
         </div>
-        <a href="https://share.google/jTkxRK6gXJpO9uube" target="_blank" rel="noopener" class="btn btn-line" style="height:44px;padding:0 28px;font-size:10px;margin-top:40px;text-decoration:none">Read all reviews on Google &rarr;</a>
+        <a data-rev-link href="https://share.google/jTkxRK6gXJpO9uube" target="_blank" rel="noopener" class="btn btn-line" style="height:44px;padding:0 28px;font-size:10px;margin-top:40px;text-decoration:none">Read all reviews on Google &rarr;</a>
       </div>
-      <div style="display:flex;flex-direction:column;gap:12px">
+      <div data-rev-tiles="3" data-rev-variant="d" style="display:flex;flex-direction:column;gap:12px">
         <div class="review-tile">
           <div style="display:flex;align-items:center;justify-content:space-between">
             <div class="mo" style="font-size:9px;color:var(--bamboo)">Google</div>
@@ -645,11 +645,11 @@ body{padding:0!important;background:var(--cream)!important;}
       <div class="mo" style="font-size:9px;color:rgba(84,88,61,.5);margin-top:14px">— Angela Acosta · Google</div>
       <div class="scale-row" style="margin-top:30px">
         <div class="scale-cell" style="padding:14px 0">
-          <div class="bc" style="font-size:26px;color:var(--clay)">2,008</div>
+          <div class="bc" data-rev-total style="font-size:26px;color:var(--clay)">2,008</div>
           <div class="mo" style="font-size:8px;color:var(--bamboo);margin-top:5px">Reviews</div>
         </div>
         <div class="scale-cell" style="padding:14px 0 14px 16px">
-          <div class="bc" style="font-size:26px;color:var(--clay)">4.4</div>
+          <div class="bc" data-rev-rating style="font-size:26px;color:var(--clay)">4.4</div>
           <div class="mo" style="font-size:8px;color:var(--bamboo);margin-top:5px">Stars</div>
         </div>
         <div class="scale-cell" style="padding:14px 0 14px 16px">
@@ -657,7 +657,7 @@ body{padding:0!important;background:var(--cream)!important;}
           <div class="mo" style="font-size:8px;color:var(--bamboo);margin-top:7px">Google</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px">
+      <div data-rev-tiles="4" data-rev-variant="m" style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px">
         <div class="review-tile" style="padding:14px">
           <div class="mo" style="font-size:8px;color:var(--bamboo)">Google <span class="stars">★★★★★</span></div>
           <div class="rb" style="font-size:11px;font-style:italic;color:var(--night);line-height:1.6">"Excellent food, service, and atmosphere. Don't miss out."</div>
@@ -669,7 +669,7 @@ body{padding:0!important;background:var(--cream)!important;}
           <div class="mo" style="font-size:8px;color:rgba(84,88,61,.42);margin-top:6px">Lucía L. · Local Guide</div>
         </div>
       </div>
-      <a href="https://share.google/jTkxRK6gXJpO9uube" target="_blank" rel="noopener" class="btn btn-line btn-fw" style="height:44px;font-size:9px;margin-top:14px;text-decoration:none">Read all reviews on Google &rarr;</a>
+      <a data-rev-link href="https://share.google/jTkxRK6gXJpO9uube" target="_blank" rel="noopener" class="btn btn-line btn-fw" style="height:44px;font-size:9px;margin-top:14px;text-decoration:none">Read all reviews on Google &rarr;</a>
     </div>
 
     <!-- M: BRAND STATEMENT -->
@@ -919,6 +919,37 @@ function sw(id){
   }
   var thai=false;
   setTimeout(function tick(){ thai=!thai; flip(thai); setTimeout(tick, thai?1900:7000); }, 4500);
+})();
+</script>
+<script>
+(function(){
+  if(/editor|studio/i.test(location.pathname)) return;
+  function esc(s){return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function clip(s,n){s=(s||'').trim();return s.length>n?s.slice(0,n-1).replace(/\s+\S*$/,'')+'\u2026':s;}
+  function stars(r){return '\u2605'.repeat(Math.max(1,Math.min(5,Math.round(r||5))));}
+  function tile(r,v){
+    if(v==='m'){return '<div class="review-tile" style="padding:14px">'
+      +'<div class="mo" style="font-size:8px;color:var(--bamboo)">Google <span class="stars">'+stars(r.rating)+'</span></div>'
+      +'<div class="rb" style="font-size:11px;font-style:italic;color:var(--night);line-height:1.6">\u201c'+esc(clip(r.text,120))+'\u201d</div>'
+      +'<div class="mo" style="font-size:8px;color:rgba(84,88,61,.42);margin-top:6px">'+esc(r.author)+'</div></div>';}
+    return '<div class="review-tile">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between">'
+      +'<div class="mo" style="font-size:9px;color:var(--bamboo)">Google</div>'
+      +'<div class="stars" style="font-size:11px">'+stars(r.rating)+'</div></div>'
+      +'<div class="rb" style="font-size:14px;font-style:italic;color:var(--night);line-height:1.65">\u201c'+esc(clip(r.text,210))+'\u201d</div>'
+      +'<div class="mo" style="font-size:9px;color:rgba(84,88,61,.42)">'+esc(r.author)+' \u00b7 Google</div></div>';
+  }
+  fetch('/api/reviews').then(function(r){return r.ok?r.json():null;}).then(function(d){
+    if(!d||!d.reviews||!d.reviews.length) return;
+    if(d.rating) document.querySelectorAll('[data-rev-rating]').forEach(function(e){e.textContent=Number(d.rating).toFixed(1);});
+    if(d.total) document.querySelectorAll('[data-rev-total]').forEach(function(e){e.textContent=Number(d.total).toLocaleString();});
+    if(d.url) document.querySelectorAll('[data-rev-link]').forEach(function(e){e.href=d.url;});
+    document.querySelectorAll('[data-rev-tiles]').forEach(function(c){
+      var n=+c.getAttribute('data-rev-tiles')||3, v=c.getAttribute('data-rev-variant')||'d';
+      var html=d.reviews.slice(0,n).map(function(r){return tile(r,v);}).join('');
+      if(html) c.innerHTML=html;
+    });
+  }).catch(function(){});
 })();
 </script>
 </body>
