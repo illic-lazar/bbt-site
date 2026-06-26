@@ -1,0 +1,27 @@
+{
+  "redirects": [
+    { "source": "/menu", "destination": "/menu.html", "permanent": true },
+    { "source": "/menus", "destination": "/menu.html", "permanent": true },
+    { "source": "/food", "destination": "/menu.html", "permanent": true },
+    { "source": "/about", "destination": "/about.html", "permanent": true },
+    { "source": "/about-us", "destination": "/about.html", "permanent": true },
+    { "source": "/aboutus", "destination": "/about.html", "permanent": true },
+    { "source": "/our-story", "destination": "/about.html", "permanent": true },
+    { "source": "/story", "destination": "/about.html", "permanent": true },
+    { "source": "/gallery", "destination": "/gallery.html", "permanent": true },
+    { "source": "/photos", "destination": "/gallery.html", "permanent": true },
+    { "source": "/photo-gallery", "destination": "/gallery.html", "permanent": true },
+    { "source": "/reservations", "destination": "/visit.html", "permanent": true },
+    { "source": "/reservation", "destination": "/visit.html", "permanent": true },
+    { "source": "/reserve", "destination": "/visit.html", "permanent": true },
+    { "source": "/book", "destination": "/visit.html", "permanent": true },
+    { "source": "/booking", "destination": "/visit.html", "permanent": true },
+    { "source": "/find-us", "destination": "/visit.html", "permanent": true },
+    { "source": "/findus", "destination": "/visit.html", "permanent": true },
+    { "source": "/contact", "destination": "/visit.html", "permanent": true },
+    { "source": "/contact-us", "destination": "/visit.html", "permanent": true },
+    { "source": "/location", "destination": "/visit.html", "permanent": true },
+    { "source": "/visit", "destination": "/visit.html", "permanent": true },
+    { "source": "/home", "destination": "/", "permanent": true }
+  ]
+}
