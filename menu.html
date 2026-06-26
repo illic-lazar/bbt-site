@@ -273,13 +273,16 @@
     modal.classList.add('open');document.body.style.overflow='hidden';
   }
   function close(){modal.classList.remove('open');document.body.style.overflow='';}
+  var BY={};
   document.querySelectorAll('.m-item').forEach(function(it){
     var n=it.querySelector('.m-name');if(!n)return;
     var sl=slug(cleanName(n));
-    if(SET.has(sl)){it.classList.add('haspic');it.addEventListener('click',function(){open(it,sl);});}
+    if(SET.has(sl)){it.classList.add('haspic');it.addEventListener('click',function(){open(it,sl);});BY[sl]=it;}
   });
   modal.addEventListener('click',function(e){if(e.target.hasAttribute('data-close'))close();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+  var hm=(location.hash||'').match(/^#d-(.+)$/);
+  if(hm&&BY[hm[1]]) setTimeout(function(){open(BY[hm[1]],hm[1]);},80);
 })();
 </script>
 <script>
