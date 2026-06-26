@@ -160,8 +160,10 @@ body {
 .btn {
   display:inline-flex; align-items:center; justify-content:center;
   font-family:'Space Mono',monospace; letter-spacing:.08em; text-transform:uppercase;
-  border-radius:2px; cursor:default; white-space:nowrap;
+  border-radius:2px; cursor:pointer; white-space:nowrap; transition:opacity .15s, transform .15s;
 }
+.btn:hover { opacity:.85; transform:translateY(-1px); }
+.d-nav-links a:hover { color:var(--clay) !important; }
 .btn-clay  { background:var(--clay); color:var(--cream); border:none; }
 .btn-ghost { background:transparent; color:var(--cream); border:1.5px solid rgba(255,245,232,.28); }
 .btn-line  { background:transparent; color:var(--night); border:1.5px solid rgba(24,24,24,.26); }
