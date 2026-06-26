@@ -30,9 +30,20 @@
 .m-spice{color:var(--clay);}
 .menu-note{text-align:center;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--bamboo);
   margin-top:8px;padding-top:26px;border-top:1px solid rgba(24,24,24,.1);text-transform:uppercase;}
+/* angled corner elephant watermark — matches the printed menu */
+nav,main,footer{position:relative;z-index:1;}
+.page-head::before{display:none;}
+.menu-elephant{position:fixed;z-index:0;pointer-events:none;right:-150px;bottom:-120px;
+  width:min(860px,100vw);aspect-ratio:541/417;background-color:var(--clay);
+  -webkit-mask:url('assets/elephant-full.svg') no-repeat center/contain;
+          mask:url('assets/elephant-full.svg') no-repeat center/contain;
+  opacity:.07;transform:rotate(-14deg);}
+@media(max-width:760px){.menu-elephant{right:-45%;bottom:-60px;opacity:.05;}}
 </style>
 </head>
 <body>
+
+<div class="menu-elephant" aria-hidden="true"></div>
 
 <nav class="nav">
   <a href="index.html" class="nav-logo">Big Bad Thai</a>
