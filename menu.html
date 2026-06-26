@@ -219,7 +219,7 @@
 
 <script>
 (function(){
-  var SET=new Set(["cashew-chicken","chicken-lemongrass-salad","coconut-pancakes","crispy-chicken-wings","crispy-rice-lettuce-wraps","fresh-spring-rolls","fried-banana-with-ice-cream","fried-rice","fried-shrimp-cakes","fried-spring-rolls","garlic-bok-choy","green-curry","green-papaya-salad","grilled-beef-salad","grilled-prawns","larb-mushroom","mango-sticky-rice","massaman-curry","morning-glory","mushroom-trio","pad-krapow","pad-thai","red-curry","royal-golden-curry","satay-chicken","seafood-bucket","seafood-skewers","steamed-mussels","stir-fried-mussels","tom-kha-gai","tom-yum","yellow-curry"]);
+  var SET=new Set(["cashew-chicken","chicken-lemongrass-salad","coconut-pancakes","crispy-chicken-wings","crispy-rice-lettuce-wraps","fresh-spring-rolls","fried-banana-with-ice-cream","fried-rice","fried-shrimp-cakes","fried-spring-rolls","garlic-bok-choy","green-curry","green-papaya-salad","grilled-beef-salad","grilled-prawns","larb-mushroom","mango-sticky-rice","massaman-curry","morning-glory","mushroom-trio","pad-krapow","pad-thai","red-curry","royal-golden-curry","satay-chicken","seafood-bucket","seafood-skewers","steamed-mussels","stir-fried-mussels","tom-kha-gai","tom-yum","yellow-curry","thairita","sabai-sabai","white-elephant"]);
   function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
   function cleanName(el){var c=el.cloneNode(true);var b=c.querySelector('.m-new');if(b)b.remove();return c.textContent.trim();}
   var modal=document.getElementById('dish-modal');
@@ -234,7 +234,7 @@
     dDesc.innerHTML=(it.querySelector('.m-desc')||{}).innerHTML||'';
     var meta=it.querySelector('.m-meta');dMeta.innerHTML=meta?meta.innerHTML:'';
     dImg.style.display='';dImg.onerror=function(){dImg.style.display='none';};
-    dImg.src='assets/dishes/'+sl+'.jpg';dImg.alt=nm;
+    dImg.src='assets/dishes/'+sl+'.jpg?v=2';dImg.alt=nm;
     modal.scrollTop=0;modal.querySelector('.sheet').scrollTop=0;
     modal.classList.add('open');document.body.style.overflow='hidden';
   }
