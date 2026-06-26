@@ -30,16 +30,18 @@
 .m-spice{color:var(--clay);}
 .menu-note{text-align:center;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--bamboo);
   margin-top:8px;padding-top:26px;border-top:1px solid rgba(24,24,24,.1);text-transform:uppercase;}
-/* angled elephant watermark on the page — matches the printed menu */
+/* angled black elephant watermarks — two corners, like the printed menu */
 .page{position:relative;overflow:hidden;}
 .page-head::before{display:none;}
 .page-head,.menu-cols,.menu-note{position:relative;z-index:1;}
-.menu-elephant{position:absolute;z-index:0;pointer-events:none;right:-90px;top:70px;
-  width:min(720px,80%);aspect-ratio:541/417;background-color:var(--clay);
+.ele-w{position:absolute;z-index:0;pointer-events:none;width:min(640px,74%);aspect-ratio:541/417;
+  background-color:#181818;
   -webkit-mask:url('assets/elephant-full.svg') no-repeat center/contain;
           mask:url('assets/elephant-full.svg') no-repeat center/contain;
-  opacity:.12;transform:rotate(-13deg);}
-@media(max-width:760px){.menu-elephant{right:-30%;top:40px;width:120%;opacity:.08;}}
+  opacity:.08;}
+.ele-br{right:-80px;bottom:-70px;transform:rotate(-12deg);}
+.ele-tl{left:-80px;top:40px;transform:rotate(10deg) scaleX(-1);}
+@media(max-width:760px){.ele-w{width:118%;opacity:.06;}.ele-br{right:-35%;bottom:-40px;}.ele-tl{left:-35%;top:30px;}}
 </style>
 </head>
 <body>
@@ -58,7 +60,8 @@
 </nav>
 
 <main class="page">
-  <div class="menu-elephant" aria-hidden="true"></div>
+  <div class="ele-w ele-tl" aria-hidden="true"></div>
+  <div class="ele-w ele-br" aria-hidden="true"></div>
   <div class="page-head">
     <span class="mo">From Our Kitchen</span>
     <h1>The Menu</h1>
