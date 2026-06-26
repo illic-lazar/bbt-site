@@ -30,6 +30,31 @@
 .m-spice{color:var(--clay);}
 .menu-note{text-align:center;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--bamboo);
   margin-top:8px;padding-top:26px;border-top:1px solid rgba(24,24,24,.1);text-transform:uppercase;}
+/* tap-a-dish modal */
+.m-item{border-radius:6px;transition:background .12s;-webkit-tap-highlight-color:transparent;}
+.m-item.haspic{cursor:pointer;}
+.m-item.haspic:hover{background:rgba(189,94,38,.05);}
+.m-item.haspic .m-name::after{content:"";display:inline-block;width:13px;height:13px;margin-left:8px;vertical-align:-1px;opacity:.5;
+  background:no-repeat center/contain;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23BD5E26' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpath d='M21 15l-5-5L5 21'/%3E%3C/svg%3E");}
+#dish-modal{position:fixed;inset:0;z-index:1000;display:none;}
+#dish-modal.open{display:block;}
+#dish-modal .backdrop{position:absolute;inset:0;background:rgba(15,10,5,.6);}
+#dish-modal .sheet{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,92vw);
+  max-height:88vh;overflow-y:auto;background:var(--cream);border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.45);}
+.dm-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--cream2);}
+.dm-close{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(15,10,5,.55);
+  color:#fff;border:none;font-size:15px;cursor:pointer;z-index:2;line-height:1;}
+.dm-body{padding:22px 24px 28px;}
+.dm-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:30px;color:var(--night);line-height:1;}
+.dm-new{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.06em;color:var(--clay);border:1px solid rgba(189,94,38,.4);border-radius:20px;padding:2px 8px;margin-left:8px;vertical-align:middle;}
+.dm-price{font-family:'Space Mono',monospace;font-size:14px;color:var(--clay);margin-top:10px;}
+.dm-desc{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:15px;color:var(--bamboo);line-height:1.65;margin-top:14px;}
+.dm-meta{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:rgba(84,88,61,.65);margin-top:16px;}
+.dm-spice{color:var(--clay);}
+@media(max-width:560px){
+  #dish-modal .sheet{left:0;right:0;bottom:0;top:auto;transform:none;width:100%;max-height:92vh;border-radius:18px 18px 0 0;animation:dm-up .26s ease;}
+  @keyframes dm-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+}
 </style>
 </head>
 <body>
@@ -177,6 +202,53 @@
   </div>
   <span class="footer-copy">© 2026 Big Bad Thai · El Nido</span>
 </footer>
+
+<div id="dish-modal" aria-hidden="true">
+  <div class="backdrop" data-close></div>
+  <div class="sheet">
+    <button class="dm-close" data-close aria-label="Close">✕</button>
+    <img class="dm-img" alt="">
+    <div class="dm-body">
+      <div class="dm-name"></div>
+      <div class="dm-price"></div>
+      <div class="dm-desc"></div>
+      <div class="dm-meta"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var SET=new Set(["cashew-chicken","chicken-lemongrass-salad","coconut-pancakes","crispy-chicken-wings","crispy-rice-lettuce-wraps","fresh-spring-rolls","fried-banana-with-ice-cream","fried-rice","fried-shrimp-cakes","fried-spring-rolls","garlic-bok-choy","green-curry","green-papaya-salad","grilled-beef-salad","grilled-prawns","larb-mushroom","mango-sticky-rice","massaman-curry","morning-glory","mushroom-trio","pad-krapow","pad-thai","red-curry","royal-golden-curry","satay-chicken","seafood-bucket","seafood-skewers","steamed-mussels","stir-fried-mussels","tom-kha-gai","tom-yum","yellow-curry"]);
+  function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+  function cleanName(el){var c=el.cloneNode(true);var b=c.querySelector('.m-new');if(b)b.remove();return c.textContent.trim();}
+  var modal=document.getElementById('dish-modal');
+  var dImg=modal.querySelector('.dm-img'),dName=modal.querySelector('.dm-name'),
+      dPrice=modal.querySelector('.dm-price'),dDesc=modal.querySelector('.dm-desc'),dMeta=modal.querySelector('.dm-meta');
+  function open(it,sl){
+    var nm=cleanName(it.querySelector('.m-name'));
+    var isNew=!!it.querySelector('.m-new');
+    dName.innerHTML=nm+(isNew?' <span class="dm-new">New</span>':'');
+    var price=it.querySelector('.m-price'),prices=it.querySelector('.m-prices');
+    dPrice.textContent=prices?prices.textContent:(price?'₱'+price.textContent:'');
+    dDesc.innerHTML=(it.querySelector('.m-desc')||{}).innerHTML||'';
+    var meta=it.querySelector('.m-meta');dMeta.innerHTML=meta?meta.innerHTML:'';
+    dImg.style.display='';dImg.onerror=function(){dImg.style.display='none';};
+    dImg.src='assets/dishes/'+sl+'.jpg';dImg.alt=nm;
+    modal.scrollTop=0;modal.querySelector('.sheet').scrollTop=0;
+    modal.classList.add('open');document.body.style.overflow='hidden';
+  }
+  function close(){modal.classList.remove('open');document.body.style.overflow='';}
+  document.querySelectorAll('.m-item').forEach(function(it){
+    var n=it.querySelector('.m-name');if(!n)return;
+    var sl=slug(cleanName(n));
+    if(SET.has(sl)){it.classList.add('haspic');it.addEventListener('click',function(){open(it,sl);});}
+  });
+  modal.addEventListener('click',function(e){if(e.target.hasAttribute('data-close'))close();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+})();
+</script>
+<script src="assets/actionbar.js" defer></script>
 
 </body>
 </html>
