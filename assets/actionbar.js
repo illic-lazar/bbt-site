@@ -18,7 +18,17 @@
   + ".open-badge{display:inline-flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase}"
   + ".open-badge .od{width:8px;height:8px;border-radius:50%;display:inline-block}"
   + ".open-badge.is-open{color:#3c8a4e}.open-badge.is-open .od{background:#3c8a4e;box-shadow:0 0 0 3px rgba(60,138,78,.18)}"
-  + ".open-badge.is-closed{color:#b04a2b}.open-badge.is-closed .od{background:#b04a2b}";
+  + ".open-badge.is-closed{color:#b04a2b}.open-badge.is-closed .od{background:#b04a2b}"
+  + "#bbt-lang{position:fixed;right:16px;bottom:18px;z-index:490}"
+  + "@media(max-width:760px){#bbt-lang{bottom:78px;right:12px}}"
+  + "#bbt-lang .lang-btn{width:42px;height:42px;border-radius:50%;background:var(--night,#181818);color:var(--cream,#FFF5E8);"
+  +   "border:1px solid rgba(255,245,232,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.28);padding:0}"
+  + "#bbt-lang .lang-btn svg{width:20px;height:20px}"
+  + "#bbt-lang .lang-menu{position:absolute;right:0;bottom:50px;background:var(--cream,#FFF5E8);border-radius:10px;"
+  +   "box-shadow:0 16px 40px rgba(0,0,0,.24);padding:6px;display:none;min-width:150px;max-height:60vh;overflow:auto}"
+  + "#bbt-lang.open .lang-menu{display:block}"
+  + "#bbt-lang .lang-menu a{display:block;padding:9px 13px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.03em;color:var(--night,#181818);text-decoration:none;border-radius:6px}"
+  + "#bbt-lang .lang-menu a:hover{background:rgba(189,94,38,.1);color:var(--clay,#BD5E26)}";
   var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 
   /* ---------------- icons ---------------- */
@@ -39,6 +49,25 @@
   // iOS → Apple Maps walking directions
   var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   if(isIOS){var d=document.getElementById('bbt-dir');if(d)d.href='https://maps.apple.com/?daddr=Big+Bad+Thai+Restaurant+El+Nido,+Hama+Street&dirflg=w';}
+
+  /* ---------------- language switcher (Google Translate proxy) ---------------- */
+  var LANGS=[['en','English'],['ko','한국어'],['zh-CN','中文'],['ja','日本語'],['de','Deutsch'],['fr','Français'],['es','Español'],['it','Italiano'],['ru','Русский']];
+  function transURL(tl){
+    if(tl==='en') return location.pathname+location.search;
+    var h=location.hostname;
+    if(location.protocol==='file:'||/^(localhost|127\.|0\.0\.0\.0|\[?::1)/.test(h))
+      return 'https://translate.google.com/translate?sl=en&tl='+tl+'&u='+encodeURIComponent(location.href);
+    var sub=h.replace(/-/g,'--').replace(/\./g,'-');
+    var sep=location.search?'&':'?';
+    return 'https://'+sub+'.translate.goog'+location.pathname+location.search+sep+'_x_tr_sl=en&_x_tr_tl='+tl+'&_x_tr_hl='+tl;
+  }
+  var globe='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+  var lang=document.createElement('div');lang.id='bbt-lang';
+  lang.innerHTML='<div class="lang-menu">'+LANGS.map(function(l){return '<a href="'+transURL(l[0])+'">'+l[1]+'</a>';}).join('')+'</div>'
+    +'<button class="lang-btn" type="button" aria-label="Language" aria-haspopup="true">'+globe+'</button>';
+  document.body.appendChild(lang);
+  lang.querySelector('.lang-btn').addEventListener('click',function(e){e.stopPropagation();lang.classList.toggle('open');});
+  document.addEventListener('click',function(e){if(!lang.contains(e.target))lang.classList.remove('open');});
 
   /* ---------------- open-now badge (Asia/Manila, 11:00–23:00 daily) ---------------- */
   try{
