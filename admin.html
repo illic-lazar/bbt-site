@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BBT · Chat insights</title>
+<style>
+  :root{--clay:#BD5E26;--gold:#E2993B;--night:#181818;--cream:#FFF5E8;--bamboo:#54583D}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--night);color:var(--cream);font-family:'Roboto Condensed',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  h1,h2{font-family:'Barlow Condensed','Arial Narrow',sans-serif;text-transform:uppercase;letter-spacing:.03em;margin:0}
+  a{color:var(--gold)}
+  .wrap{max-width:1000px;margin:0 auto;padding:24px 18px 60px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  header h1{font-size:26px}
+  header .sp{flex:1}
+  button{font-family:inherit;cursor:pointer}
+  .btn{background:var(--clay);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:13px}
+  .ghost{background:transparent;border:1px solid rgba(255,245,232,.25);color:var(--cream);border-radius:8px;padding:8px 14px;font-size:12px}
+  /* gate */
+  #gate{max-width:360px;margin:14vh auto;text-align:center}
+  #gate input{width:100%;margin:14px 0;padding:11px 14px;border-radius:8px;border:1px solid rgba(255,245,232,.25);background:#222;color:var(--cream);font-size:15px}
+  #gate .err{color:#ff8a65;font-size:13px;min-height:18px}
+  /* cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:26px}
+  .card{background:#222018;border:1px solid rgba(255,245,232,.08);border-radius:12px;padding:16px}
+  .card .n{font-family:'Barlow Condensed',sans-serif;font-size:38px;line-height:1;color:var(--gold)}
+  .card .l{font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.6;margin-top:6px}
+  section{margin-bottom:30px}
+  section h2{font-size:18px;color:var(--gold);margin-bottom:12px;border-bottom:1px solid rgba(255,245,232,.1);padding-bottom:8px}
+  /* top questions */
+  .q{margin-bottom:9px}
+  .q .qt{display:flex;justify-content:space-between;gap:10px;font-size:14px;margin-bottom:3px}
+  .q .qt b{color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:700}
+  .bar{height:6px;background:rgba(255,245,232,.1);border-radius:4px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--clay)}
+  /* keywords */
+  .kw{display:flex;flex-wrap:wrap;gap:8px}
+  .kw span{background:#2a2820;border:1px solid rgba(255,245,232,.1);border-radius:14px;padding:5px 11px;font-size:13px}
+  .kw span b{color:var(--gold)}
+  /* day chart */
+  .days{display:flex;align-items:flex-end;gap:5px;height:120px}
+  .days .d{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
+  .days .d i{width:100%;background:var(--clay);border-radius:3px 3px 0 0;min-height:2px}
+  .days .d em{font-size:9px;opacity:.5;font-style:normal}
+  .days .d u{font-size:10px;opacity:.7;text-decoration:none}
+  /* recent */
+  .r{border-left:2px solid var(--clay);padding:4px 0 10px 12px;margin-bottom:12px}
+  .r .t{font-size:11px;opacity:.5;margin-bottom:3px}
+  .r .rq{font-size:14px;color:var(--cream)}
+  .r .ra{font-size:13px;opacity:.7;margin-top:3px}
+  .muted{opacity:.55;font-size:13px}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="gate">
+    <h1>Chat insights</h1>
+    <p class="muted">Enter your admin password.</p>
+    <input id="pw" type="password" placeholder="Admin password" autocomplete="off">
+    <div class="err" id="gerr"></div>
+    <button class="btn" id="go" style="width:100%">View dashboard</button>
+  </div>
+
+  <div id="dash" class="hide">
+    <header>
+      <h1>Chat insights</h1>
+      <span class="sp"></span>
+      <button class="ghost" id="refresh">Refresh</button>
+      <button class="ghost" id="out">Log out</button>
+    </header>
+
+    <div id="notcfg" class="hide"><p class="muted">Logging isn't connected yet — add the Supabase keys in Vercel and ask a question on the site, then refresh.</p></div>
+
+    <div id="body" class="hide">
+      <div class="cards">
+        <div class="card"><div class="n" id="cTotal">–</div><div class="l">Questions total</div></div>
+        <div class="card"><div class="n" id="cToday">–</div><div class="l">Today</div></div>
+        <div class="card"><div class="n" id="cSess">–</div><div class="l">Conversations</div></div>
+      </div>
+
+      <section><h2>Last 14 days</h2><div class="days" id="days"></div></section>
+      <section><h2>Most-asked questions</h2><div id="topq"></div></section>
+      <section><h2>Common keywords</h2><div class="kw" id="kw"></div></section>
+      <section><h2>Recent questions</h2><div id="recent"></div><p class="muted" id="winnote"></p></section>
+    </div>
+  </div>
+
+</div>
+<script>
+(function(){
+  var KEY='bbtAdmin';
+  var $=function(s){return document.querySelector(s);};
+  var gate=$('#gate'), dash=$('#dash'), body=$('#body'), notcfg=$('#notcfg');
+
+  function esc(s){return (s||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  function show(el,on){el.classList[on?'remove':'add']('hide');}
+
+  function load(token){
+    return fetch('/api/stats',{headers:{'x-admin-token':token}}).then(function(r){
+      if(r.status===401) throw new Error('Wrong password.');
+      if(r.status===503) throw new Error('Set an ADMIN_TOKEN in Vercel first.');
+      return r.json();
+    });
+  }
+
+  function render(d){
+    show(gate,false); show(dash,true);
+    if(d.configured===false){ show(notcfg,true); show(body,false); return; }
+    show(notcfg,false); show(body,true);
+    $('#cTotal').textContent=d.total!=null?d.total:'–';
+    $('#cToday').textContent=d.today!=null?d.today:'–';
+    $('#cSess').textContent=d.sessions!=null?d.sessions:'–';
+
+    var max=Math.max(1,Math.max.apply(null,(d.byDay||[]).map(function(x){return x.count;})));
+    $('#days').innerHTML=(d.byDay||[]).map(function(x){
+      var h=Math.round(x.count/max*100);
+      var dd=x.date.slice(8),mm=x.date.slice(5,7);
+      return '<div class="d"><u>'+(x.count||'')+'</u><i style="height:'+h+'%"></i><em>'+dd+'/'+mm+'</em></div>';
+    }).join('');
+
+    var tq=d.topQuestions||[]; var qmax=Math.max(1,(tq[0]&&tq[0].count)||1);
+    $('#topq').innerHTML=tq.length? tq.map(function(q){
+      return '<div class="q"><div class="qt"><span>'+esc(q.sample)+'</span><b>'+q.count+'</b></div><div class="bar"><i style="width:'+Math.round(q.count/qmax*100)+'%"></i></div></div>';
+    }).join('') : '<p class="muted">No questions yet.</p>';
+
+    var kw=d.topKeywords||[];
+    $('#kw').innerHTML=kw.length? kw.map(function(k){return '<span>'+esc(k.word)+' <b>'+k.count+'</b></span>';}).join('') : '<p class="muted">—</p>';
+
+    $('#recent').innerHTML=(d.recent||[]).map(function(r){
+      var t=new Date(r.at).toLocaleString();
+      return '<div class="r"><div class="t">'+esc(t)+'</div><div class="rq">'+esc(r.q)+'</div>'+(r.a?'<div class="ra">'+esc(r.a)+'</div>':'')+'</div>';
+    }).join('')||'<p class="muted">No messages yet.</p>';
+    $('#winnote').textContent=d.windowSize?('Trends & top lists based on the most recent '+d.windowSize+' questions.'):'';
+  }
+
+  function enter(token){
+    load(token).then(function(d){ sessionStorage.setItem(KEY,token); render(d); })
+      .catch(function(e){ $('#gerr').textContent=e.message||'Could not load.'; sessionStorage.removeItem(KEY); });
+  }
+
+  $('#go').onclick=function(){ var v=$('#pw').value.trim(); if(v) enter(v); };
+  $('#pw').addEventListener('keydown',function(e){ if(e.key==='Enter') $('#go').click(); });
+  $('#refresh').onclick=function(){ var t=sessionStorage.getItem(KEY); if(t) enter(t); };
+  $('#out').onclick=function(){ sessionStorage.removeItem(KEY); location.reload(); };
+
+  var saved=sessionStorage.getItem(KEY);
+  if(saved) enter(saved); else { show(gate,true); show(dash,false); }
+})();
+</script>
+</body>
+</html>

@@ -42,6 +42,7 @@
   var msgsEl=panel.querySelector('.bc-msgs'), chipsEl=panel.querySelector('.bc-chips'),
       form=panel.querySelector('.bc-form'), input=panel.querySelector('input');
   var history=[], greeted=false, busy=false;
+  var SID=(function(){try{var k='bbtSid',v=sessionStorage.getItem(k);if(!v){v=Date.now().toString(36)+Math.random().toString(36).slice(2,8);sessionStorage.setItem(k,v);}return v;}catch(e){return 'na';}})();
 
   function esc(s){return (s||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
   function add(role,text){var d=document.createElement('div');d.className='bc-msg '+(role==='user'?'me':'bot');d.innerHTML=esc(text);msgsEl.appendChild(d);msgsEl.scrollTop=msgsEl.scrollHeight;}
@@ -61,7 +62,7 @@
     add('user',text); history.push({role:'user',content:text});
     busy=true;
     var typing=document.createElement('div');typing.className='bc-typing';typing.textContent='Typing…';msgsEl.appendChild(typing);msgsEl.scrollTop=msgsEl.scrollHeight;
-    fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages:history.slice(-12)})})
+    fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages:history.slice(-12),sid:SID})})
       .then(function(r){return r.json();})
       .then(function(d){
         typing.remove();
