@@ -789,10 +789,6 @@ body{padding:0!important;background:var(--cream)!important;}
           </div>
         </div>
 
-        <div style="background:var(--cream);display:flex;align-items:center;justify-content:center;min-height:128px">
-          <a class="mo" href="menu.html" style="font-size:9px;color:var(--clay);text-decoration:none">View all &rarr;</a>
-        </div>
-
       </div>
 
       <a class="btn btn-line btn-fw" style="height:48px;font-size:10px;margin-top:32px;text-decoration:none" href="menu.html">View full menu</a>
@@ -880,22 +876,74 @@ function sw(id){
 </script>
 <script src="assets/actionbar.js" defer></script>
 
+<div id="dish-modal-home" aria-hidden="true">
+  <div class="dmh-back" data-dmh-close></div>
+  <div class="dmh-sheet">
+    <button class="dmh-x" data-dmh-close aria-label="Close">✕</button>
+    <img class="dmh-img" alt="">
+    <div class="dmh-body">
+      <div class="dmh-name"></div>
+      <div class="dmh-price"></div>
+      <div class="dmh-desc"></div>
+      <a class="btn btn-clay dmh-cta" style="height:44px;padding:0 24px;font-size:10px;text-decoration:none;color:var(--cream);margin-top:20px" href="menu.html">See full menu &amp; prices &rarr;</a>
+    </div>
+  </div>
+</div>
 <style id="bbt-extra">
 .m-dishes{text-align:center;}
 .m-dishes .eyebrow{justify-content:center;}
 .lk{cursor:pointer;transition:opacity .15s,transform .15s;}
 .lk:hover{opacity:.92;}
 .d-dish-strip-card.lk:hover,.d-dish-featured.lk:hover{transform:translateY(-2px);}
+.lk img{transition:transform .45s ease;}
+.lk:hover img{transform:scale(1.05);}
+#dish-modal-home{position:fixed;inset:0;z-index:1000;display:none;}
+#dish-modal-home.open{display:block;}
+#dish-modal-home .dmh-back{position:absolute;inset:0;background:rgba(15,10,5,.6);}
+#dish-modal-home .dmh-sheet{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,92vw);max-height:88vh;overflow-y:auto;background:var(--cream);border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.45);}
+#dish-modal-home .dmh-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--cream2);}
+#dish-modal-home .dmh-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(15,10,5,.55);color:#fff;border:none;font-size:15px;cursor:pointer;z-index:2;line-height:1;}
+#dish-modal-home .dmh-body{padding:22px 24px 26px;}
+#dish-modal-home .dmh-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:30px;color:var(--night);line-height:1;}
+#dish-modal-home .dmh-price{font-family:'Space Mono',monospace;font-size:13px;color:var(--clay);margin-top:10px;}
+#dish-modal-home .dmh-desc{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:15px;color:var(--bamboo);line-height:1.65;margin-top:14px;}
+@media(max-width:560px){
+  #dish-modal-home .dmh-sheet{left:0;right:0;bottom:0;top:auto;transform:none;width:100%;max-height:92vh;border-radius:18px 18px 0 0;animation:dmh-up .26s ease;}
+  @keyframes dmh-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+}
 </style>
 <script>
 (function(){
+  if(/editor|studio/i.test(location.pathname)) return;
   var MAP={'seafood bucket':'seafood-bucket','pad thai':'pad-thai','green papaya salad':'green-papaya-salad','fresh spring rolls':'fresh-spring-rolls','grilled beef salad':'grilled-beef-salad','red thai milk tea':'classic-thai-milk-tea'};
+  var DATA={
+    'seafood-bucket':{n:'Seafood Bucket',p:'For two · ₱2,290',d:'Steamed crabs, clams, mussels, squid & prawns with green chili dip — served with rice, built for two.'},
+    'pad-thai':{n:'Pad Thai',p:'Shrimp 540 · Beef 520 · Chicken 480 · Veggie 450',d:'Rice noodles, tamarind, peanuts, spring onion, cabbage and egg.'},
+    'green-papaya-salad':{n:'Green Papaya Salad',p:'₱290',d:'Shredded green papaya, carrot, string beans, tomato, peanuts, calamansi and chili.'},
+    'fresh-spring-rolls':{n:'Fresh Spring Rolls',p:'Shrimp 340 · Veggie 300',d:'Soft rice paper, rice noodles and fresh herbs with a creamy seafood dip.'},
+    'grilled-beef-salad':{n:'Grilled Beef Salad',p:'₱530',d:'Grilled beef, mint, lemongrass, red onion, cucumber, toasted rice powder and fish sauce.'},
+    'classic-thai-milk-tea':{n:'Classic Thai Milk Tea',p:'₱160',d:'Cha Tra Mue red tea with sweet condensed & evaporated milk, over ice.'}
+  };
+  var modal=document.getElementById('dish-modal-home'); if(!modal) return;
+  var mImg=modal.querySelector('.dmh-img'),mName=modal.querySelector('.dmh-name'),mPrice=modal.querySelector('.dmh-price'),mDesc=modal.querySelector('.dmh-desc'),mCta=modal.querySelector('.dmh-cta');
+  function open(slug){
+    var d=DATA[slug]; if(!d) return;
+    mName.textContent=d.n; mPrice.textContent=d.p||''; mDesc.textContent=d.d||'';
+    mImg.style.display=''; mImg.onerror=function(){mImg.style.display='none';};
+    mImg.src='assets/dishes/'+slug+'.jpg?v=3'; mImg.alt=d.n;
+    mCta.href='menu.html#d-'+slug;
+    modal.querySelector('.dmh-sheet').scrollTop=0;
+    modal.classList.add('open'); document.body.style.overflow='hidden';
+  }
+  function close(){ modal.classList.remove('open'); document.body.style.overflow=''; }
+  modal.addEventListener('click',function(e){ if(e.target.hasAttribute('data-dmh-close')) close(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
   function wire(card){
-    if(!card||card.__wired) return;
+    if(!card||card.__w) return;
     var n=card.querySelector('.bf,.bs'); if(!n) return;
     var slug=MAP[n.textContent.trim().toLowerCase()]; if(!slug) return;
-    card.__wired=1; card.classList.add('lk');
-    card.addEventListener('click',function(){location.href='menu.html#d-'+slug;});
+    card.__w=1; card.classList.add('lk');
+    card.addEventListener('click',function(){ open(slug); });
   }
   [].forEach.call(document.querySelectorAll('.d-dish-featured,.d-dish-strip-card,.m-feat'),wire);
   var g=document.querySelector('.m-dishgrid'); if(g)[].forEach.call(g.children,wire);
