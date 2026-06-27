@@ -789,6 +789,18 @@ body{padding:0!important;background:var(--cream)!important;}
           </div>
         </div>
 
+        <div style="background:var(--cream);padding:0 0 20px">
+          <div style="height:108px;position:relative;overflow:hidden">
+            <img src="assets/dishes/green-curry.jpg?v=3" alt="Green curry"
+                 style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block">
+          </div>
+          <div style="padding:14px 0 0">
+            <div class="mo" style="font-size:8px;color:rgba(84,88,61,.36);margin-bottom:6px">07</div>
+            <div class="bs" style="font-size:15px">Green Curry</div>
+            <div class="tag" style="margin-top:10px">Mild spicy</div>
+          </div>
+        </div>
+
       </div>
 
       <a class="btn btn-line btn-fw" style="height:48px;font-size:10px;margin-top:32px;text-decoration:none" href="menu.html">View full menu</a>
@@ -915,14 +927,15 @@ function sw(id){
 <script>
 (function(){
   if(/editor|studio/i.test(location.pathname)) return;
-  var MAP={'seafood bucket':'seafood-bucket','pad thai':'pad-thai','green papaya salad':'green-papaya-salad','fresh spring rolls':'fresh-spring-rolls','grilled beef salad':'grilled-beef-salad','red thai milk tea':'classic-thai-milk-tea'};
+  var MAP={'seafood bucket':'seafood-bucket','pad thai':'pad-thai','green papaya salad':'green-papaya-salad','fresh spring rolls':'fresh-spring-rolls','grilled beef salad':'grilled-beef-salad','red thai milk tea':'classic-thai-milk-tea','green curry':'green-curry'};
   var DATA={
     'seafood-bucket':{n:'Seafood Bucket',p:'For two · ₱2,290',d:'Steamed crabs, clams, mussels, squid & prawns with green chili dip — served with rice, built for two.'},
     'pad-thai':{n:'Pad Thai',p:'Shrimp 540 · Beef 520 · Chicken 480 · Veggie 450',d:'Rice noodles, tamarind, peanuts, spring onion, cabbage and egg.'},
     'green-papaya-salad':{n:'Green Papaya Salad',p:'₱290',d:'Shredded green papaya, carrot, string beans, tomato, peanuts, calamansi and chili.'},
     'fresh-spring-rolls':{n:'Fresh Spring Rolls',p:'Shrimp 340 · Veggie 300',d:'Soft rice paper, rice noodles and fresh herbs with a creamy seafood dip.'},
     'grilled-beef-salad':{n:'Grilled Beef Salad',p:'₱530',d:'Grilled beef, mint, lemongrass, red onion, cucumber, toasted rice powder and fish sauce.'},
-    'classic-thai-milk-tea':{n:'Classic Thai Milk Tea',p:'₱160',d:'Cha Tra Mue red tea with sweet condensed & evaporated milk, over ice.'}
+    'classic-thai-milk-tea':{n:'Classic Thai Milk Tea',p:'₱160',d:'Cha Tra Mue red tea with sweet condensed & evaporated milk, over ice.'},
+    'green-curry':{n:'Green Curry',p:'Shrimp 520 · Beef 490 · Chicken 440 · Veggie 340',d:'Coconut milk, green chili paste, eggplant, string beans, sweet basil and kaffir lime, with steamed rice.'}
   };
   var modal=document.getElementById('dish-modal-home'); if(!modal) return;
   var mImg=modal.querySelector('.dmh-img'),mName=modal.querySelector('.dmh-name'),mPrice=modal.querySelector('.dmh-price'),mDesc=modal.querySelector('.dmh-desc'),mCta=modal.querySelector('.dmh-cta');
