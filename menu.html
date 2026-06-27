@@ -72,6 +72,11 @@
   .catbar a{flex:0 0 auto;border:1px solid rgba(24,24,24,.16);border-radius:20px;padding:7px 14px;font-size:10px;letter-spacing:.06em;}
   .catbar a.active{background:var(--clay);color:var(--cream);border-color:var(--clay);}
 }
+/* currency switcher */
+.cur-switch{display:flex;justify-content:center;gap:6px;margin:0 0 8px;}
+.cur-switch button{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:7px 14px;border:1px solid rgba(24,24,24,.18);border-radius:20px;background:transparent;color:var(--bamboo);cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
+.cur-switch button.on{background:var(--clay);color:var(--cream);border-color:var(--clay);}
+.cur-approx{text-align:center;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.05em;color:rgba(84,88,61,.55);text-transform:uppercase;margin:0 0 26px;min-height:11px;}
 </style>
 </head>
 <body>
@@ -96,6 +101,13 @@
     <h1>The Menu</h1>
     <p>The dishes we grew up on — authentic Thai recipes, generous portions, cooked the way Mom taught us.</p>
   </div>
+
+  <div class="cur-switch" role="group" aria-label="Currency">
+    <button type="button" data-cur="PHP" class="on">₱ PHP</button>
+    <button type="button" data-cur="USD">$ USD</button>
+    <button type="button" data-cur="EUR">€ EUR</button>
+  </div>
+  <div class="cur-approx"></div>
 
   <div class="menu-layout">
   <nav class="catbar" id="catbar" aria-label="Menu categories">
@@ -320,6 +332,36 @@
   }
   window.addEventListener('scroll',atBottom,{passive:true});
   var t; window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(function(){build();atBottom();},200);});
+})();
+</script>
+<script>
+(function(){
+  var sw=document.querySelector('.cur-switch'); if(!sw) return;
+  var note=document.querySelector('.cur-approx');
+  var FALLBACK={USD:0.0175,EUR:0.016}, rates={PHP:1,USD:FALLBACK.USD,EUR:FALLBACK.EUR};
+  try{var c=JSON.parse(localStorage.getItem('bbtRates')||'null');
+    if(c&&Date.now()-c.t<43200000){rates.USD=c.USD;rates.EUR=c.EUR;}}catch(e){}
+  fetch('https://open.er-api.com/v6/latest/PHP').then(function(r){return r.json();}).then(function(d){
+    if(d&&d.rates&&d.rates.USD){rates.USD=d.rates.USD;rates.EUR=d.rates.EUR||FALLBACK.EUR;
+      try{localStorage.setItem('bbtRates',JSON.stringify({USD:rates.USD,EUR:rates.EUR,t:Date.now()}));}catch(e){}}
+  }).catch(function(){});
+  var els=[].slice.call(document.querySelectorAll('.m-price,.m-prices'));
+  els.forEach(function(el){el.setAttribute('data-php',el.textContent);});
+  var sym={PHP:'₱',USD:'$',EUR:'€'};
+  function convert(cur){
+    els.forEach(function(el){
+      var orig=el.getAttribute('data-php');
+      if(cur==='PHP'){el.textContent=orig;return;}
+      var rate=rates[cur];
+      el.textContent=orig.replace(/[\d,]+/g,function(m){
+        var n=parseInt(m.replace(/,/g,''),10); if(isNaN(n))return m;
+        return sym[cur]+Math.round(n*rate);
+      });
+    });
+    note.textContent = cur==='PHP' ? '' : '≈ approximate · converted from ₱';
+    [].forEach.call(sw.children,function(b){b.classList.toggle('on',b.getAttribute('data-cur')===cur);});
+  }
+  sw.addEventListener('click',function(e){var b=e.target.closest('button');if(b)convert(b.getAttribute('data-cur'));});
 })();
 </script>
 <script src="assets/actionbar.js" defer></script>
