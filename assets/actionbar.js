@@ -19,12 +19,12 @@
   + ".open-badge .od{width:8px;height:8px;border-radius:50%;display:inline-block}"
   + ".open-badge.is-open{color:#3c8a4e}.open-badge.is-open .od{background:#3c8a4e;box-shadow:0 0 0 3px rgba(60,138,78,.18)}"
   + ".open-badge.is-closed{color:#b04a2b}.open-badge.is-closed .od{background:#b04a2b}"
-  + "#bbt-lang{position:fixed;right:16px;bottom:18px;z-index:490}"
-  + "@media(max-width:760px){#bbt-lang{bottom:78px;right:12px}}"
+  + "#bbt-lang{position:fixed;left:16px;bottom:18px;z-index:490}"
+  + "@media(max-width:760px){#bbt-lang{bottom:80px;left:12px}}"
   + "#bbt-lang .lang-btn{width:42px;height:42px;border-radius:50%;background:var(--night,#181818);color:var(--cream,#FFF5E8);"
   +   "border:1px solid rgba(255,245,232,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.28);padding:0}"
   + "#bbt-lang .lang-btn svg{width:20px;height:20px}"
-  + "#bbt-lang .lang-menu{position:absolute;right:0;bottom:50px;background:var(--cream,#FFF5E8);border-radius:10px;"
+  + "#bbt-lang .lang-menu{position:absolute;left:0;bottom:50px;background:var(--cream,#FFF5E8);border-radius:10px;"
   +   "box-shadow:0 16px 40px rgba(0,0,0,.24);padding:6px;display:none;min-width:150px;max-height:60vh;overflow:auto}"
   + "#bbt-lang.open .lang-menu{display:block}"
   + "#bbt-lang .lang-menu button{display:block;width:100%;text-align:left;padding:9px 13px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.03em;color:var(--night,#181818);background:none;border:none;border-radius:6px;cursor:pointer}"
@@ -104,4 +104,7 @@
   var ati=document.createElement('link');ati.rel='apple-touch-icon';ati.href='/icon-192.png';document.head.appendChild(ati);
   [['apple-mobile-web-app-capable','yes'],['apple-mobile-web-app-status-bar-style','default'],['apple-mobile-web-app-title','Big Bad Thai'],['mobile-web-app-capable','yes']].forEach(function(m){var mt=document.createElement('meta');mt.name=m[0];mt.content=m[1];document.head.appendChild(mt);});
   if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}
+
+  /* ---------------- chat assistant ---------------- */
+  var bbtChat=document.createElement('script');bbtChat.src='assets/chat.js';bbtChat.defer=true;document.body.appendChild(bbtChat);
 })();

@@ -1,6 +1,6 @@
 /* Big Bad Thai service worker — conservative: HTML network-first (always fresh online),
    assets stale-while-revalidate, never touches /api or cross-origin. Bump V to invalidate. */
-const V = 'bbt-v1';
+const V = 'bbt-v2';
 const CORE = ['/', '/menu.html', '/about.html', '/gallery.html', '/visit.html', '/assets/site.css', '/icon-192.png'];
 
 self.addEventListener('install', e => {
