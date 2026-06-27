@@ -35,7 +35,8 @@ HOW TO ANSWER
 
 // Log a Q&A to Supabase if configured. Never throws — logging must not break the reply.
 async function logChat(sid, question, reply) {
-  const url = process.env.SUPABASE_URL, sk = process.env.SUPABASE_SERVICE_KEY;
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const sk = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !sk) return;
   try {
     await fetch(url.replace(/\/+$/, "") + "/rest/v1/chat_logs", {

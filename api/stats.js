@@ -8,7 +8,8 @@ module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
 
   const ADMIN = process.env.ADMIN_TOKEN;
-  const url = process.env.SUPABASE_URL, sk = process.env.SUPABASE_SERVICE_KEY;
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const sk = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
   const token = (req.headers && (req.headers["x-admin-token"] || req.headers["X-Admin-Token"])) || (req.query && req.query.token) || "";
 
   if (!ADMIN) { res.status(503).json({ error: "ADMIN_TOKEN not set" }); return; }
