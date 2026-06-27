@@ -27,8 +27,11 @@
   + "#bbt-lang .lang-menu{position:absolute;right:0;bottom:50px;background:var(--cream,#FFF5E8);border-radius:10px;"
   +   "box-shadow:0 16px 40px rgba(0,0,0,.24);padding:6px;display:none;min-width:150px;max-height:60vh;overflow:auto}"
   + "#bbt-lang.open .lang-menu{display:block}"
-  + "#bbt-lang .lang-menu a{display:block;padding:9px 13px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.03em;color:var(--night,#181818);text-decoration:none;border-radius:6px}"
-  + "#bbt-lang .lang-menu a:hover{background:rgba(189,94,38,.1);color:var(--clay,#BD5E26)}";
+  + "#bbt-lang .lang-menu button{display:block;width:100%;text-align:left;padding:9px 13px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.03em;color:var(--night,#181818);background:none;border:none;border-radius:6px;cursor:pointer}"
+  + "#bbt-lang .lang-menu button:hover{background:rgba(189,94,38,.1);color:var(--clay,#BD5E26)}"
+  + ".goog-te-banner-frame,.goog-te-balloon-frame,#goog-gt-tt,.goog-tooltip{display:none!important}"
+  + "#gt-host{position:absolute!important;left:-9999px!important;top:-9999px!important;width:1px;height:1px;overflow:hidden}"
+  + "body{top:0!important}";
   var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 
   /* ---------------- icons ---------------- */
@@ -50,23 +53,39 @@
   var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   if(isIOS){var d=document.getElementById('bbt-dir');if(d)d.href='https://maps.apple.com/?daddr=Big+Bad+Thai+Restaurant+El+Nido,+Hama+Street&dirflg=w';}
 
-  /* ---------------- language switcher (Google Translate proxy) ---------------- */
+  /* ---------------- language switcher (Google Translate widget, in-place) ---------------- */
   var LANGS=[['en','English'],['ko','한국어'],['zh-CN','中文'],['ja','日本語'],['de','Deutsch'],['fr','Français'],['es','Español'],['it','Italiano'],['ru','Русский']];
-  function transURL(tl){
-    if(tl==='en') return location.pathname+location.search;
-    var h=location.hostname;
-    if(location.protocol==='file:'||/^(localhost|127\.|0\.0\.0\.0|\[?::1)/.test(h))
-      return 'https://translate.google.com/translate?sl=en&tl='+tl+'&u='+encodeURIComponent(location.href);
-    var sub=h.replace(/-/g,'--').replace(/\./g,'-');
-    var sep=location.search?'&':'?';
-    return 'https://'+sub+'.translate.goog'+location.pathname+location.search+sep+'_x_tr_sl=en&_x_tr_tl='+tl+'&_x_tr_hl='+tl;
+  var GT_INCL='ko,zh-CN,ja,de,fr,es,it,ru', gtInjected=false;
+  function injectGT(){
+    if(gtInjected) return; gtInjected=true;
+    window.googleTranslateElementInit=function(){try{new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:GT_INCL,autoDisplay:false},'gt-host');}catch(e){}};
+    var h=document.createElement('div');h.id='gt-host';document.body.appendChild(h);
+    var s=document.createElement('script');s.src='https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';document.body.appendChild(s);
   }
+  function applyLang(code,n){
+    var c=document.querySelector('.goog-te-combo');
+    if(!c){ if((n||0)<40) setTimeout(function(){applyLang(code,(n||0)+1);},150); return; }
+    c.value=code; c.dispatchEvent(new Event('change'));
+  }
+  function setLang(code){
+    if(code==='en'){
+      try{localStorage.removeItem('bbtLang');}catch(e){}
+      document.cookie='googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+      document.cookie='googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.'+location.hostname;
+      location.reload(); return;
+    }
+    try{localStorage.setItem('bbtLang',code);}catch(e){}
+    injectGT(); applyLang(code);
+  }
+  try{var saved=localStorage.getItem('bbtLang'); if(saved&&saved!=='en'){injectGT();applyLang(saved);}}catch(e){}
+
   var globe='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
-  var lang=document.createElement('div');lang.id='bbt-lang';
-  lang.innerHTML='<div class="lang-menu">'+LANGS.map(function(l){return '<a href="'+transURL(l[0])+'">'+l[1]+'</a>';}).join('')+'</div>'
+  var lang=document.createElement('div');lang.id='bbt-lang';lang.className='notranslate';
+  lang.innerHTML='<div class="lang-menu">'+LANGS.map(function(l){return '<button type="button" data-l="'+l[0]+'">'+l[1]+'</button>';}).join('')+'</div>'
     +'<button class="lang-btn" type="button" aria-label="Language" aria-haspopup="true">'+globe+'</button>';
   document.body.appendChild(lang);
   lang.querySelector('.lang-btn').addEventListener('click',function(e){e.stopPropagation();lang.classList.toggle('open');});
+  [].forEach.call(lang.querySelectorAll('.lang-menu button'),function(b){b.addEventListener('click',function(){lang.classList.remove('open');setLang(b.getAttribute('data-l'));});});
   document.addEventListener('click',function(e){if(!lang.contains(e.target))lang.classList.remove('open');});
 
   /* ---------------- open-now badge (Asia/Manila, 11:00–23:00 daily) ---------------- */
