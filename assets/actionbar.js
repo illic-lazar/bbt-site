@@ -54,8 +54,8 @@
   if(isIOS){var d=document.getElementById('bbt-dir');if(d)d.href='https://maps.apple.com/?daddr=Big+Bad+Thai+Restaurant+El+Nido,+Hama+Street&dirflg=w';}
 
   /* ---------------- language switcher (Google Translate widget, in-place) ---------------- */
-  var LANGS=[['en','English'],['ko','한국어'],['zh-CN','中文'],['ja','日本語'],['de','Deutsch'],['fr','Français'],['es','Español'],['it','Italiano'],['ru','Русский']];
-  var GT_INCL='ko,zh-CN,ja,de,fr,es,it,ru', gtInjected=false;
+  var LANGS=[['en','English'],['th','ไทย'],['sr','Srpski'],['ko','한국어'],['zh-CN','中文'],['ja','日本語'],['de','Deutsch'],['fr','Français'],['es','Español'],['it','Italiano'],['ru','Русский']];
+  var GT_INCL='th,sr,ko,zh-CN,ja,de,fr,es,it,ru', gtInjected=false;
   function injectGT(){
     if(gtInjected) return; gtInjected=true;
     window.googleTranslateElementInit=function(){try{new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:GT_INCL,autoDisplay:false},'gt-host');}catch(e){}};
