@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") { res.status(405).json({ error: "method" }); return; }
 
-  const key = process.env.ANTHROPIC_API_KEY;
+  const key = process.env.ANTHROPIC_API_KEY || process.env.bbt_website; // bbt_website = the key the owner added under a non-standard name in Vercel
   if (!key) { res.status(200).json({ reply: "Our assistant isn't switched on yet — please message us on WhatsApp or Messenger and we'll reply fast!", error: "no-key" }); return; }
 
   try {
