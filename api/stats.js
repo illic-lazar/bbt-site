@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
   const token = (req.headers && (req.headers["x-admin-token"] || req.headers["X-Admin-Token"])) || (req.query && req.query.token) || "";
 
   if (!ADMIN) { res.status(503).json({ error: "ADMIN_TOKEN not set" }); return; }
-  if (!token || token !== ADMIN) { res.status(401).json({ error: "unauthorized" }); return; }
+  if (!token || String(token).trim() !== String(ADMIN).trim()) { res.status(401).json({ error: "unauthorized" }); return; }
   if (!url || !sk) { res.status(200).json({ configured: false }); return; }
 
   const base = url.replace(/\/+$/, "");
