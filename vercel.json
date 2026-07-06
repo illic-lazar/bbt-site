@@ -1,4 +1,7 @@
 {
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" }
+  ],
   "redirects": [
     { "source": "/menu", "destination": "/menu.html", "permanent": true },
     { "source": "/menus", "destination": "/menu.html", "permanent": true },
