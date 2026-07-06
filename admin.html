@@ -237,8 +237,9 @@
 
   function loadAll(){ loadFaq(); loadReach(); loadReviews(); }
   function enter(token){
-    loadStats().then(function(d){ TOKEN=token; sessionStorage.setItem(KEY,token); show(gate,false); show(dash,true); renderStats(d); if(d.configured!==false) loadAll(); })
-      .catch(function(e){ $('#gerr').textContent=e.message||'Could not load.'; sessionStorage.removeItem(KEY); });
+    TOKEN=token;
+    loadStats().then(function(d){ sessionStorage.setItem(KEY,token); show(gate,false); show(dash,true); renderStats(d); if(d.configured!==false) loadAll(); })
+      .catch(function(e){ TOKEN=''; $('#gerr').textContent=e.message||'Could not load.'; sessionStorage.removeItem(KEY); });
   }
   $('#go').onclick=function(){ var v=$('#pw').value.trim(); if(v) enter(v); };
   $('#pw').addEventListener('keydown',function(e){ if(e.key==='Enter') $('#go').click(); });
