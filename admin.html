@@ -4,20 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>BBT · Chat admin</title>
+<title>BBT · Admin</title>
 <style>
-  :root{--clay:#BD5E26;--gold:#E2993B;--night:#181818;--cream:#FFF5E8;--bamboo:#54583D}
+  :root{--clay:#BD5E26;--gold:#E2993B;--night:#181818;--cream:#FFF5E8}
   *{box-sizing:border-box}
   body{margin:0;background:var(--night);color:var(--cream);font-family:'Roboto Condensed',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   h1,h2{font-family:'Barlow Condensed','Arial Narrow',sans-serif;text-transform:uppercase;letter-spacing:.03em;margin:0}
   a{color:var(--gold)}
   .wrap{max-width:1000px;margin:0 auto;padding:24px 18px 60px}
-  header{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
   header h1{font-size:26px}
   header .sp{flex:1}
   button{font-family:inherit;cursor:pointer}
   .btn{background:var(--clay);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:13px}
   .ghost{background:transparent;border:1px solid rgba(255,245,232,.25);color:var(--cream);border-radius:8px;padding:8px 14px;font-size:12px}
+  .tabs{display:flex;gap:6px;margin-bottom:24px;border-bottom:1px solid rgba(255,245,232,.12)}
+  .tab{background:none;border:none;color:var(--cream);opacity:.55;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.04em;font-size:16px;font-weight:700;padding:8px 4px;margin-right:14px;border-bottom:2px solid transparent}
+  .tab.on{opacity:1;color:var(--gold);border-bottom-color:var(--gold)}
   #gate{max-width:360px;margin:14vh auto;text-align:center}
   #gate input{width:100%;margin:14px 0;padding:11px 14px;border-radius:8px;border:1px solid rgba(255,245,232,.25);background:#222;color:var(--cream);font-size:15px}
   #gate .err{color:#ff8a65;font-size:13px;min-height:18px}
@@ -55,6 +58,17 @@
   .faq .acts{display:flex;gap:6px;flex:0 0 auto}
   .mini{background:transparent;border:1px solid rgba(255,245,232,.22);color:var(--cream);border-radius:6px;padding:4px 9px;font-size:11px}
   .mini.del{border-color:rgba(255,120,90,.4);color:#ff8a65}
+  .rate{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
+  .rate .big{font-family:'Barlow Condensed',sans-serif;font-size:54px;line-height:1;color:var(--gold)}
+  .rate .st{font-size:20px;color:var(--gold);letter-spacing:2px}
+  .rate .ct{font-size:13px;opacity:.6}
+  .rev{background:#222018;border:1px solid rgba(255,245,232,.08);border-radius:12px;padding:14px;margin-bottom:12px}
+  .rev .h{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .rev .h img{width:34px;height:34px;border-radius:50%;background:#333}
+  .rev .h .nm{font-weight:700}
+  .rev .h .st{color:var(--gold);font-size:13px;letter-spacing:1px}
+  .rev .tx{font-size:14px;line-height:1.5;opacity:.9}
+  .rev .tm{font-size:11px;opacity:.5;margin-top:6px}
   .muted{opacity:.55;font-size:13px}
   .hide{display:none!important}
 </style>
@@ -63,7 +77,7 @@
 <div class="wrap">
 
   <div id="gate">
-    <h1>Chat admin</h1>
+    <h1>Big Bad Thai · Admin</h1>
     <p class="muted">Enter your admin password.</p>
     <input id="pw" type="password" placeholder="Admin password" autocomplete="off">
     <div class="err" id="gerr"></div>
@@ -72,36 +86,59 @@
 
   <div id="dash" class="hide">
     <header>
-      <h1>Big Bad Thai · Chat admin</h1>
+      <h1>Big Bad Thai · Admin</h1>
       <span class="sp"></span>
       <button class="ghost" id="refresh">Refresh</button>
       <button class="ghost" id="out">Log out</button>
     </header>
+    <div class="tabs">
+      <button class="tab on" data-t="chat">Chat</button>
+      <button class="tab" data-t="reach">Reach</button>
+      <button class="tab" data-t="rep">Reputation</button>
+    </div>
 
-    <div id="notcfg" class="hide"><p class="muted">Logging isn't connected yet — add the Supabase keys in Vercel and ask a question on the site, then refresh.</p></div>
+    <div id="notcfg" class="hide"><p class="muted">Logging isn't connected yet — add the Supabase keys in Vercel, then refresh.</p></div>
 
-    <div id="body" class="hide">
+    <!-- CHAT -->
+    <div id="tab-chat">
       <div class="cards">
         <div class="card"><div class="n" id="cTotal">–</div><div class="l">Questions total</div></div>
         <div class="card"><div class="n" id="cToday">–</div><div class="l">Today</div></div>
         <div class="card"><div class="n" id="cSess">–</div><div class="l">Conversations</div></div>
       </div>
-
       <section>
         <h2>Teach the bot</h2>
-        <p class="muted" style="margin:-4px 0 12px">Add a fact or answer the assistant should use in every reply — e.g. <i>“We don’t offer delivery or takeaway — dine-in only.”</i> or <i>“We have free street parking on Hama Street.”</i> Changes take effect within a minute.</p>
-        <div class="faq-add">
-          <textarea id="faqIn" rows="2" placeholder="Type a fact or Q&amp;A the bot should know…" maxlength="1000"></textarea>
-          <button class="btn" id="faqAdd">Add</button>
-        </div>
+        <p class="muted" style="margin:-4px 0 12px">Add a fact the assistant should use in every reply — e.g. <i>“We don’t offer delivery — dine-in only.”</i> Changes take effect within a minute.</p>
+        <div class="faq-add"><textarea id="faqIn" rows="2" placeholder="Type a fact or Q&amp;A the bot should know…" maxlength="1000"></textarea><button class="btn" id="faqAdd">Add</button></div>
         <div id="faqList"></div>
       </section>
-
       <section><h2>Bot couldn’t answer / handed off</h2><div id="unans"></div></section>
       <section><h2>Most-asked questions</h2><div id="topq"></div></section>
       <section><h2>Last 14 days</h2><div class="days" id="days"></div></section>
       <section><h2>Common keywords</h2><div class="kw" id="kw"></div></section>
       <section><h2>Recent questions</h2><div id="recent"></div><p class="muted" id="winnote"></p></section>
+    </div>
+
+    <!-- REACH -->
+    <div id="tab-reach" class="hide">
+      <div id="reachBody">
+        <div class="cards">
+          <div class="card"><div class="n" id="rViews">–</div><div class="l">Page views</div></div>
+          <div class="card"><div class="n" id="rVisits">–</div><div class="l">Visits</div></div>
+          <div class="card"><div class="n" id="rToday">–</div><div class="l">Views today</div></div>
+        </div>
+        <section><h2>Last 14 days</h2><div class="days" id="rDays"></div></section>
+        <section><h2>Top pages</h2><div id="rPages"></div></section>
+        <section><h2>Where visitors are from</h2><div class="kw" id="rCountries"></div></section>
+        <section><h2>How they found you</h2><div id="rRefs"></div></section>
+        <p class="muted" id="rNote"></p>
+      </div>
+    </div>
+
+    <!-- REPUTATION -->
+    <div id="tab-rep" class="hide">
+      <div id="repHead"></div>
+      <div id="repList"></div>
     </div>
   </div>
 
@@ -110,83 +147,99 @@
 (function(){
   var KEY='bbtAdmin', TOKEN='';
   var $=function(s){return document.querySelector(s);};
-  var gate=$('#gate'), dash=$('#dash'), body=$('#body'), notcfg=$('#notcfg');
-
+  var gate=$('#gate'), dash=$('#dash'), notcfg=$('#notcfg');
+  var RN; try{ RN=new Intl.DisplayNames(['en'],{type:'region'}); }catch(e){ RN=null; }
   function esc(s){return (s||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
   function show(el,on){el.classList[on?'remove':'add']('hide');}
+  function stars(n){ n=Math.round(n||0); var s=''; for(var i=0;i<5;i++) s+= i<n?'★':'☆'; return s; }
+  function flag(cc){ if(!cc||cc.length!==2) return '🏳️'; try{ return String.fromCodePoint.apply(null, cc.toUpperCase().split('').map(function(c){return 127397+c.charCodeAt(0);})); }catch(e){ return '🏳️'; } }
+  function cname(cc){ try{ return (RN&&RN.of(cc))||cc; }catch(e){ return cc; } }
+  function daysHtml(byDay){ var max=Math.max(1,Math.max.apply(null,(byDay||[]).map(function(x){return x.count;}))); return (byDay||[]).map(function(x){ var h=Math.round(x.count/max*100), dd=x.date.slice(8), mm=x.date.slice(5,7); return '<div class="d"><u>'+(x.count||'')+'</u><i style="height:'+h+'%"></i><em>'+dd+'/'+mm+'</em></div>'; }).join(''); }
+  function barList(items,labelFn){ if(!items||!items.length) return '<p class="muted">—</p>'; var mx=Math.max(1,items[0].c); return items.map(function(it){ return '<div class="q"><div class="qt"><span>'+esc(labelFn?labelFn(it.k):it.k)+'</span><b>'+it.c+'</b></div><div class="bar"><i style="width:'+Math.round(it.c/mx*100)+'%"></i></div></div>'; }).join(''); }
 
-  function load(token){
-    return fetch('/api/stats',{headers:{'x-admin-token':token}}).then(function(r){
+  // ---- CHAT ----
+  function loadStats(){
+    return fetch('/api/stats',{headers:{'x-admin-token':TOKEN}}).then(function(r){
       if(r.status===401) throw new Error('Wrong password.');
       if(r.status===503) throw new Error('Set an ADMIN_TOKEN in Vercel first.');
       return r.json();
     });
   }
-
-  function render(d){
-    show(gate,false); show(dash,true);
-    if(d.configured===false){ show(notcfg,true); show(body,false); return; }
-    show(notcfg,false); show(body,true);
+  function renderStats(d){
+    if(d.configured===false){ show(notcfg,true); return; }
+    show(notcfg,false);
     $('#cTotal').textContent=d.total!=null?d.total:'–';
     $('#cToday').textContent=d.today!=null?d.today:'–';
     $('#cSess').textContent=d.sessions!=null?d.sessions:'–';
-
-    $('#unans').innerHTML=(d.unanswered||[]).length ? (d.unanswered||[]).map(function(u){
-      var t=new Date(u.at).toLocaleString();
-      return '<div class="una"><div class="t">'+esc(t)+'</div><div class="q">'+esc(u.q)+'</div></div>';
-    }).join('') : '<p class="muted">None yet — the bot has answered everything on its own. 🎉 (Anything here is a question it passed to WhatsApp; add a fact above so it can handle it next time.)</p>';
-
+    $('#unans').innerHTML=(d.unanswered||[]).length ? (d.unanswered).map(function(u){ var t=new Date(u.at).toLocaleString(); return '<div class="una"><div class="t">'+esc(t)+'</div><div class="q">'+esc(u.q)+'</div></div>'; }).join('') : '<p class="muted">None yet — the bot has answered everything on its own. 🎉</p>';
     var tq=d.topQuestions||[]; var qmax=Math.max(1,(tq[0]&&tq[0].count)||1);
-    $('#topq').innerHTML=tq.length? tq.map(function(q){
-      return '<div class="q"><div class="qt"><span>'+esc(q.sample)+'</span><b>'+q.count+'</b></div><div class="bar"><i style="width:'+Math.round(q.count/qmax*100)+'%"></i></div></div>';
-    }).join('') : '<p class="muted">No questions yet.</p>';
-
-    var max=Math.max(1,Math.max.apply(null,(d.byDay||[]).map(function(x){return x.count;})));
-    $('#days').innerHTML=(d.byDay||[]).map(function(x){
-      var h=Math.round(x.count/max*100), dd=x.date.slice(8), mm=x.date.slice(5,7);
-      return '<div class="d"><u>'+(x.count||'')+'</u><i style="height:'+h+'%"></i><em>'+dd+'/'+mm+'</em></div>';
-    }).join('');
-
+    $('#topq').innerHTML=tq.length? tq.map(function(q){ return '<div class="q"><div class="qt"><span>'+esc(q.sample)+'</span><b>'+q.count+'</b></div><div class="bar"><i style="width:'+Math.round(q.count/qmax*100)+'%"></i></div></div>'; }).join('') : '<p class="muted">No questions yet.</p>';
+    $('#days').innerHTML=daysHtml(d.byDay);
     var kw=d.topKeywords||[];
     $('#kw').innerHTML=kw.length? kw.map(function(k){return '<span>'+esc(k.word)+' <b>'+k.count+'</b></span>';}).join('') : '<p class="muted">—</p>';
-
-    $('#recent').innerHTML=(d.recent||[]).map(function(r){
-      var t=new Date(r.at).toLocaleString();
-      return '<div class="r"><div class="t">'+esc(t)+'</div><div class="rq">'+esc(r.q)+'</div>'+(r.a?'<div class="ra">'+esc(r.a)+'</div>':'')+'</div>';
-    }).join('')||'<p class="muted">No messages yet.</p>';
+    $('#recent').innerHTML=(d.recent||[]).map(function(r){ var t=new Date(r.at).toLocaleString(); return '<div class="r"><div class="t">'+esc(t)+'</div><div class="rq">'+esc(r.q)+'</div>'+(r.a?'<div class="ra">'+esc(r.a)+'</div>':'')+'</div>'; }).join('')||'<p class="muted">No messages yet.</p>';
     $('#winnote').textContent=d.windowSize?('Trends & top lists based on the most recent '+d.windowSize+' questions.'):'';
   }
 
-  // ---- Teach the bot (bot_faq) ----
+  // ---- TEACH THE BOT ----
   function loadFaq(){
     fetch('/api/admin',{headers:{'x-admin-token':TOKEN}}).then(function(r){return r.json();}).then(function(d){
-      if(!d || d.configured===false){ $('#faqList').innerHTML='<p class="muted">Connect Supabase first.</p>'; return; }
-      if(!d.faq){ $('#faqList').innerHTML='<p class="muted">One-time setup: create the <b>bot_faq</b> table in Supabase (the SQL Claude gave you), then reload.</p>'; return; }
+      if(!d||d.configured===false){ $('#faqList').innerHTML='<p class="muted">Connect Supabase first.</p>'; return; }
+      if(!d.faq){ $('#faqList').innerHTML='<p class="muted">One-time setup: create the <b>bot_faq</b> table in Supabase, then reload.</p>'; return; }
       renderFaq(d.faq);
     }).catch(function(){ $('#faqList').innerHTML='<p class="muted">Couldn’t load facts.</p>'; });
   }
   function renderFaq(list){
-    $('#faqList').innerHTML = list.length ? list.map(function(f){
-      return '<div class="faq'+(f.active?'':' off')+'" data-id="'+f.id+'"><div class="c">'+esc(f.content)+'</div>'
-           + '<div class="acts"><button class="mini tg">'+(f.active?'Disable':'Enable')+'</button><button class="mini del">Delete</button></div></div>';
-    }).join('') : '<p class="muted">No facts yet. Add one above and the bot will start using it.</p>';
-    Array.prototype.forEach.call(document.querySelectorAll('#faqList .faq'),function(el){
-      var id=el.getAttribute('data-id');
-      el.querySelector('.tg').onclick=function(){ faqAction({action:'toggle',id:id,active:el.classList.contains('off')}); };
-      el.querySelector('.del').onclick=function(){ if(confirm('Delete this fact?')) faqAction({action:'delete',id:id}); };
-    });
+    $('#faqList').innerHTML = list.length ? list.map(function(f){ return '<div class="faq'+(f.active?'':' off')+'" data-id="'+f.id+'"><div class="c">'+esc(f.content)+'</div><div class="acts"><button class="mini tg">'+(f.active?'Disable':'Enable')+'</button><button class="mini del">Delete</button></div></div>'; }).join('') : '<p class="muted">No facts yet. Add one above.</p>';
+    Array.prototype.forEach.call(document.querySelectorAll('#faqList .faq'),function(el){ var id=el.getAttribute('data-id'); el.querySelector('.tg').onclick=function(){ faqAction({action:'toggle',id:id,active:el.classList.contains('off')}); }; el.querySelector('.del').onclick=function(){ if(confirm('Delete this fact?')) faqAction({action:'delete',id:id}); }; });
   }
-  function faqAction(b){
-    fetch('/api/admin',{method:'POST',headers:{'x-admin-token':TOKEN,'content-type':'application/json'},body:JSON.stringify(b)})
-      .then(function(){ loadFaq(); });
-  }
+  function faqAction(b){ fetch('/api/admin',{method:'POST',headers:{'x-admin-token':TOKEN,'content-type':'application/json'},body:JSON.stringify(b)}).then(function(){ loadFaq(); }); }
   $('#faqAdd').onclick=function(){ var v=$('#faqIn').value.trim(); if(!v) return; $('#faqIn').value=''; faqAction({action:'add',content:v}); };
 
-  function enter(token){
-    load(token).then(function(d){ TOKEN=token; sessionStorage.setItem(KEY,token); render(d); if(d.configured!==false) loadFaq(); })
-      .catch(function(e){ $('#gerr').textContent=e.message||'Could not load.'; sessionStorage.removeItem(KEY); });
+  // ---- REACH ----
+  function loadReach(){
+    fetch('/api/reach',{headers:{'x-admin-token':TOKEN}}).then(function(r){return r.json();}).then(function(d){
+      if(!d||d.configured===false){ $('#reachBody').innerHTML='<p class="muted">Connect Supabase first.</p>'; return; }
+      if(d.needsTable){ $('#reachBody').innerHTML='<p class="muted">One-time setup: create the <b>page_hits</b> table in Supabase, then visit the site once and refresh.</p>'; return; }
+      $('#rViews').textContent=d.total!=null?d.total:'–';
+      $('#rVisits').textContent=d.visits!=null?d.visits:'–';
+      $('#rToday').textContent=d.today!=null?d.today:'–';
+      $('#rDays').innerHTML=daysHtml(d.byDay);
+      $('#rPages').innerHTML=barList(d.topPages);
+      $('#rRefs').innerHTML=barList(d.topReferrers);
+      $('#rCountries').innerHTML=(d.topCountries||[]).length? (d.topCountries).map(function(c){return '<span>'+flag(c.k)+' '+esc(cname(c.k))+' <b>'+c.c+'</b></span>';}).join('') : '<p class="muted">No location data yet.</p>';
+      $('#rNote').textContent=d.windowSize?('Based on the most recent '+d.windowSize+' page views.'):'';
+    }).catch(function(){ $('#reachBody').innerHTML='<p class="muted">Couldn’t load traffic.</p>'; });
   }
 
+  // ---- REPUTATION ----
+  function loadReviews(){
+    fetch('/api/reviews').then(function(r){return r.json();}).then(function(d){
+      if(!d || d.error==='no-key' || (!d.rating && !(d.reviews&&d.reviews.length))){
+        $('#repHead').innerHTML=''; $('#repList').innerHTML='<p class="muted">Live Google reviews aren’t connected yet. Add a <b>GOOGLE_PLACES_KEY</b> in Vercel (a Google Maps Places API key) and this fills in automatically — overall rating, review count, and recent reviews.</p>';
+        return;
+      }
+      $('#repHead').innerHTML='<div class="rate"><div class="big">'+(d.rating||'–')+'</div><div><div class="st">'+stars(d.rating)+'</div><div class="ct">'+(d.total?d.total+' Google reviews':'')+(d.url?' · <a href="'+d.url+'" target="_blank" rel="noopener">Open on Google</a>':'')+'</div></div></div>';
+      $('#repList').innerHTML=(d.reviews||[]).length? (d.reviews).map(function(rv){
+        return '<div class="rev"><div class="h">'+(rv.photo?'<img src="'+esc(rv.photo)+'" alt="">':'')+'<div><div class="nm">'+esc(rv.author||'Google user')+'</div><div class="st">'+stars(rv.rating)+'</div></div></div><div class="tx">'+esc(rv.text||'')+'</div><div class="tm">'+esc(rv.relativeTime||'')+'</div></div>';
+      }).join('') : '<p class="muted">No recent reviews with text.</p>';
+    }).catch(function(){ $('#repList').innerHTML='<p class="muted">Couldn’t load reviews.</p>'; });
+  }
+
+  // ---- tabs ----
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(t){
+    t.onclick=function(){
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(x){x.classList.remove('on');});
+      t.classList.add('on');
+      show($('#tab-chat'), t.dataset.t==='chat'); show($('#tab-reach'), t.dataset.t==='reach'); show($('#tab-rep'), t.dataset.t==='rep');
+    };
+  });
+
+  function loadAll(){ loadFaq(); loadReach(); loadReviews(); }
+  function enter(token){
+    loadStats().then(function(d){ TOKEN=token; sessionStorage.setItem(KEY,token); show(gate,false); show(dash,true); renderStats(d); if(d.configured!==false) loadAll(); })
+      .catch(function(e){ $('#gerr').textContent=e.message||'Could not load.'; sessionStorage.removeItem(KEY); });
+  }
   $('#go').onclick=function(){ var v=$('#pw').value.trim(); if(v) enter(v); };
   $('#pw').addEventListener('keydown',function(e){ if(e.key==='Enter') $('#go').click(); });
   $('#refresh').onclick=function(){ if(TOKEN) enter(TOKEN); };
