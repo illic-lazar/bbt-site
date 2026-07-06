@@ -51,6 +51,25 @@ async function logChat(sid, question, reply) {
   } catch (e) { /* swallow */ }
 }
 
+// Owner-added facts (bot_faq table), cached in-memory ~60s across warm invocations.
+let _faq = { at: 0, text: "" };
+async function getFaq() {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const sk = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !sk) return "";
+  if (Date.now() - _faq.at < 60000) return _faq.text;
+  try {
+    const r = await fetch(url.replace(/\/+$/, "") + "/rest/v1/bot_faq?select=content&active=eq.true&order=created_at.asc", { headers: { apikey: sk, authorization: "Bearer " + sk } });
+    if (r.ok) {
+      const rows = await r.json();
+      _faq = { at: Date.now(), text: (Array.isArray(rows) && rows.length)
+        ? "\n\nOWNER-ADDED FACTS — authoritative; use and trust these, and let them override anything above if they conflict:\n" + rows.map(function (x) { return "- " + String(x.content || "").trim(); }).join("\n")
+        : "" };
+    }
+  } catch (e) { /* keep last cache */ }
+  return _faq.text;
+}
+
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") { res.status(405).json({ error: "method" }); return; }
@@ -71,13 +90,17 @@ module.exports = async (req, res) => {
       .map(m => ({ role: m.role, content: m.content.slice(0, 1500) }));
     if (!msgs.length || msgs[msgs.length - 1].role !== "user") { res.status(400).json({ error: "bad-input" }); return; }
 
+    const faq = await getFaq();
+    const systemBlocks = [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }];
+    if (faq) systemBlocks.push({ type: "text", text: faq });
+
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 500,
-        system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
+        system: systemBlocks,
         messages: msgs,
       }),
     });

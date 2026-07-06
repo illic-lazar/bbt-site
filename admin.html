@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>BBT · Chat insights</title>
+<title>BBT · Chat admin</title>
 <style>
   :root{--clay:#BD5E26;--gold:#E2993B;--night:#181818;--cream:#FFF5E8;--bamboo:#54583D}
   *{box-sizing:border-box}
@@ -18,38 +18,43 @@
   button{font-family:inherit;cursor:pointer}
   .btn{background:var(--clay);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:13px}
   .ghost{background:transparent;border:1px solid rgba(255,245,232,.25);color:var(--cream);border-radius:8px;padding:8px 14px;font-size:12px}
-  /* gate */
   #gate{max-width:360px;margin:14vh auto;text-align:center}
   #gate input{width:100%;margin:14px 0;padding:11px 14px;border-radius:8px;border:1px solid rgba(255,245,232,.25);background:#222;color:var(--cream);font-size:15px}
   #gate .err{color:#ff8a65;font-size:13px;min-height:18px}
-  /* cards */
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:26px}
   .card{background:#222018;border:1px solid rgba(255,245,232,.08);border-radius:12px;padding:16px}
   .card .n{font-family:'Barlow Condensed',sans-serif;font-size:38px;line-height:1;color:var(--gold)}
   .card .l{font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.6;margin-top:6px}
   section{margin-bottom:30px}
   section h2{font-size:18px;color:var(--gold);margin-bottom:12px;border-bottom:1px solid rgba(255,245,232,.1);padding-bottom:8px}
-  /* top questions */
   .q{margin-bottom:9px}
   .q .qt{display:flex;justify-content:space-between;gap:10px;font-size:14px;margin-bottom:3px}
   .q .qt b{color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:700}
   .bar{height:6px;background:rgba(255,245,232,.1);border-radius:4px;overflow:hidden}
   .bar i{display:block;height:100%;background:var(--clay)}
-  /* keywords */
   .kw{display:flex;flex-wrap:wrap;gap:8px}
   .kw span{background:#2a2820;border:1px solid rgba(255,245,232,.1);border-radius:14px;padding:5px 11px;font-size:13px}
   .kw span b{color:var(--gold)}
-  /* day chart */
   .days{display:flex;align-items:flex-end;gap:5px;height:120px}
   .days .d{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
   .days .d i{width:100%;background:var(--clay);border-radius:3px 3px 0 0;min-height:2px}
   .days .d em{font-size:9px;opacity:.5;font-style:normal}
   .days .d u{font-size:10px;opacity:.7;text-decoration:none}
-  /* recent */
   .r{border-left:2px solid var(--clay);padding:4px 0 10px 12px;margin-bottom:12px}
   .r .t{font-size:11px;opacity:.5;margin-bottom:3px}
   .r .rq{font-size:14px;color:var(--cream)}
   .r .ra{font-size:13px;opacity:.7;margin-top:3px}
+  .una{border-left:2px solid var(--gold);padding:3px 0 8px 12px;margin-bottom:9px}
+  .una .t{font-size:11px;opacity:.5}
+  .una .q{font-size:14px;color:var(--cream)}
+  .faq-add{display:flex;gap:8px;margin-bottom:14px;align-items:flex-start}
+  .faq-add textarea{flex:1;background:#222;border:1px solid rgba(255,245,232,.2);color:var(--cream);border-radius:8px;padding:10px 12px;font-family:'Roboto Condensed',sans-serif;font-size:14px;line-height:1.4;resize:vertical;min-height:46px}
+  .faq{display:flex;align-items:flex-start;gap:10px;background:#222018;border:1px solid rgba(255,245,232,.08);border-radius:10px;padding:11px 13px;margin-bottom:8px}
+  .faq .c{flex:1;font-size:14px;line-height:1.45}
+  .faq.off .c{opacity:.4;text-decoration:line-through}
+  .faq .acts{display:flex;gap:6px;flex:0 0 auto}
+  .mini{background:transparent;border:1px solid rgba(255,245,232,.22);color:var(--cream);border-radius:6px;padding:4px 9px;font-size:11px}
+  .mini.del{border-color:rgba(255,120,90,.4);color:#ff8a65}
   .muted{opacity:.55;font-size:13px}
   .hide{display:none!important}
 </style>
@@ -58,16 +63,16 @@
 <div class="wrap">
 
   <div id="gate">
-    <h1>Chat insights</h1>
+    <h1>Chat admin</h1>
     <p class="muted">Enter your admin password.</p>
     <input id="pw" type="password" placeholder="Admin password" autocomplete="off">
     <div class="err" id="gerr"></div>
-    <button class="btn" id="go" style="width:100%">View dashboard</button>
+    <button class="btn" id="go" style="width:100%">Open</button>
   </div>
 
   <div id="dash" class="hide">
     <header>
-      <h1>Chat insights</h1>
+      <h1>Big Bad Thai · Chat admin</h1>
       <span class="sp"></span>
       <button class="ghost" id="refresh">Refresh</button>
       <button class="ghost" id="out">Log out</button>
@@ -82,8 +87,19 @@
         <div class="card"><div class="n" id="cSess">–</div><div class="l">Conversations</div></div>
       </div>
 
-      <section><h2>Last 14 days</h2><div class="days" id="days"></div></section>
+      <section>
+        <h2>Teach the bot</h2>
+        <p class="muted" style="margin:-4px 0 12px">Add a fact or answer the assistant should use in every reply — e.g. <i>“We don’t offer delivery or takeaway — dine-in only.”</i> or <i>“We have free street parking on Hama Street.”</i> Changes take effect within a minute.</p>
+        <div class="faq-add">
+          <textarea id="faqIn" rows="2" placeholder="Type a fact or Q&amp;A the bot should know…" maxlength="1000"></textarea>
+          <button class="btn" id="faqAdd">Add</button>
+        </div>
+        <div id="faqList"></div>
+      </section>
+
+      <section><h2>Bot couldn’t answer / handed off</h2><div id="unans"></div></section>
       <section><h2>Most-asked questions</h2><div id="topq"></div></section>
+      <section><h2>Last 14 days</h2><div class="days" id="days"></div></section>
       <section><h2>Common keywords</h2><div class="kw" id="kw"></div></section>
       <section><h2>Recent questions</h2><div id="recent"></div><p class="muted" id="winnote"></p></section>
     </div>
@@ -92,7 +108,7 @@
 </div>
 <script>
 (function(){
-  var KEY='bbtAdmin';
+  var KEY='bbtAdmin', TOKEN='';
   var $=function(s){return document.querySelector(s);};
   var gate=$('#gate'), dash=$('#dash'), body=$('#body'), notcfg=$('#notcfg');
 
@@ -115,17 +131,21 @@
     $('#cToday').textContent=d.today!=null?d.today:'–';
     $('#cSess').textContent=d.sessions!=null?d.sessions:'–';
 
-    var max=Math.max(1,Math.max.apply(null,(d.byDay||[]).map(function(x){return x.count;})));
-    $('#days').innerHTML=(d.byDay||[]).map(function(x){
-      var h=Math.round(x.count/max*100);
-      var dd=x.date.slice(8),mm=x.date.slice(5,7);
-      return '<div class="d"><u>'+(x.count||'')+'</u><i style="height:'+h+'%"></i><em>'+dd+'/'+mm+'</em></div>';
-    }).join('');
+    $('#unans').innerHTML=(d.unanswered||[]).length ? (d.unanswered||[]).map(function(u){
+      var t=new Date(u.at).toLocaleString();
+      return '<div class="una"><div class="t">'+esc(t)+'</div><div class="q">'+esc(u.q)+'</div></div>';
+    }).join('') : '<p class="muted">None yet — the bot has answered everything on its own. 🎉 (Anything here is a question it passed to WhatsApp; add a fact above so it can handle it next time.)</p>';
 
     var tq=d.topQuestions||[]; var qmax=Math.max(1,(tq[0]&&tq[0].count)||1);
     $('#topq').innerHTML=tq.length? tq.map(function(q){
       return '<div class="q"><div class="qt"><span>'+esc(q.sample)+'</span><b>'+q.count+'</b></div><div class="bar"><i style="width:'+Math.round(q.count/qmax*100)+'%"></i></div></div>';
     }).join('') : '<p class="muted">No questions yet.</p>';
+
+    var max=Math.max(1,Math.max.apply(null,(d.byDay||[]).map(function(x){return x.count;})));
+    $('#days').innerHTML=(d.byDay||[]).map(function(x){
+      var h=Math.round(x.count/max*100), dd=x.date.slice(8), mm=x.date.slice(5,7);
+      return '<div class="d"><u>'+(x.count||'')+'</u><i style="height:'+h+'%"></i><em>'+dd+'/'+mm+'</em></div>';
+    }).join('');
 
     var kw=d.topKeywords||[];
     $('#kw').innerHTML=kw.length? kw.map(function(k){return '<span>'+esc(k.word)+' <b>'+k.count+'</b></span>';}).join('') : '<p class="muted">—</p>';
@@ -137,14 +157,39 @@
     $('#winnote').textContent=d.windowSize?('Trends & top lists based on the most recent '+d.windowSize+' questions.'):'';
   }
 
+  // ---- Teach the bot (bot_faq) ----
+  function loadFaq(){
+    fetch('/api/admin',{headers:{'x-admin-token':TOKEN}}).then(function(r){return r.json();}).then(function(d){
+      if(!d || d.configured===false){ $('#faqList').innerHTML='<p class="muted">Connect Supabase first.</p>'; return; }
+      if(!d.faq){ $('#faqList').innerHTML='<p class="muted">One-time setup: create the <b>bot_faq</b> table in Supabase (the SQL Claude gave you), then reload.</p>'; return; }
+      renderFaq(d.faq);
+    }).catch(function(){ $('#faqList').innerHTML='<p class="muted">Couldn’t load facts.</p>'; });
+  }
+  function renderFaq(list){
+    $('#faqList').innerHTML = list.length ? list.map(function(f){
+      return '<div class="faq'+(f.active?'':' off')+'" data-id="'+f.id+'"><div class="c">'+esc(f.content)+'</div>'
+           + '<div class="acts"><button class="mini tg">'+(f.active?'Disable':'Enable')+'</button><button class="mini del">Delete</button></div></div>';
+    }).join('') : '<p class="muted">No facts yet. Add one above and the bot will start using it.</p>';
+    Array.prototype.forEach.call(document.querySelectorAll('#faqList .faq'),function(el){
+      var id=el.getAttribute('data-id');
+      el.querySelector('.tg').onclick=function(){ faqAction({action:'toggle',id:id,active:el.classList.contains('off')}); };
+      el.querySelector('.del').onclick=function(){ if(confirm('Delete this fact?')) faqAction({action:'delete',id:id}); };
+    });
+  }
+  function faqAction(b){
+    fetch('/api/admin',{method:'POST',headers:{'x-admin-token':TOKEN,'content-type':'application/json'},body:JSON.stringify(b)})
+      .then(function(){ loadFaq(); });
+  }
+  $('#faqAdd').onclick=function(){ var v=$('#faqIn').value.trim(); if(!v) return; $('#faqIn').value=''; faqAction({action:'add',content:v}); };
+
   function enter(token){
-    load(token).then(function(d){ sessionStorage.setItem(KEY,token); render(d); })
+    load(token).then(function(d){ TOKEN=token; sessionStorage.setItem(KEY,token); render(d); if(d.configured!==false) loadFaq(); })
       .catch(function(e){ $('#gerr').textContent=e.message||'Could not load.'; sessionStorage.removeItem(KEY); });
   }
 
   $('#go').onclick=function(){ var v=$('#pw').value.trim(); if(v) enter(v); };
   $('#pw').addEventListener('keydown',function(e){ if(e.key==='Enter') $('#go').click(); });
-  $('#refresh').onclick=function(){ var t=sessionStorage.getItem(KEY); if(t) enter(t); };
+  $('#refresh').onclick=function(){ if(TOKEN) enter(TOKEN); };
   $('#out').onclick=function(){ sessionStorage.removeItem(KEY); location.reload(); };
 
   var saved=sessionStorage.getItem(KEY);

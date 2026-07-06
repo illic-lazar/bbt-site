@@ -36,10 +36,11 @@ module.exports = async (req, res) => {
     const dayKey = d => { const x = new Date(d); return x.getFullYear() + "-" + String(x.getMonth() + 1).padStart(2, "0") + "-" + String(x.getDate()).padStart(2, "0"); };
     const todayKey = dayKey(now);
 
-    const sessions = new Set(), qCount = {}, kCount = {}, byDayMap = {};
+    const sessions = new Set(), qCount = {}, kCount = {}, byDayMap = {}, unanswered = [];
     let today = 0;
     list.forEach(r => {
       if (r.session_id) sessions.add(r.session_id);
+      if (/\[\[\s*whatsapp\s*\]\]/i.test(r.reply || "")) unanswered.push({ at: r.created_at, q: r.question });
       const dk = dayKey(r.created_at); byDayMap[dk] = (byDayMap[dk] || 0) + 1;
       if (dk === todayKey) today++;
       const q = (r.question || "").trim();
@@ -68,6 +69,7 @@ module.exports = async (req, res) => {
       today,
       windowSize: list.length,
       topQuestions, topKeywords, byDay, recent,
+      unanswered: unanswered.slice(0, 40),
     });
   } catch (e) {
     res.status(200).json({ error: String((e && e.message) || e) });
