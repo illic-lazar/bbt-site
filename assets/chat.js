@@ -5,10 +5,14 @@
   var WA='639452994225';
   var BOOKMSG='Hi Big Bad Thai! I would like to reserve a table.\n\nName:\nDate:\nTime:\nNumber of guests:\n\n(Sent from your website)';
   var BOOK_URL='https://wa.me/'+WA+'?text='+encodeURIComponent(BOOKMSG);
+  var DIR_URL=/iPad|iPhone|iPod/.test(navigator.userAgent||'')
+    ? 'https://maps.apple.com/?daddr='+encodeURIComponent('Big Bad Thai Restaurant El Nido, Hama Street')+'&dirflg=w'
+    : 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent('Big Bad Thai Restaurant, Hama Street, El Nido, Palawan')+'&destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&travelmode=walking';
   var ACT={
-    book:{label:'📅 Book a table on WhatsApp',href:BOOK_URL},
-    whatsapp:{label:'💬 Chat with us on WhatsApp',href:'https://wa.me/'+WA},
-    messenger:{label:'💬 Message us on Messenger',href:'https://m.me/bigbadthai'}
+    book:{label:'📅 Book a table on WhatsApp',href:BOOK_URL,cls:'wa'},
+    whatsapp:{label:'💬 Chat with us on WhatsApp',href:'https://wa.me/'+WA,cls:'wa'},
+    messenger:{label:'💬 Message us on Messenger',href:'https://m.me/bigbadthai',cls:'wa'},
+    directions:{label:'📍 Get directions',href:DIR_URL,cls:'map'}
   };
 
   var css = ""
@@ -38,6 +42,7 @@
   + ".bc-actions{align-self:flex-start;display:flex;flex-wrap:wrap;gap:6px;margin:1px 0 2px}"
   + ".bc-act{display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;text-decoration:none;font-family:-apple-system,system-ui,sans-serif;font-size:13px;font-weight:700;padding:9px 14px;border-radius:20px;line-height:1.2}"
   + ".bc-act:hover{filter:brightness(.96)}"
+  + ".bc-act.map{background:var(--clay,#BD5E26)}"
   + ".bc-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px}"
   + ".bc-chips button,.bc-chips a{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;background:transparent;border:1px solid rgba(189,94,38,.4);color:var(--clay,#BD5E26);border-radius:16px;padding:6px 11px;cursor:pointer;text-decoration:none}"
   + ".bc-chips button:hover,.bc-chips a:hover{background:rgba(189,94,38,.08)}"
@@ -113,12 +118,12 @@
   }
   function botMsg(text){
     var acts=[], seen={};
-    var clean=(text||'').replace(/\[\[\s*(book|whatsapp|messenger)\s*\]\]/gi,function(m,k){k=k.toLowerCase();if(!seen[k]&&ACT[k]){seen[k]=1;acts.push(k);}return '';});
+    var clean=(text||'').replace(/\[\[\s*(book|whatsapp|messenger|directions)\s*\]\]/gi,function(m,k){k=k.toLowerCase();if(!seen[k]&&ACT[k]){seen[k]=1;acts.push(k);}return '';});
     clean=clean.replace(/\n{3,}/g,'\n\n').trim();
     var d=document.createElement('div');d.className='bc-msg bot';d.innerHTML=md(clean);msgsEl.appendChild(d);
     if(acts.length){
       var wrap=document.createElement('div');wrap.className='bc-actions';
-      acts.forEach(function(k){var a=document.createElement('a');a.className='bc-act';a.href=ACT[k].href;a.target='_blank';a.rel='noopener';a.textContent=ACT[k].label;wrap.appendChild(a);});
+      acts.forEach(function(k){var a=document.createElement('a');a.className='bc-act '+(ACT[k].cls||'');a.href=ACT[k].href;a.target='_blank';a.rel='noopener';a.textContent=ACT[k].label;wrap.appendChild(a);});
       msgsEl.appendChild(wrap);
     }
     msgsEl.scrollTop=msgsEl.scrollHeight;
