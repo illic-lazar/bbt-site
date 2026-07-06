@@ -2,6 +2,15 @@
 (function(){
   if(/editor|studio/i.test(location.pathname)) return;
 
+  var WA='639452994225';
+  var BOOKMSG='Hi Big Bad Thai! I would like to reserve a table.\n\nName:\nDate:\nTime:\nNumber of guests:\n\n(Sent from your website)';
+  var BOOK_URL='https://wa.me/'+WA+'?text='+encodeURIComponent(BOOKMSG);
+  var ACT={
+    book:{label:'📅 Book a table on WhatsApp',href:BOOK_URL},
+    whatsapp:{label:'💬 Chat with us on WhatsApp',href:'https://wa.me/'+WA},
+    messenger:{label:'💬 Message us on Messenger',href:'https://m.me/bigbadthai'}
+  };
+
   var css = ""
   + "#bbt-chat-btn{position:fixed;right:18px;bottom:18px;z-index:520;width:56px;height:56px;border-radius:50%;background:var(--clay,#BD5E26);color:var(--cream,#FFF5E8);border:none;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center}"
   + "#bbt-chat-btn svg{width:26px;height:26px}"
@@ -13,7 +22,7 @@
   + ".bc-head{background:var(--night,#181818);color:var(--cream,#FFF5E8);padding:12px 14px;display:flex;align-items:center;gap:8px}"
   + ".bc-head .t{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:15px;letter-spacing:.03em}"
   + ".bc-head .sub{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.05em;text-transform:uppercase;opacity:.55;margin-top:2px}"
-  + ".bc-head .ic{margin:0;background:none;border:none;color:var(--cream,#FFF5E8);cursor:pointer;opacity:.75;font-size:15px;line-height:1;padding:4px}"
+  + ".bc-head .ic{background:none;border:none;color:var(--cream,#FFF5E8);cursor:pointer;opacity:.75;font-size:15px;line-height:1;padding:4px}"
   + ".bc-head .ic:hover{opacity:1}"
   + ".bc-head .rs{margin-left:auto;font-size:16px}"
   + ".bc-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px}"
@@ -26,9 +35,13 @@
   + ".bc-msg.bot li{margin:3px 0}"
   + ".bc-msg.bot strong{font-weight:700;color:#181818}"
   + ".bc-msg.bot a{color:var(--clay,#BD5E26);text-decoration:underline;font-weight:600}"
+  + ".bc-actions{align-self:flex-start;display:flex;flex-wrap:wrap;gap:6px;margin:1px 0 2px}"
+  + ".bc-act{display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;text-decoration:none;font-family:-apple-system,system-ui,sans-serif;font-size:13px;font-weight:700;padding:9px 14px;border-radius:20px;line-height:1.2}"
+  + ".bc-act:hover{filter:brightness(.96)}"
   + ".bc-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px}"
-  + ".bc-chips button{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;background:transparent;border:1px solid rgba(189,94,38,.4);color:var(--clay,#BD5E26);border-radius:16px;padding:6px 11px;cursor:pointer}"
-  + ".bc-chips button:hover{background:rgba(189,94,38,.08)}"
+  + ".bc-chips button,.bc-chips a{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;background:transparent;border:1px solid rgba(189,94,38,.4);color:var(--clay,#BD5E26);border-radius:16px;padding:6px 11px;cursor:pointer;text-decoration:none}"
+  + ".bc-chips button:hover,.bc-chips a:hover{background:rgba(189,94,38,.08)}"
+  + ".bc-chips a.primary{background:var(--clay,#BD5E26);color:#fff;border-color:var(--clay,#BD5E26)}"
   + ".bc-form{display:flex;gap:8px;padding:10px;border-top:1px solid rgba(24,24,24,.08);background:#fff}"
   + ".bc-form input{flex:1;border:1px solid rgba(24,24,24,.16);border-radius:20px;padding:10px 14px;font-family:-apple-system,system-ui,sans-serif;font-size:14.5px;outline:none}"
   + ".bc-form input:focus{border-color:var(--clay,#BD5E26)}"
@@ -46,7 +59,7 @@
 
   var panel=document.createElement('div');panel.id='bbt-chat';
   panel.innerHTML=
-     '<div class="bc-head"><div><div class="t">Ask Big Bad Thai</div><div class="sub">Menu · hours · how to find us</div></div>'
+     '<div class="bc-head"><div><div class="t">Ask Big Bad Thai</div><div class="sub">Menu · hours · book a table</div></div>'
    + '<button class="ic rs" title="New chat" aria-label="New chat">&#8635;</button>'
    + '<button class="ic x" title="Close" aria-label="Close">&#10005;</button></div>'
    + '<div class="bc-msgs"></div>'
@@ -62,11 +75,10 @@
   function esc(s){return (s||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
 
   // --- tiny, safe markdown → HTML (input is escaped first) ---
-  function linkify(esc_text){
-    // one pass over escaped text so we never re-scan inserted tags
+  function linkify(t){
     var RE=/((?:https?:\/\/|www\.)[^\s<]+)|((?:wa\.me|m\.me)\/[^\s<]+)|([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})|(\+63[\d ]{9,14}\d)/g;
-    return esc_text.replace(RE,function(m,url,waurl,email,phone){
-      function split(u){var t='',mm=u.match(/[.,!?:;)*\]]+$/);if(mm){t=mm[0];u=u.slice(0,-t.length);}return [u,t];}
+    return t.replace(RE,function(m,url,waurl,email,phone){
+      function split(u){var tr='',mm=u.match(/[.,!?:;)*\]]+$/);if(mm){tr=mm[0];u=u.slice(0,-tr.length);}return [u,tr];}
       if(url){var a=split(url),h=a[0].indexOf('http')===0?a[0]:'https://'+a[0];return '<a href="'+h+'" target="_blank" rel="noopener">'+a[0]+'</a>'+a[1];}
       if(waurl){var b=split(waurl);return '<a href="https://'+b[0]+'" target="_blank" rel="noopener">'+b[0]+'</a>'+b[1];}
       if(email){return '<a href="mailto:'+email+'">'+email+'</a>';}
@@ -95,21 +107,42 @@
     return out||('<p>'+inline(text)+'</p>');
   }
 
-  function bubble(role,text){
-    var d=document.createElement('div');
-    d.className='bc-msg '+(role==='user'?'me':'bot');
-    d.innerHTML = role==='user' ? esc(text) : md(text);
+  function userMsg(text){
+    var d=document.createElement('div');d.className='bc-msg me';d.innerHTML=esc(text);
     msgsEl.appendChild(d); msgsEl.scrollTop=msgsEl.scrollHeight;
+  }
+  function botMsg(text){
+    var acts=[], seen={};
+    var clean=(text||'').replace(/\[\[\s*(book|whatsapp|messenger)\s*\]\]/gi,function(m,k){k=k.toLowerCase();if(!seen[k]&&ACT[k]){seen[k]=1;acts.push(k);}return '';});
+    clean=clean.replace(/\n{3,}/g,'\n\n').trim();
+    var d=document.createElement('div');d.className='bc-msg bot';d.innerHTML=md(clean);msgsEl.appendChild(d);
+    if(acts.length){
+      var wrap=document.createElement('div');wrap.className='bc-actions';
+      acts.forEach(function(k){var a=document.createElement('a');a.className='bc-act';a.href=ACT[k].href;a.target='_blank';a.rel='noopener';a.textContent=ACT[k].label;wrap.appendChild(a);});
+      msgsEl.appendChild(wrap);
+    }
+    msgsEl.scrollTop=msgsEl.scrollHeight;
   }
   function save(){ try{ sessionStorage.setItem(STORE,JSON.stringify(history.slice(-24))); }catch(e){} }
 
-  var CHIPS=[['Open now?','Are you open right now?'],['Vegetarian options','What vegetarian dishes do you have?'],['How to find you','Where are you and how do I get there?'],['Reserve a table','How can I reserve a table?']];
-  function showChips(){chipsEl.innerHTML='';CHIPS.forEach(function(c){var b=document.createElement('button');b.type='button';b.textContent=c[0];b.onclick=function(){send(c[1]);};chipsEl.appendChild(b);});}
+  var CHIPS=[
+    {label:'📅 Book a table',href:BOOK_URL,primary:true},
+    {label:'Open now?',q:'Are you open right now?'},
+    {label:'Vegetarian options',q:'What vegetarian dishes do you have?'},
+    {label:'How to find you',q:'Where are you and how do I get there?'}
+  ];
+  function showChips(){
+    chipsEl.innerHTML='';
+    CHIPS.forEach(function(c){
+      if(c.href){ var a=document.createElement('a');a.href=c.href;a.target='_blank';a.rel='noopener';a.textContent=c.label;if(c.primary)a.className='primary';chipsEl.appendChild(a); }
+      else { var b=document.createElement('button');b.type='button';b.textContent=c.label;b.onclick=function(){send(c.q);};chipsEl.appendChild(b); }
+    });
+  }
   function greet(){
     if(greeted)return; greeted=true;
     var saved=[]; try{ saved=JSON.parse(sessionStorage.getItem(STORE)||'[]'); }catch(e){}
-    if(saved && saved.length){ history=saved; saved.forEach(function(m){ bubble(m.role,m.content); }); }
-    else { bubble('bot','Hi! 👋 I’m the Big Bad Thai assistant. Ask me about our menu, hours, how to find us — or anything else.'); showChips(); }
+    if(saved && saved.length){ history=saved; saved.forEach(function(m){ m.role==='user'?userMsg(m.content):botMsg(m.content); }); }
+    else { botMsg('Hi! 👋 I’m the Big Bad Thai assistant. Ask me about our menu, hours, how to find us, or book a table.'); showChips(); }
   }
   function open(){panel.classList.add('open');greet();setTimeout(function(){input.focus();},60);}
   function close(){panel.classList.remove('open');}
@@ -123,7 +156,7 @@
     if(busy||!text||!text.trim())return;
     text=text.trim().slice(0,500);
     chipsEl.innerHTML='';
-    bubble('user',text); history.push({role:'user',content:text}); save();
+    userMsg(text); history.push({role:'user',content:text}); save();
     busy=true; sendBtn.disabled=true;
     var typing=document.createElement('div');typing.className='bc-typing';typing.innerHTML='<i></i><i></i><i></i>';msgsEl.appendChild(typing);msgsEl.scrollTop=msgsEl.scrollHeight;
     fetch('/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages:history.slice(-12),sid:SID})})
@@ -131,9 +164,9 @@
       .then(function(d){
         typing.remove();
         var reply=(d&&d.reply)||'Sorry — please message us on WhatsApp.';
-        bubble('bot',reply); history.push({role:'assistant',content:reply}); save(); busy=false; sendBtn.disabled=false; input.focus();
+        botMsg(reply); history.push({role:'assistant',content:reply}); save(); busy=false; sendBtn.disabled=false; input.focus();
       })
-      .catch(function(){ typing.remove(); bubble('bot','Sorry, I couldn’t connect. Please message us on WhatsApp or Messenger.'); busy=false; sendBtn.disabled=false; });
+      .catch(function(){ typing.remove(); botMsg('Sorry, I couldn’t connect. Please message us on WhatsApp or Messenger. [[whatsapp]]'); busy=false; sendBtn.disabled=false; });
   }
   form.addEventListener('submit',function(e){e.preventDefault();var t=input.value;input.value='';send(t);});
 })();
