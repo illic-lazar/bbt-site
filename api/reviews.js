@@ -4,7 +4,7 @@ const PLACE_ID = "ChIJj-thjxVVtjMRdmsUeV7mG_E";
 
 module.exports = async (req, res) => {
   // Cache at the edge: ~1 call/hour to Google regardless of traffic.
-  res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+  res.setHeader("Cache-Control", "public, s-maxage=21600, stale-while-revalidate=86400");
   const key = process.env.GOOGLE_PLACES_KEY;
   if (!key) { res.status(200).json({ reviews: [], error: "no-key" }); return; }
   try {
