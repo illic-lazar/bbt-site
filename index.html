@@ -1015,5 +1015,5 @@ function sw(id){
   }).catch(function(){});
 })();
 </script>
-</body>
+<script>addEventListener("load",function(){[].forEach.call(document.querySelectorAll("video"),function(v){if(v.offsetParent===null)return;if(v.getBoundingClientRect().top>innerHeight)return;var p=v.play();if(p&&p.catch)p.catch(function(){});});});</script></body>
 </html>
