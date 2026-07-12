@@ -44,6 +44,7 @@ a{color:inherit;text-decoration:none;}
 .nav-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--bamboo);transition:color .15s;}
 .nav-links a:hover,.nav-links a.active{color:var(--clay);}
 .nav-links a.nav-home{display:none;}
+.nav-links a.nav-reserve{display:none;}
 .nav-cta{font-family:'Space Mono',monospace;font-size:10px;height:38px;padding:0 22px;}
 .nav-cta-m{display:none;}
 .nav-ham{display:none;flex-direction:column;gap:4.5px;cursor:pointer;background:none;border:none;}
@@ -58,6 +59,7 @@ a{color:inherit;text-decoration:none;}
   .nav-links a{padding:16px 24px;width:100%;border-top:1px solid rgba(24,24,24,.06);font-size:12px;}
   .nav-links a:first-child{border-top:none;}
   .nav-links a.nav-home{display:block;}
+  .nav-links a.nav-reserve{display:block;color:var(--clay);}
   .nav-ham{display:flex;order:-1;}
   .nav-cta-d{display:none;}
   .nav-cta-m{display:inline-flex;order:1;height:32px;padding:0 14px;font-size:9px;}

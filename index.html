@@ -232,7 +232,7 @@ body {
         <a class="mo" style="font-size:10px;color:var(--bamboo);text-decoration:none" href="gallery.html">Gallery</a>
         <a class="mo" style="font-size:10px;color:var(--bamboo);text-decoration:none" href="visit.html">Find Us</a>
       </div>
-      <a class="btn btn-clay" style="height:38px;padding:0 22px;font-size:10px;text-decoration:none;cursor:pointer" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve</a>
+      <a class="btn btn-clay" data-cta="reserve" style="height:38px;padding:0 22px;font-size:10px;text-decoration:none;cursor:pointer" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve a Table</a>
     </nav>
 
     <!-- ── 1. HERO — hero-video.mp4 (BBT RESTAURANT reel), autoplay/muted/loop ─── -->
@@ -248,8 +248,8 @@ body {
         <h1 class="bf" style="font-size:106px;color:var(--cream);line-height:.84;max-width:800px">Cooked the way<br><span class="mae">Mom</span> taught us.</h1>
         <p class="rl" style="font-size:17px;color:rgba(255,245,232,.9);font-weight:400;margin-top:24px;max-width:480px;text-shadow:0 1px 14px rgba(0,0,0,.45)">Authentic Thai recipes carried from our family's kitchen to El Nido, generous portions and never watered down.</p>
         <div style="display:flex;gap:14px;margin-top:40px">
-          <a class="btn btn-clay" style="height:48px;padding:0 34px;font-size:10px;text-decoration:none;cursor:pointer" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve a Table</a>
-          <a class="btn btn-ghost" style="height:48px;padding:0 34px;font-size:10px;text-decoration:none;cursor:pointer" href="menu.html">View Menu</a>
+          <a class="btn btn-clay" data-cta="reserve" style="height:48px;padding:0 34px;font-size:10px;text-decoration:none;cursor:pointer" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve a Table</a>
+          <a class="btn btn-ghost" data-cta="menu" style="height:48px;padding:0 34px;font-size:10px;text-decoration:none;cursor:pointer" href="menu.html">View Menu</a>
         </div>
       </div>
       <div class="d-hero-scroll">
@@ -475,7 +475,10 @@ body {
             <div class="v-icon"><i class="ti ti-phone" style="font-size:18px;color:var(--night)" aria-hidden="true"></i></div>
             <div class="bs" style="font-size:19px;margin-top:6px">Reservations</div>
             <div class="rl" style="font-size:15px;color:var(--bamboo);line-height:1.85;margin-bottom:4px">+63 945 299 4225</div>
-            <a class="btn btn-clay" style="height:46px;padding:0 26px;font-size:10px;width:fit-content;margin-top:4px;text-decoration:none;cursor:pointer" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Message to Book</a>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+              <a class="btn btn-clay" data-cta="reserve" style="height:46px;padding:0 26px;font-size:10px;text-decoration:none;cursor:pointer" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve a Table</a>
+              <a class="btn btn-line" data-cta="directions" style="height:46px;padding:0 26px;font-size:10px;text-decoration:none;cursor:pointer" href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Bad+Thai+Restaurant+El+Nido&amp;destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&amp;travelmode=walking" target="_blank" rel="noopener">Get Directions</a>
+            </div>
           </div>
         </div>
         <!-- Exterior photo -->
@@ -522,7 +525,7 @@ body {
       <a href="about.html">About</a>
       <a href="gallery.html">Gallery</a>
       <a href="visit.html">Find Us</a>
-      <a class="reserve" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve a Table</a>
+      <a class="reserve" data-cta="reserve" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve a Table</a>
     </div>
 
     <!-- M: HERO — hero-video.mp4 (BBT RESTAURANT reel), autoplay/muted/loop -->
@@ -538,8 +541,8 @@ body {
         <h1 class="bf" style="font-size:48px;color:var(--cream);line-height:.84;max-width:290px">Cooked the way<br><span class="mae">Mom</span> taught us.</h1>
         <p class="rl" style="font-size:13px;color:rgba(255,245,232,.9);font-weight:400;margin-top:14px;max-width:240px;text-shadow:0 1px 12px rgba(0,0,0,.45)">Authentic Thai recipes, carried from our family's kitchen to El Nido.</p>
         <div style="display:flex;gap:10px;margin-top:26px">
-          <a class="btn btn-clay" style="height:42px;padding:0 22px;font-size:9px;text-decoration:none" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve</a>
-          <a class="btn btn-ghost" style="height:42px;padding:0 18px;font-size:9px;text-decoration:none" href="menu.html">Menu</a>
+          <a class="btn btn-clay" data-cta="reserve" style="height:42px;padding:0 22px;font-size:9px;text-decoration:none" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve a Table</a>
+          <a class="btn btn-ghost" data-cta="menu" style="height:42px;padding:0 18px;font-size:9px;text-decoration:none" href="menu.html">Menu</a>
         </div>
       </div>
     </div>
@@ -761,7 +764,8 @@ body {
         style="width:100%;height:150px;border:0;border-radius:3px;margin-bottom:32px;display:block"
         src="https://www.google.com/maps?q=Big%20Bad%20Thai%20Restaurant%20El%20Nido%20Hama%20Street&output=embed"></iframe>
 
-      <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" class="btn btn-clay btn-fw" style="height:50px;font-size:10px;text-decoration:none">Message to Book</a>
+      <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" data-cta="reserve" class="btn btn-clay btn-fw" style="height:50px;font-size:10px;text-decoration:none">Reserve a Table</a>
+      <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Bad+Thai+Restaurant+El+Nido&amp;destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&amp;travelmode=walking" target="_blank" rel="noopener" data-cta="directions" class="btn btn-line btn-fw" style="height:50px;font-size:10px;margin-top:10px;text-decoration:none">Get Directions</a>
     </div>
 
     <!-- M: FOOTER -->
