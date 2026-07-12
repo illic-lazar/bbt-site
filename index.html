@@ -11,6 +11,7 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="TKC03572.jpg">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.bigbadthai.com/">
 <link rel="icon" type="image/png" href="favicon.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,68 +42,11 @@
 /* ══ RESET ═══════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ══ SHELL ═══════════════════════════════════════════════ */
 body {
-  background: #E8E5DE;
+  background: var(--cream);
   font-family: 'Roboto Condensed', sans-serif;
   -webkit-font-smoothing: antialiased;
-  padding: 28px 28px 88px;
 }
-.shell-header {
-  display: flex; align-items: baseline; justify-content: space-between;
-  margin-bottom: 20px;
-}
-.shell-title { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:#999; }
-.shell-meta  { font-family:'Space Mono',monospace; font-size:10px; color:#bbb; letter-spacing:.05em; }
-
-/* ══ TABS ════════════════════════════════════════════════ */
-.tabs {
-  display: flex; border: 1px solid rgba(0,0,0,.13);
-  border-radius: 6px; overflow: hidden; width: fit-content;
-  margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,.07);
-}
-.tab {
-  padding: 9px 28px; font-family: 'Space Mono', monospace; font-size: 10px;
-  letter-spacing: .09em; text-transform: uppercase;
-  cursor: pointer; border: none; background: #EDEAE3; color: #999;
-  transition: background .12s, color .12s;
-}
-.tab.active { background: var(--night); color: var(--cream); }
-.view { display: none; }
-.view.active { display: block; }
-
-/* ══ BROWSER FRAME ═══════════════════════════════════════ */
-.browser-frame {
-  border: 1px solid rgba(0,0,0,.18); border-radius: 12px; overflow: hidden;
-  box-shadow: 0 20px 64px rgba(0,0,0,.22), 0 3px 10px rgba(0,0,0,.1);
-}
-.browser-chrome {
-  background: #1C1C1C; padding: 11px 16px;
-  display: flex; align-items: center; gap: 12px;
-}
-.chrome-dots { display: flex; gap: 6px; }
-.chrome-dot  { width:10px; height:10px; border-radius:50%; }
-.chrome-dot:nth-child(1){background:#FF5F57}
-.chrome-dot:nth-child(2){background:#FEBC2E}
-.chrome-dot:nth-child(3){background:#28C840}
-.chrome-url {
-  flex:1; background:#2A2A2A; border-radius:5px; padding:5px 14px;
-  font-family:'Space Mono',monospace; font-size:11px; color:#616161;
-  display:flex; align-items:center; gap:7px;
-}
-
-/* ══ PHONE FRAME ═════════════════════════════════════════ */
-.phone-outer { max-width:390px; margin:0 auto; }
-.phone-frame {
-  border:3px solid var(--night); border-radius:48px; overflow:hidden;
-  box-shadow: 0 20px 64px rgba(0,0,0,.28), 0 4px 12px rgba(0,0,0,.14);
-}
-.phone-status {
-  background:var(--cream); padding:14px 28px 8px;
-  display:flex; justify-content:space-between; align-items:center;
-}
-.phone-time  { font-family:'Space Mono',monospace; font-size:13px; color:var(--night); }
-.phone-icons { display:flex; gap:5px; align-items:center; color:var(--night); }
 
 /* ══ IMAGE UTILITIES ═════════════════════════════════════ */
 .cover {
@@ -264,12 +208,7 @@ body {
 
 </style>
 <style id="deploy-overrides">
-/* turn the review mockup into the live site */
-.shell-header,.tabs{display:none!important;}
-.browser-frame,.phone-frame{border:none!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important;}
-.browser-chrome,.phone-status{display:none!important;}
-.phone-outer{max-width:none!important;margin:0!important;}
-body{padding:0!important;background:var(--cream)!important;}
+/* responsive: desktop layout on wide screens, mobile layout on narrow */
 #view-d{display:block!important;}
 #view-m{display:none!important;}
 @media(max-width:860px){
@@ -281,26 +220,7 @@ body{padding:0!important;background:var(--cream)!important;}
 <link rel="preload" as="image" href="TKC01055.jpg" fetchpriority="high"></head>
 <body>
 
-<div class="shell-header">
-  <span class="shell-title">Big Bad Thai — Design Lock v4 · Photos</span>
-  <span class="shell-meta">All images relative to this file · June 2025</span>
-</div>
-
-<div class="tabs">
-  <button class="tab active" onclick="sw('d')">Desktop</button>
-  <button class="tab" onclick="sw('m')">Mobile</button>
-</div>
-
-
-<!-- ════════════════════════════════════════════════════════
-     DESKTOP
-════════════════════════════════════════════════════════ -->
 <div id="view-d" class="view active">
-<div class="browser-frame">
-  <div class="browser-chrome">
-    <div class="chrome-dots"><div class="chrome-dot"></div><div class="chrome-dot"></div><div class="chrome-dot"></div></div>
-    <div class="chrome-url"><i class="ti ti-lock" aria-hidden="true"></i>bigbadthai.com</div>
-  </div>
   <div class="site">
 
     <!-- NAV -->
@@ -585,24 +505,9 @@ body{padding:0!important;background:var(--cream)!important;}
 
   </div>
 </div>
-</div>
 
 
-<!-- ════════════════════════════════════════════════════════
-     MOBILE
-════════════════════════════════════════════════════════ -->
 <div id="view-m" class="view">
-<div class="phone-outer">
-<div class="phone-frame">
-
-  <div class="phone-status">
-    <span class="phone-time">9:41</span>
-    <div class="phone-icons">
-      <i class="ti ti-wifi" style="font-size:13px" aria-hidden="true"></i>
-      <i class="ti ti-battery" style="font-size:13px" aria-hidden="true"></i>
-    </div>
-  </div>
-
   <div class="site">
 
     <!-- M: NAV -->
@@ -874,20 +779,8 @@ body{padding:0!important;background:var(--cream)!important;}
 
   </div>
 </div>
-</div>
-</div>
 
 
-<script>
-function sw(id){
-  document.querySelectorAll('.tab').forEach(function(t,i){
-    t.classList.toggle('active',['d','m'][i]===id);
-  });
-  document.querySelectorAll('.view').forEach(function(v){
-    v.classList.toggle('active',v.id==='view-'+id);
-  });
-}
-</script>
 <script src="assets/actionbar.js" defer></script>
 
 <div id="dish-modal-home" aria-hidden="true">
