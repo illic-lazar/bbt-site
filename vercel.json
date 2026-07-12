@@ -26,5 +26,10 @@
     { "source": "/location", "destination": "/visit.html", "permanent": true },
     { "source": "/visit", "destination": "/visit.html", "permanent": true },
     { "source": "/home", "destination": "/", "permanent": true }
+  ],
+  "headers": [
+    { "source": "/(.*)\\.(avif|webp|jpg|jpeg|png|gif|svg|ico|mp4|woff2|woff|otf|ttf)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
+    { "source": "/(.*)\\.(css|js)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }] },
+    { "source": "/(.*)\\.html", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] }
   ]
 }
