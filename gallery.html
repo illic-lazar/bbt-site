@@ -20,9 +20,16 @@
 .grid picture{display:block;}
 .grid img{width:100%;height:auto;display:block;transition:transform .4s ease,opacity .3s;}
 .grid figure:hover img{transform:scale(1.04);}
-#lb{position:fixed;inset:0;background:rgba(15,10,5,.94);z-index:1000;display:none;align-items:center;justify-content:center;cursor:zoom-out;}
-#lb img{max-width:92vw;max-height:90vh;border-radius:4px;box-shadow:0 30px 80px rgba(0,0,0,.5);}
-#lb .x{position:absolute;top:20px;right:26px;color:var(--cream);font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.1em;cursor:pointer;}
+#lb{position:fixed;inset:0;background:rgba(15,10,5,.94);z-index:1000;display:none;align-items:center;justify-content:center;}
+#lb.open{display:flex;}
+#lb img{max-width:88vw;max-height:88vh;border-radius:4px;box-shadow:0 30px 80px rgba(0,0,0,.5);}
+#lb button{position:absolute;background:rgba(255,245,232,.14);color:var(--cream);border:none;cursor:pointer;font-family:'Space Mono',monospace;display:flex;align-items:center;justify-content:center;}
+#lb .lb-close{top:16px;right:18px;font-size:14px;letter-spacing:.1em;border-radius:8px;min-width:44px;min-height:44px;}
+#lb .lb-prev,#lb .lb-next{top:50%;transform:translateY(-50%);font-size:30px;width:52px;height:52px;border-radius:50%;line-height:1;}
+#lb .lb-prev{left:12px;}
+#lb .lb-next{right:12px;}
+#lb button:hover{background:rgba(255,245,232,.24);}
+.grid img{cursor:zoom-in;}
 </style>
 </head>
 <body>
@@ -67,7 +74,12 @@
   </div>
 </main>
 
-<div id="lb" onclick="this.style.display='none'"><span class="x">Close ✕</span><img src="" alt=""></div>
+<div id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" aria-hidden="true">
+  <button class="lb-close" type="button" aria-label="Close photo viewer">✕</button>
+  <button class="lb-prev" type="button" aria-label="Previous photo">‹</button>
+  <img id="lb-img" src="" alt="">
+  <button class="lb-next" type="button" aria-label="Next photo">›</button>
+</div>
 
 <section style="background:var(--night);text-align:center;padding:clamp(48px,8vw,96px) 22px">
   <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:22px">Big Bad Thai · El Nido</div>
@@ -90,11 +102,34 @@
 </footer>
 
 <script>
-var lb=document.getElementById('lb'),lbimg=lb.querySelector('img');
-document.getElementById('grid').addEventListener('click',function(e){
-  var img=e.target.closest('img'); if(!img)return;
-  lbimg.src=img.getAttribute('data-full')||img.src; lbimg.alt=img.alt; lb.style.display='flex';
-});
+(function(){
+  var lb=document.getElementById('lb'), lbimg=document.getElementById('lb-img');
+  var closeBtn=lb.querySelector('.lb-close'), prevBtn=lb.querySelector('.lb-prev'), nextBtn=lb.querySelector('.lb-next');
+  var imgs=[].slice.call(document.querySelectorAll('#grid img'));
+  imgs.forEach(function(im){im.tabIndex=0;});                        // thumbnails keyboard-focusable
+  var idx=-1, opener=null;
+  function show(i){ idx=(i+imgs.length)%imgs.length; var im=imgs[idx];
+    lbimg.src=im.getAttribute('data-full')||im.currentSrc||im.src; lbimg.alt=im.alt||''; }
+  function open(i){ opener=imgs[i]; show(i); lb.classList.add('open'); lb.setAttribute('aria-hidden','false');
+    document.documentElement.style.overflow='hidden'; closeBtn.focus(); }
+  function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true');
+    document.documentElement.style.overflow=''; if(opener&&opener.focus) opener.focus(); }
+  var grid=document.getElementById('grid');
+  grid.addEventListener('click',function(e){var im=e.target.closest('img');if(im)open(imgs.indexOf(im));});
+  grid.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var im=e.target.closest('img');if(im){e.preventDefault();open(imgs.indexOf(im));}}});
+  closeBtn.addEventListener('click',close);
+  prevBtn.addEventListener('click',function(){show(idx-1);});
+  nextBtn.addEventListener('click',function(){show(idx+1);});
+  lb.addEventListener('click',function(e){if(e.target===lb)close();});   // click backdrop to close
+  document.addEventListener('keydown',function(e){
+    if(!lb.classList.contains('open'))return;
+    if(e.key==='Escape'){close();}
+    else if(e.key==='ArrowLeft'){show(idx-1);prevBtn.focus();}
+    else if(e.key==='ArrowRight'){show(idx+1);nextBtn.focus();}
+    else if(e.key==='Tab'){var f=[prevBtn,nextBtn,closeBtn],i=f.indexOf(document.activeElement);e.preventDefault();
+      f[e.shiftKey?(i<=0?f.length-1:i-1):(i>=f.length-1?0:i+1)].focus();}
+  });
+})();
 </script>
 <script src="assets/actionbar.js" defer></script>
 </body>

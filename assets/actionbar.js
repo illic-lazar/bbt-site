@@ -3,6 +3,17 @@
   /* ---------------- styles ---------------- */
   var css = "#bbt-bar{display:none}"
   + "#bbt-bar.bbt-hidden{display:none!important}"
+  /* skip link: off-screen until focused */
+  + ".bbt-skip{position:fixed;top:8px;left:8px;z-index:2000;background:var(--clay,#BD5E26);color:var(--cream,#FFF5E8);font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.04em;padding:12px 18px;border-radius:8px;text-decoration:none;transform:translateY(-170%);transition:transform .18s}"
+  + ".bbt-skip:focus{transform:translateY(0)}"
+  /* visible brand focus ring for every interactive element (keyboard only) */
+  + "a:focus-visible,button:focus-visible,[tabindex]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--clay,#BD5E26);outline-offset:2px;border-radius:2px}"
+  /* respect reduced-motion: neutralise transitions, animations and smooth scroll */
+  + "@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}"
+  /* a11y contrast: lift faint muted text (inline low-opacity bamboo) to AA on light backgrounds */
+  + "[style*=\"rgba(84,88,61,.36)\"],[style*=\"rgba(84,88,61,.38)\"],[style*=\"rgba(84,88,61,.42)\"],[style*=\"rgba(84,88,61,.5)\"]{color:#54583d!important}"
+  /* a11y contrast: lift faint cream text (footer links, copyright) on dark backgrounds */
+  + "[style*=\"rgba(255,245,232,.14)\"],[style*=\"rgba(255,245,232,.16)\"],[style*=\"rgba(255,245,232,.26)\"],[style*=\"rgba(255,245,232,.28)\"]{color:rgba(255,245,232,.62)!important}"
   + "@media(max-width:760px){"
   + "#bbt-bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:500;background:var(--night,#181818);"
   +   "border-top:1px solid rgba(255,245,232,.1);padding:8px 6px calc(8px + env(safe-area-inset-bottom));gap:6px;box-shadow:0 -8px 24px rgba(0,0,0,.25)}"
@@ -18,7 +29,7 @@
   + "}"
   + ".open-badge{display:inline-flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase}"
   + ".open-badge .od{width:8px;height:8px;border-radius:50%;display:inline-block}"
-  + ".open-badge.is-open{color:#3c8a4e}.open-badge.is-open .od{background:#3c8a4e;box-shadow:0 0 0 3px rgba(60,138,78,.18)}"
+  + ".open-badge.is-open{color:#2e6b3d}.open-badge.is-open .od{background:#3c8a4e;box-shadow:0 0 0 3px rgba(60,138,78,.18)}"
   + ".open-badge.is-closed{color:#b04a2b}.open-badge.is-closed .od{background:#b04a2b}"
   + "#bbt-lang{position:fixed;left:16px;bottom:18px;z-index:490}"
   + "@media(max-width:760px){#bbt-lang{bottom:calc(80px + env(safe-area-inset-bottom));left:12px}}"
@@ -53,12 +64,55 @@
   // iOS → Apple Maps walking directions (applies to every directions link on the page)
   var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   if(isIOS){[].forEach.call(document.querySelectorAll('[data-cta="directions"]'),function(d){d.href='https://maps.apple.com/?daddr=Big+Bad+Thai+Restaurant+El+Nido,+Hama+Street&dirflg=w';});}
-  // hide the sticky bar while a mobile nav drawer is open
+  // ---- mobile nav drawer: hide sticky bar when open + full keyboard/screen-reader a11y ----
   var drawer=document.getElementById('mMenu')||document.getElementById('navlinks');
+  var hamb=document.querySelector('.nav-ham')||document.querySelector('.ham');
   if(drawer){
-    var syncBar=function(){bar.classList.toggle('bbt-hidden',drawer.classList.contains('open'));};
-    try{new MutationObserver(syncBar).observe(drawer,{attributes:true,attributeFilter:['class']});}catch(e){}
-    syncBar();
+    if(hamb){hamb.setAttribute('aria-controls',drawer.id);hamb.setAttribute('aria-expanded','false');}
+    var dFoc=function(){return [].slice.call(drawer.querySelectorAll('a[href],button,[tabindex]:not([tabindex="-1"])')).filter(function(e){return e.offsetParent!==null;});};
+    var syncDrawer=function(){
+      var open=drawer.classList.contains('open');
+      bar.classList.toggle('bbt-hidden',open);
+      if(hamb) hamb.setAttribute('aria-expanded',open?'true':'false');
+      document.documentElement.style.overflow=open?'hidden':'';   // prevent background scroll
+      if(open){var f=dFoc();if(f[0])f[0].focus();}                 // move focus into the menu
+    };
+    try{new MutationObserver(syncDrawer).observe(drawer,{attributes:true,attributeFilter:['class']});}catch(e){}
+    document.addEventListener('keydown',function(e){
+      if(!drawer.classList.contains('open'))return;
+      if(e.key==='Escape'){e.preventDefault();drawer.classList.remove('open');if(hamb&&hamb.focus)hamb.focus();} // Escape + return focus
+      else if(e.key==='Tab'){var f=dFoc();if(!f.length)return;var a=f[0],z=f[f.length-1];                        // trap focus
+        if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();}
+        else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();}}
+    });
+    syncDrawer();
+  }
+
+  // ---- skip to main content ----
+  var skip=document.createElement('a');skip.href='#main';skip.className='bbt-skip';skip.textContent='Skip to main content';
+  document.body.insertBefore(skip,document.body.firstChild);
+  skip.addEventListener('click',function(e){
+    e.preventDefault();
+    var m=[].slice.call(document.querySelectorAll('main,[role="main"],h1')).filter(function(el){return el.offsetParent!==null;})[0];
+    if(m){m.setAttribute('tabindex','-1');m.focus();try{m.scrollIntoView();}catch(_){}}
+  });
+
+  // ---- announce review stars as one label ("Rated 4.4 out of 5"), not five glyphs ----
+  var labelStars=function(){
+    var hdr=document.querySelector('[data-rev-rating]'); var overall=hdr?hdr.textContent.trim():null;
+    [].forEach.call(document.querySelectorAll('.stars:not([data-al])'),function(s){
+      s.setAttribute('data-al','1');
+      var count=(s.textContent.match(/★/g)||[]).length||5;
+      var near=s.parentElement&&/\b[0-5]\.\d\b/.test(s.parentElement.textContent);
+      s.setAttribute('role','img');
+      s.setAttribute('aria-label','Rated '+((near&&overall)?overall:count)+' out of 5');
+    });
+  };
+  labelStars(); setTimeout(labelStars,1500); setTimeout(labelStars,3500);
+
+  // ---- reduced motion: don't autoplay video (its poster remains as static content) ----
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){
+    [].forEach.call(document.querySelectorAll('video'),function(v){try{v.removeAttribute('autoplay');v.pause();v.addEventListener('play',function(){v.pause();});}catch(e){}});
   }
 
   /* ---------------- language switcher (Google Translate widget, in-place) ---------------- */
@@ -90,11 +144,14 @@
   var globe='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
   var lang=document.createElement('div');lang.id='bbt-lang';lang.className='notranslate';
   lang.innerHTML='<div class="lang-menu">'+LANGS.map(function(l){return '<button type="button" data-l="'+l[0]+'">'+l[1]+'</button>';}).join('')+'</div>'
-    +'<button class="lang-btn" type="button" aria-label="Language" aria-haspopup="true">'+globe+'</button>';
+    +'<button class="lang-btn" type="button" aria-label="Language" aria-haspopup="true" aria-expanded="false">'+globe+'</button>';
   document.body.appendChild(lang);
-  lang.querySelector('.lang-btn').addEventListener('click',function(e){e.stopPropagation();lang.classList.toggle('open');});
-  [].forEach.call(lang.querySelectorAll('.lang-menu button'),function(b){b.addEventListener('click',function(){lang.classList.remove('open');setLang(b.getAttribute('data-l'));});});
-  document.addEventListener('click',function(e){if(!lang.contains(e.target))lang.classList.remove('open');});
+  var langBtn=lang.querySelector('.lang-btn');
+  var setLangOpen=function(o){lang.classList.toggle('open',o);langBtn.setAttribute('aria-expanded',o?'true':'false');if(o){var fi=lang.querySelector('.lang-menu button');if(fi)fi.focus();}};
+  langBtn.addEventListener('click',function(e){e.stopPropagation();setLangOpen(!lang.classList.contains('open'));});
+  [].forEach.call(lang.querySelectorAll('.lang-menu button'),function(b){b.addEventListener('click',function(){setLangOpen(false);setLang(b.getAttribute('data-l'));langBtn.focus();});});
+  document.addEventListener('click',function(e){if(!lang.contains(e.target))setLangOpen(false);});
+  lang.addEventListener('keydown',function(e){if(e.key==='Escape'&&lang.classList.contains('open')){setLangOpen(false);langBtn.focus();}});
 
   /* ---------------- open-now badge (Asia/Manila, 11:00–23:00 daily) ---------------- */
   try{

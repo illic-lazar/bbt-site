@@ -6,7 +6,7 @@
 }
 
 :root{
-  --clay:#BD5E26; --gold:#E2993B; --night:#181818; --cream:#FFF5E8;
+  --clay:#A9531F; --gold:#E2993B; --night:#181818; --cream:#FFF5E8;
   --bamboo:#54583D; --tam:#412A19; --cream2:#F0E4D2; --cream3:#E8DDD0;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
