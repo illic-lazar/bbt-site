@@ -71,6 +71,40 @@
   .rev .tm{font-size:11px;opacity:.5;margin-top:6px}
   .muted{opacity:.55;font-size:13px}
   .hide{display:none!important}
+  /* ---- content editor (Stage 5) ---- */
+  .cms-sub{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+  .cms-sub button{background:none;border:1px solid rgba(255,245,232,.16);color:var(--cream);opacity:.7;border-radius:20px;padding:6px 14px;font-size:12px;font-family:inherit;letter-spacing:.03em}
+  .cms-sub button.on{opacity:1;background:var(--clay);border-color:var(--clay);color:#fff}
+  .f{margin-bottom:14px}
+  .f>label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;opacity:.6;margin-bottom:5px}
+  .f input,.f textarea,.f select{width:100%;background:#222;border:1px solid rgba(255,245,232,.2);color:var(--cream);border-radius:8px;padding:9px 12px;font-family:inherit;font-size:14px;line-height:1.4}
+  .f textarea{resize:vertical;min-height:64px}
+  .f input:focus,.f textarea:focus,.f select:focus{outline:none;border-color:var(--gold)}
+  .f small{display:block;opacity:.45;font-size:11px;margin-top:4px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:620px){.grid2{grid-template-columns:1fr}}
+  .box{background:#222018;border:1px solid rgba(255,245,232,.09);border-radius:12px;padding:15px;margin-bottom:14px}
+  .box>h3{font-family:'Barlow Condensed',sans-serif;font-size:16px;text-transform:uppercase;letter-spacing:.03em;color:var(--gold);margin:0 0 12px}
+  .rowline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .rowline .grow{flex:1;min-width:120px}
+  .toolbar{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(24,24,24,0),var(--night) 34%);padding:16px 0 6px;margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:5}
+  .toolbar .msg{font-size:12px;opacity:.7;margin-left:auto}
+  .toolbar .msg.err{color:#ff8a65;opacity:1}
+  .toolbar .msg.ok{color:#7fd18a;opacity:1}
+  .dirty-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;margin-right:2px}
+  .errs{background:rgba(255,120,90,.1);border:1px solid rgba(255,120,90,.35);border-radius:8px;padding:10px 13px;margin-bottom:12px;font-size:13px;color:#ffb59e}
+  .errs ul{margin:6px 0 0;padding-left:18px}
+  .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+  .mcard{position:relative;border:1px solid rgba(255,245,232,.12);border-radius:8px;overflow:hidden;background:#111}
+  .mcard img{width:100%;height:88px;object-fit:cover;display:block}
+  .mcard .mact{display:flex;gap:4px;padding:5px}
+  .mono{font-family:'Space Mono',monospace;font-size:11px}
+  .drop{border:1.5px dashed rgba(255,245,232,.3);border-radius:10px;padding:20px;text-align:center;font-size:13px;opacity:.8;cursor:pointer}
+  .drop.hi{border-color:var(--gold);background:rgba(226,153,59,.08)}
+  .modal-bd{position:fixed;inset:0;background:rgba(10,8,5,.7);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px}
+  .modal-c{background:#1c1a14;border:1px solid rgba(255,245,232,.14);border-radius:14px;max-width:520px;width:100%;max-height:84vh;overflow:auto;padding:22px}
+  .up{background:none;border:1px solid rgba(255,245,232,.22);color:var(--cream);border-radius:6px;width:28px;height:28px;font-size:13px;line-height:1}
+  .swrap{margin-bottom:26px}
 </style>
 </head>
 <body>
@@ -95,6 +129,10 @@
       <button class="tab on" data-t="chat">Chat</button>
       <button class="tab" data-t="reach">Reach</button>
       <button class="tab" data-t="rep">Reputation</button>
+      <button class="tab" data-t="content">Content</button>
+      <button class="tab" data-t="menu">Menu</button>
+      <button class="tab" data-t="photos">Photos</button>
+      <button class="tab" data-t="seo">SEO</button>
     </div>
 
     <div id="notcfg" class="hide"><p class="muted">Logging isn't connected yet — add the Supabase keys in Vercel, then refresh.</p></div>
@@ -140,6 +178,27 @@
       <div id="repHead"></div>
       <div id="repList"></div>
     </div>
+
+    <!-- CONTENT (settings + homepage + about) -->
+    <div id="tab-content" class="hide">
+      <div class="cms-sub" id="contentSub">
+        <button class="on" data-s="settings">Hours &amp; Contact</button>
+        <button data-s="home">Homepage</button>
+        <button data-s="about">About page</button>
+      </div>
+      <div id="paneSettings"></div>
+      <div id="paneHome" class="hide"></div>
+      <div id="paneAbout" class="hide"></div>
+    </div>
+
+    <!-- MENU -->
+    <div id="tab-menu" class="hide"><div id="paneMenu"></div></div>
+
+    <!-- PHOTOS (media library + gallery) -->
+    <div id="tab-photos" class="hide"><div id="panePhotos"></div></div>
+
+    <!-- SEO -->
+    <div id="tab-seo" class="hide"><div id="paneSeo"></div></div>
   </div>
 
 </div>
@@ -231,7 +290,8 @@
     t.onclick=function(){
       Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(x){x.classList.remove('on');});
       t.classList.add('on');
-      show($('#tab-chat'), t.dataset.t==='chat'); show($('#tab-reach'), t.dataset.t==='reach'); show($('#tab-rep'), t.dataset.t==='rep');
+      ['chat','reach','rep','content','menu','photos','seo'].forEach(function(p){ show($('#tab-'+p), t.dataset.t===p); });
+      if(window.CMS) window.CMS.open(t.dataset.t);
     };
   });
 
@@ -248,6 +308,228 @@
 
   var saved=sessionStorage.getItem(KEY);
   if(saved) enter(saved); else { show(gate,true); show(dash,false); }
+})();
+</script>
+
+<script>
+/* ===== Stage 5 — website content editor (Content / Menu / Photos / SEO) =====
+   Reuses the same login token (sessionStorage 'bbtAdmin'), same design, and the
+   same Supabase backend. Talks to /api/manage (content) and /api/media (images). */
+window.CMS=(function(){
+  function tok(){ return sessionStorage.getItem('bbtAdmin')||''; }
+  function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function show(el,on){ if(el) el.classList[on?'remove':'add']('hide'); }
+  function clone(o){ return o==null?null:JSON.parse(JSON.stringify(o)); }
+  function api(path,opts){ opts=opts||{}; opts.headers=Object.assign({'x-admin-token':tok()},opts.headers||{}); return fetch(path,opts).then(function(r){return r.json().catch(function(){return {};});}); }
+  function setPath(o,p,v){ var a=p.split('.'),k; for(var i=0;i<a.length-1;i++){ k=a[i]; if(o[k]==null) o[k]=/^\d+$/.test(a[i+1])?[]:{}; o=o[k]; } o[a[a.length-1]]=v; }
+  function swap(a,i,j){ if(i<0||j<0||i>=a.length||j>=a.length)return; var t=a[i];a[i]=a[j];a[j]=t; }
+
+  /* built-in defaults = the current site content (used until first Publish) */
+  var DEF={
+    settings:{phone:'+63 945 299 4225',phone_href:'639452994225',whatsapp:'639452994225',email:'info.elnido@bigbadthai.com',
+      reserve_url:'https://m.me/bigbadthai',
+      maps_url:'https://www.google.com/maps/place/?q=place_id:ChIJj-thjxVVtjMRdmsUeV7mG_E',
+      directions_url:'https://www.google.com/maps/dir/?api=1&destination=Big+Bad+Thai+Restaurant+El+Nido&destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&travelmode=walking',
+      instagram:'https://www.instagram.com/bigbadthairestaurant',facebook:'https://www.facebook.com/bigbadthai',
+      hours:{open:'11:00',close:'23:00',label:'Open daily<br>11:00 AM – 11:00 PM'},
+      address_html:'Hama Street, Barangay Masagana<br>El Nido, 5313 Palawan<br>Philippines',
+      footer_copy:'© 2026 Big Bad Thai · El Nido'},
+    home:{hero_title_html:'Cooked the way<br><span class="mae">Mom</span> taught us.',featured:[
+      {name:'Seafood Bucket',tag:'For two · ₱2,290'},
+      {name:'Pad Thai',tag:'Noodles'},
+      {name:'Green Papaya Salad',tag:'Mild spicy'},
+      {name:'Fresh Spring Rolls',tag:'New'},
+      {name:'Grilled Beef Salad',tag:'Hot spicy'},
+      {name:'Red Thai Milk Tea',tag:'Drinks'},
+      {name:'Green Curry',tag:'Mild spicy'}]},
+    about:{kicker:'El Nido · Palawan · Est. 2017',hero_title:'Our Story',
+      lead_html:'More than a restaurant — a Thai dream on the shores of <b>El Nido</b>.',
+      scenes:[
+        {no:'01',title:'It began in Koh Phangan',body:'Nelly, from Serbia, and Apple, from north-eastern Thailand, met on the island of Koh Phangan — and found a shared passion for Thai cuisine and a vision to create something extraordinary of their own.'},
+        {no:'02',title:'Learned at eleven',body:'Apple started cooking at just eleven, learning her mother’s recipes — the kind passed down through generations. That same love and dedication goes into every dish she prepares today: each meal a celebration of Thai culinary heritage.'},
+        {no:'03',title:'Born in 2017',body:'They turned the dream into Big Bad Thai — a table where traditional Thai flavour meets the natural beauty of El Nido. Every dish is crafted from fresh, local ingredients and authentic Thai spices, nothing watered down.'},
+        {no:'04',title:'Above Bacuit Bay',body:'From our Rooftop Lounge and second-floor dining, the whole of Bacuit Bay opens up — limestone cliffs, sea breeze, and a sunset over every plate.'}],
+      close_kicker:'Join us in El Nido',close_title_html:'Thai food.<br>Serbian&nbsp;hospitality.',close_sub:'Come taste the story.'},
+    seo:{pages:{
+      '/':{title:'Big Bad Thai — Authentic Thai in El Nido, Palawan',desc:'Bold, authentic Thai food from our family’s kitchen — in the heart of El Nido, Palawan. Open daily 11am–11pm. Reserve a table.',og:'https://www.bigbadthai.com/storefront-night.jpg',robots:'index'},
+      '/menu.html':{title:'Menu — Big Bad Thai · El Nido',desc:'The full Big Bad Thai menu — authentic Thai starters, salads, curries, mains, desserts and drinks in El Nido, Palawan.',og:'https://www.bigbadthai.com/storefront-night.jpg',robots:'index'},
+      '/about.html':{title:'About — Big Bad Thai · El Nido',desc:'The story of Big Bad Thai — Nelly from Serbia and Apple from north-eastern Thailand brought authentic Thai cooking to El Nido, Palawan, in 2017.',og:'https://www.bigbadthai.com/storefront-night.jpg',robots:'index'},
+      '/gallery.html':{title:'Gallery — Big Bad Thai · El Nido',desc:'A look inside Big Bad Thai — the food, the bar and the room, on the El Nido waterfront.',og:'https://www.bigbadthai.com/storefront-night.jpg',robots:'index'},
+      '/visit.html':{title:'Find Us — Big Bad Thai · El Nido',desc:'Visit Big Bad Thai on Hama Street, El Nido, Palawan. Open daily 11am–11pm. Reserve a table or get directions.',og:'https://www.bigbadthai.com/storefront-night.jpg',robots:'index'}}}
+  };
+
+  var rows=null, state={}, lib=[], loadedRows=false, opened={};
+
+  function loadRows(){ return api('/api/manage').then(function(d){
+    if(d.configured===false){ notReady('Connect Supabase first (add the keys in Vercel), then Refresh.'); return false; }
+    if(d.ready===false){ notReady('One-time setup: run SUPABASE_STAGE5.sql in your Supabase SQL editor, then Refresh.'); return false; }
+    rows=d.rows||{}; loadedRows=true; return true; }); }
+  function notReady(msg){ ['paneSettings','paneMenu','panePhotos','paneSeo'].forEach(function(id){ var el=document.getElementById(id); if(el) el.innerHTML='<p class="muted">'+esc(msg)+'</p>'; }); }
+
+  function draftOf(key){ if(state[key]) return state[key]; var r=rows&&rows[key];
+    if(r&&r.draft!=null) state[key]=r.draft; else if(r&&r.published!=null) state[key]=clone(r.published); else if(DEF[key]) state[key]=clone(DEF[key]); else return null;
+    return state[key]; }
+
+  /* menu + gallery seed by parsing the live pages (guarantees the starting point matches the site) */
+  function ensureMenu(){ if(state.menu) return Promise.resolve(state.menu); var d=draftOf('menu'); if(d) return Promise.resolve(d);
+    return fetch('/menu.html').then(function(r){return r.text();}).then(function(h){ state.menu=parseMenu(h); return state.menu; }); }
+  function ensureGallery(){ if(state.gallery) return Promise.resolve(state.gallery); var d=draftOf('gallery'); if(d) return Promise.resolve(d);
+    return fetch('/gallery.html').then(function(r){return r.text();}).then(function(h){ state.gallery=parseGallery(h); return state.gallery; }); }
+  function cleanName(el){ var c=el.cloneNode(true); var b=c.querySelector('.m-new'); if(b)b.remove(); return c.textContent.trim(); }
+  function parseMenu(html){ var doc=new DOMParser().parseFromString(html,'text/html');
+    var cats=[].map.call(doc.querySelectorAll('.menu-cols .cat'),function(sec,ci){
+      var h=sec.querySelector('.cat-title');
+      var items=[].map.call(sec.querySelectorAll('.m-item'),function(it,ii){
+        var ne=it.querySelector('.m-name'); var isNew=!!(ne&&ne.querySelector('.m-new')); var name=ne?cleanName(ne):'';
+        var price=(it.querySelector('.m-price')||{}).textContent||''; var variants=[];
+        var pr=it.querySelector('.m-prices'); if(pr){ pr.textContent.split('·').forEach(function(p){ p=p.trim(); if(!p)return; var m=p.match(/^(.*?)([\d][\d,\/]*)$/); variants.push(m?{label:m[1].trim(),price:m[2].trim()}:{label:p,price:''}); }); }
+        var sp=it.querySelector('.m-spice'); var spice=sp?sp.textContent.trim():'';
+        var meta=it.querySelector('.m-meta'); var al=''; if(meta){ var mc=meta.cloneNode(true); var s=mc.querySelector('.m-spice'); if(s)s.remove(); al=mc.textContent.replace(/^\s*·?\s*/,'').trim(); }
+        return {id:'i'+ci+'-'+ii,name:name,desc:((it.querySelector('.m-desc')||{}).textContent||'').trim(),price:price.trim(),variants:variants,spice:spice,allergens:al,dietary:[],featured:false,available:true,is_new:isNew,image:'',deleted:false,sort:ii};
+      });
+      return {id:(h&&h.id)||('cat'+ci),title:h?h.textContent.trim():'',sort:ci,active:true,items:items};
+    });
+    return {note:((doc.querySelector('.menu-note')||{}).textContent||'').trim(),categories:cats}; }
+  function parseGallery(html){ var doc=new DOMParser().parseFromString(html,'text/html');
+    return {images:[].map.call(doc.querySelectorAll('#grid img'),function(im,i){ return {id:'g'+i,full:im.getAttribute('data-full')||im.getAttribute('src'),thumb:im.getAttribute('src')||'',alt:im.getAttribute('alt')||'',sort:i,deleted:false}; })}; }
+
+  /* ---------- field helpers ---------- */
+  function fIn(label,path,val,ph){ return '<div class="f"><label>'+esc(label)+'</label><input data-path="'+path+'" value="'+esc(val)+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'></div>'; }
+  function fTa(label,path,val,rows,ph){ return '<div class="f"><label>'+esc(label)+'</label><textarea data-path="'+path+'" rows="'+(rows||3)+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'>'+esc(val)+'</textarea></div>'; }
+  function toolbarHtml(){ return '<div class="toolbar"><button class="btn" data-act="save">Save draft</button><button class="ghost" data-act="preview">Preview</button><button class="btn" data-act="publish" style="background:#3a7d44">Publish…</button><button class="ghost" data-act="history">History</button><span class="msg" data-msg></span></div>'; }
+  function msg(pane,text,cls){ var m=pane.querySelector('[data-msg]'); if(m){ m.textContent=text; m.className='msg '+(cls||''); } }
+  function showErrs(pane,list,title){ var box=pane.querySelector('[data-errs]'); if(!box){ box=document.createElement('div'); box.setAttribute('data-errs',''); box.className='errs'; pane.insertBefore(box,pane.firstChild); } box.innerHTML='<b>'+esc(title||'')+'</b><ul>'+list.map(function(e){return '<li>'+esc(e)+'</li>';}).join('')+'</ul>'; box.scrollIntoView({block:'nearest'}); }
+  function clearErrs(pane){ var b=pane.querySelector('[data-errs]'); if(b) b.remove(); }
+
+  /* ---------- collect edits from a pane back into state ---------- */
+  function syncFrom(pane){ var key=pane.getAttribute('data-key'); if(!key) return;
+    if(key==='seo'){ var se=state.seo; [].forEach.call(pane.querySelectorAll('[data-seo]'),function(el){ var pr=el.getAttribute('data-seo').split('|'); se.pages[pr[0]]=se.pages[pr[0]]||{}; se.pages[pr[0]][pr[1]]=el.value; }); return; }
+    var obj=state[key]; if(!obj) return;
+    [].forEach.call(pane.querySelectorAll('[data-path]'),function(el){ var v=el.type==='checkbox'?el.checked:el.value; setPath(obj,el.getAttribute('data-path'),v); });
+    if(key==='menu') foldMenu(obj); }
+  function foldMenu(m){ (m.categories||[]).forEach(function(c,ci){ c.sort=ci; (c.items||[]).forEach(function(it,ii){ it.sort=ii;
+    if('_variantstr' in it){ it.variants=strToVariants(it._variantstr); delete it._variantstr; }
+    if('_dietarystr' in it){ it.dietary=(it._dietarystr||'').split(',').map(function(s){return s.trim();}).filter(Boolean); delete it._dietarystr; } }); }); }
+  function variantsToStr(v){ return (v||[]).map(function(x){return (x.label?x.label+' ':'')+x.price;}).join(' · '); }
+  function strToVariants(s){ if(!s||!s.trim())return []; return s.split('·').map(function(p){p=p.trim(); var m=p.match(/^(.*?)([\d][\d,\/]*)$/); return m?{label:m[1].trim(),price:m[2].trim()}:{label:p,price:''};}).filter(function(x){return x.label||x.price;}); }
+
+  /* ---------- toolbar actions ---------- */
+  function wireToolbar(pane,key,page){
+    pane.querySelector('[data-act="save"]').onclick=function(){ syncFrom(pane); doSave(key,pane); };
+    pane.querySelector('[data-act="preview"]').onclick=function(){ syncFrom(pane); doPreview(page); };
+    pane.querySelector('[data-act="publish"]').onclick=function(){ syncFrom(pane); doPublish(key,pane); };
+    pane.querySelector('[data-act="history"]').onclick=function(){ doHistory(key); };
+  }
+  function doSave(key,pane){ msg(pane,'Saving…'); return api('/api/manage',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'save',key:key,doc:state[key]})}).then(function(d){
+    if(d.error){ msg(pane,d.error,'err'); return; } rows[key]=rows[key]||{}; rows[key].draft=clone(state[key]);
+    var w=d.warnings||[]; if(w.length){ showErrs(pane,w,'Saved — but note before publishing:'); msg(pane,'Draft saved'); } else { clearErrs(pane); msg(pane,'Draft saved','ok'); } return d; }); }
+  function doPublish(key,pane){ doSave(key,pane).then(function(){ modalConfirm('Publish these changes?','They go live on the website within about a minute.',function(){ msg(pane,'Publishing…');
+    api('/api/manage',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'publish',key:key})}).then(function(d){
+      if(d.error==='validation'){ showErrs(pane,d.errors,'Fix these before publishing:'); msg(pane,'Not published','err'); return; }
+      if(d.error){ msg(pane,d.error,'err'); return; }
+      rows[key].published=clone(state[key]); clearErrs(pane); msg(pane,'Published ✓ — live shortly','ok'); }); }); }); }
+  function doPreview(page){ var b={}; ['settings','home','about','menu','gallery','seo'].forEach(function(k){ b[k]=state[k]||(rows&&rows[k]&&rows[k].published)||DEF[k]||null; });
+    try{ localStorage.setItem('bbtPreview',JSON.stringify(b)); }catch(e){} window.open((page||'/')+'#bbtpreview','_blank'); }
+  function doHistory(key){ api('/api/manage?history='+encodeURIComponent(key)).then(function(d){ var list=d.history||[];
+    var html='<h2 style="margin-bottom:12px">History — '+esc(key)+'</h2>'+ (list.length? list.map(function(h){ return '<div class="rowline box" style="background:#1b1a13"><div class="grow"><div class="mono" style="opacity:.7">'+esc(new Date(h.created_at).toLocaleString())+'</div>'+(h.note?'<div style="font-size:13px">'+esc(h.note)+'</div>':'')+'</div><button class="ghost" data-restore="'+h.id+'">Restore</button></div>'; }).join('') : '<p class="muted">No published versions yet.</p>');
+    var bd=modalOpen(html); bd.querySelectorAll('[data-restore]').forEach(function(b){ b.onclick=function(){ if(!confirm('Restore this version? It becomes the live AND draft version.'))return;
+      api('/api/manage',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'restore',key:key,id:b.getAttribute('data-restore')})}).then(function(){ modalClose(); state={}; opened={}; loadRows().then(function(){ var on=document.querySelector('.tab.on'); if(on) render(on.getAttribute('data-t')); }); }); }; }); }); }
+
+  /* ---------- modals ---------- */
+  function modalOpen(html){ modalClose(); var bd=document.createElement('div'); bd.className='modal-bd'; bd.id='cmsModal'; bd.innerHTML='<div class="modal-c">'+html+'</div>'; bd.addEventListener('click',function(e){ if(e.target===bd) modalClose(); }); document.body.appendChild(bd); return bd; }
+  function modalClose(){ var m=document.getElementById('cmsModal'); if(m) m.remove(); }
+  function modalConfirm(title,body,onYes){ var bd=modalOpen('<h2 style="margin-bottom:8px">'+esc(title)+'</h2><p class="muted" style="margin-bottom:18px">'+esc(body)+'</p><div style="display:flex;gap:8px;justify-content:flex-end"><button class="ghost" data-no>Cancel</button><button class="btn" data-yes style="background:#3a7d44">Publish</button></div>'); bd.querySelector('[data-no]').onclick=modalClose; bd.querySelector('[data-yes]').onclick=function(){ modalClose(); onYes(); }; }
+
+  /* ---------- CONTENT: settings / home / about ---------- */
+  function renderSettings(){ var pane=document.getElementById('paneSettings'); pane.setAttribute('data-key','settings'); var s=draftOf('settings');
+    pane.innerHTML='<div class="box"><h3>Contact &amp; reservations</h3><div class="grid2">'+fIn('Phone (shown on site)','phone',s.phone)+fIn('Phone digits (tap-to-call)','phone_href',s.phone_href)+'</div><div class="grid2">'+fIn('WhatsApp number (digits)','whatsapp',s.whatsapp)+fIn('Email','email',s.email)+'</div>'+fIn('Reservation link (Messenger)','reserve_url',s.reserve_url)+'</div>'+
+      '<div class="box"><h3>Location &amp; hours</h3>'+fTa('Address ( use &lt;br&gt; for a new line )','address_html',s.address_html,2)+'<div class="grid2">'+fIn('Google Maps link','maps_url',s.maps_url)+fIn('Directions link','directions_url',s.directions_url)+'</div><div class="grid2">'+fIn('Opens (HH:MM, 24h)','hours.open',s.hours&&s.hours.open)+fIn('Closes (HH:MM, 24h)','hours.close',s.hours&&s.hours.close)+'</div>'+fIn('Hours label (Find Us page)','hours.label',s.hours&&s.hours.label)+'</div>'+
+      '<div class="box"><h3>Social &amp; footer</h3><div class="grid2">'+fIn('Instagram URL','instagram',s.instagram)+fIn('Facebook URL','facebook',s.facebook)+'</div>'+fIn('Footer copyright line','footer_copy',s.footer_copy)+'</div>'+toolbarHtml();
+    wireToolbar(pane,'settings','/visit.html'); }
+  function renderHome(){ var pane=document.getElementById('paneHome'); pane.setAttribute('data-key','home'); var h=draftOf('home'); var feats=h.featured||[];
+    var html='<div class="box"><h3>Hero headline</h3>'+fTa('Headline ( &lt;br&gt; = line break, &lt;span class="mae"&gt;word&lt;/span&gt; = script accent )','hero_title_html',h.hero_title_html,2)+'</div>';
+    html+='<div class="box"><h3>Featured dishes</h3><small class="muted" style="display:block;margin-bottom:12px">Card 1 is the large feature; cards 2–7 are the strip below it. Card 7 shows on mobile only. Card photos are managed with the desktop editor tool.</small>';
+    feats.forEach(function(f,i){ html+='<div class="rowline" style="margin-bottom:8px"><span class="mono" style="width:18px;opacity:.55;flex:0 0 auto">'+(i+1)+'</span><input class="grow" data-path="featured.'+i+'.name" value="'+esc(f.name||'')+'" placeholder="Dish name"><input style="width:150px" data-path="featured.'+i+'.tag" value="'+esc(f.tag||'')+'" placeholder="Tag / price"></div>'; });
+    html+='</div>'+toolbarHtml();
+    pane.innerHTML=html; wireToolbar(pane,'home','/'); }
+  function renderAbout(){ var pane=document.getElementById('paneAbout'); pane.setAttribute('data-key','about'); var a=draftOf('about');
+    var html='<div class="box"><h3>Intro</h3>'+fIn('Kicker','kicker',a.kicker)+fIn('Hero title','hero_title',a.hero_title)+fTa('Lead statement (HTML allowed)','lead_html',a.lead_html,2)+'</div>';
+    (a.scenes||[]).forEach(function(sc,i){ html+='<div class="box"><h3>Story '+esc(sc.no||(i+1))+'</h3><div class="grid2">'+fIn('Number','scenes.'+i+'.no',sc.no)+fIn('Title','scenes.'+i+'.title',sc.title)+'</div>'+fTa('Body','scenes.'+i+'.body',sc.body,3)+'</div>'; });
+    html+='<div class="box"><h3>Closing</h3>'+fIn('Kicker','close_kicker',a.close_kicker)+fIn('Big title (HTML)','close_title_html',a.close_title_html)+fIn('Subtitle','close_sub',a.close_sub)+'</div>'+toolbarHtml();
+    pane.innerHTML=html; wireToolbar(pane,'about','/about.html'); }
+  function wireContentSub(){ var sub=document.getElementById('contentSub'); [].forEach.call(sub.querySelectorAll('button'),function(b){ b.onclick=function(){ [].forEach.call(sub.querySelectorAll('button'),function(x){x.classList.remove('on');}); b.classList.add('on'); var s=b.getAttribute('data-s'); show(document.getElementById('paneSettings'),s==='settings'); show(document.getElementById('paneHome'),s==='home'); show(document.getElementById('paneAbout'),s==='about'); }; }); }
+
+  /* ---------- MENU ---------- */
+  function newItem(){ return {id:'item-'+Date.now(),name:'New dish',desc:'',price:'',variants:[],spice:'',allergens:'',dietary:[],featured:false,available:true,is_new:true,image:'',deleted:false}; }
+  function itemEditor(ci,ii,it){ var b='categories.'+ci+'.items.'+ii+'.';
+    return '<div class="box" style="background:#1b1a13" data-item="'+ci+','+ii+'"><div class="rowline"><input class="grow" data-path="'+b+'name" value="'+esc(it.name)+'" placeholder="Dish name"><input style="width:110px" data-path="'+b+'price" value="'+esc(it.price)+'" placeholder="Price"><button class="up" data-mv="item,'+ci+','+ii+',-1">▲</button><button class="up" data-mv="item,'+ci+','+ii+',1">▼</button><button class="up" data-del="item,'+ci+','+ii+'" style="color:#ff8a65">✕</button></div>'+
+      '<div class="f" style="margin-top:8px"><textarea data-path="'+b+'desc" rows="2" placeholder="Description">'+esc(it.desc)+'</textarea></div><div class="grid2"><div class="f"><label>Variants ( Label price · Label price )</label><input data-path="'+b+'_variantstr" value="'+esc(variantsToStr(it.variants))+'" placeholder="e.g. Shrimp 540 · Chicken 480"></div><div class="f"><label>Spice</label><input data-path="'+b+'spice" value="'+esc(it.spice)+'" placeholder="e.g. Medium spicy"></div></div>'+
+      '<div class="grid2"><div class="f"><label>Allergens</label><input data-path="'+b+'allergens" value="'+esc(it.allergens)+'"></div><div class="f"><label>Dietary tags (comma-separated)</label><input data-path="'+b+'_dietarystr" value="'+esc((it.dietary||[]).join(', '))+'" placeholder="vegetarian, vegan"></div></div>'+
+      '<div class="rowline mono" style="gap:16px"><label><input type="checkbox" data-path="'+b+'available" '+(it.available!==false?'checked':'')+'> Available</label><label><input type="checkbox" data-path="'+b+'is_new" '+(it.is_new?'checked':'')+'> “New” badge</label></div>'+
+      '<div class="rowline" style="margin-top:8px"><input class="grow" data-path="'+b+'image" value="'+esc(it.image||'')+'" placeholder="Dish photo URL (optional)"><button class="ghost" data-pick="'+b+'image">Pick photo</button>'+(it.image?'<img src="'+esc(it.image)+'" style="width:40px;height:40px;object-fit:cover;border-radius:6px">':'')+'</div></div>'; }
+  function renderMenu(){ var pane=document.getElementById('paneMenu'); pane.setAttribute('data-key','menu'); ensureMenu().then(function(m){
+    var html='<p class="muted" style="margin-top:0">Edit dishes, prices, variants, spice, allergens and availability. Use ▲▼ to reorder; ✕ removes (recoverable from History). Changes go live when you Publish.</p>'+fIn('Menu footnote','note',m.note);
+    m.categories.forEach(function(c,ci){ html+='<div class="box" data-cat="'+ci+'"><div class="rowline" style="margin-bottom:6px"><input class="grow" data-path="categories.'+ci+'.title" value="'+esc(c.title)+'" placeholder="Category name" style="font-weight:700"><label class="mono"><input type="checkbox" data-path="categories.'+ci+'.active" '+(c.active!==false?'checked':'')+'> shown</label><button class="up" data-mv="cat,'+ci+',-1">▲</button><button class="up" data-mv="cat,'+ci+',1">▼</button><button class="up" data-del="cat,'+ci+'" style="color:#ff8a65">✕</button></div>';
+      (c.items||[]).forEach(function(it,ii){ if(!it.deleted) html+=itemEditor(ci,ii,it); });
+      html+='<button class="ghost" data-add="'+ci+'">+ Add dish</button></div>'; });
+    html+='<button class="ghost" data-addcat="1" style="margin-bottom:14px">+ Add category</button>'+toolbarHtml();
+    pane.innerHTML=html;
+    [].forEach.call(pane.querySelectorAll('[data-mv]'),function(b){ b.onclick=function(){ syncFrom(pane); var p=b.getAttribute('data-mv').split(','); if(p[0]==='cat') swap(m.categories,+p[1],+p[1]+ +p[2]); else swap(m.categories[+p[1]].items,+p[2],+p[2]+ +p[3]); renderMenu(); }; });
+    [].forEach.call(pane.querySelectorAll('[data-del]'),function(b){ b.onclick=function(){ syncFrom(pane); var p=b.getAttribute('data-del').split(','); if(p[0]==='cat'){ if(confirm('Remove this whole category?')) m.categories.splice(+p[1],1); } else { m.categories[+p[1]].items[+p[2]].deleted=true; } renderMenu(); }; });
+    [].forEach.call(pane.querySelectorAll('[data-add]'),function(b){ b.onclick=function(){ syncFrom(pane); m.categories[+b.getAttribute('data-add')].items.push(newItem()); renderMenu(); }; });
+    var ac=pane.querySelector('[data-addcat]'); if(ac) ac.onclick=function(){ syncFrom(pane); m.categories.push({id:'cat-'+Date.now(),title:'New category',active:true,items:[],sort:m.categories.length}); renderMenu(); };
+    [].forEach.call(pane.querySelectorAll('[data-pick]'),function(b){ b.onclick=function(){ openPicker(function(url){ syncFrom(pane); setPath(m,b.getAttribute('data-pick'),url); renderMenu(); }); }; });
+    wireToolbar(pane,'menu','/menu.html'); }); }
+
+  /* ---------- PHOTOS: media library + gallery ---------- */
+  function renderPhotos(){ var pane=document.getElementById('panePhotos'); pane.setAttribute('data-key','gallery');
+    pane.innerHTML='<div class="box"><h3>Upload a photo</h3><div class="drop" id="dropZone">Click to choose an image — or drop one here.<br><small>Large photos are automatically resized &amp; thumbnailed in your browser (WebP) before upload.</small></div><input type="file" id="fileIn" accept="image/*" style="display:none"><div class="msg" data-up style="margin-top:8px"></div></div>'+
+      '<div class="box"><h3>Photo library</h3><div class="mgrid" id="libGrid"><p class="muted">Loading…</p></div></div>'+
+      '<div class="box"><h3>Homepage gallery — order &amp; alt text</h3><div id="galEdit"></div><button class="ghost" data-addgal="1" style="margin-top:6px">+ Add photo from library</button></div>'+toolbarHtml();
+    var fileIn=pane.querySelector('#fileIn'), dz=pane.querySelector('#dropZone');
+    dz.onclick=function(){ fileIn.click(); }; fileIn.onchange=function(){ if(fileIn.files[0]) doUpload(fileIn.files[0]); fileIn.value=''; };
+    dz.addEventListener('dragover',function(e){ e.preventDefault(); dz.classList.add('hi'); });
+    dz.addEventListener('dragleave',function(){ dz.classList.remove('hi'); });
+    dz.addEventListener('drop',function(e){ e.preventDefault(); dz.classList.remove('hi'); if(e.dataTransfer.files[0]) doUpload(e.dataTransfer.files[0]); });
+    pane.querySelector('[data-addgal]').onclick=function(){ openPicker(function(url){ addGalleryImage(url); }); };
+    loadLib(); ensureGallery().then(renderGalEdit); wireToolbar(pane,'gallery','/gallery.html'); }
+  function loadLib(){ return api('/api/media').then(function(d){ var g=document.getElementById('libGrid'); if(!g)return;
+    if(d.configured===false){ g.innerHTML='<p class="muted">Connect Supabase first.</p>'; return; }
+    if(d.ready===false){ g.innerHTML='<p class="muted">Create the media bucket (run the SQL), then upload.</p>'; return; }
+    lib=d.items||[]; g.innerHTML=lib.length? lib.map(function(it){ return '<div class="mcard"><img src="'+esc(it.thumb||it.full)+'"><div class="mact"><button class="up" data-lgal="'+esc(it.full)+'" title="Add to gallery">＋</button><button class="up" data-ldel="'+esc(it.name)+'" style="color:#ff8a65" title="Delete">✕</button></div></div>'; }).join('') : '<p class="muted">No photos yet — upload one above.</p>';
+    [].forEach.call(g.querySelectorAll('[data-lgal]'),function(b){ b.onclick=function(){ addGalleryImage(b.getAttribute('data-lgal')); }; });
+    [].forEach.call(g.querySelectorAll('[data-ldel]'),function(b){ b.onclick=function(){ if(confirm('Move this photo to trash? (recoverable in Supabase)')) api('/api/media',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'delete',path:b.getAttribute('data-ldel')})}).then(loadLib); }; }); }); }
+  function addGalleryImage(full){ var it=(lib||[]).filter(function(x){return x.full===full;})[0]; var thumb=it?it.thumb:full; ensureGallery().then(function(g){ g.images.push({id:'g-'+Date.now(),full:full,thumb:thumb,alt:'',sort:g.images.length,deleted:false}); renderGalEdit(); }); }
+  function renderGalEdit(){ var g=state.gallery, el=document.getElementById('galEdit'); if(!el)return;
+    el.innerHTML=(g.images||[]).length? g.images.map(function(im,i){ return '<div class="rowline box" style="background:#1b1a13;align-items:center"><img src="'+esc(im.thumb||im.full)+'" style="width:54px;height:54px;object-fit:cover;border-radius:6px"><input class="grow" data-path="images.'+i+'.alt" value="'+esc(im.alt||'')+'" placeholder="Describe the photo (alt text — required)"><button class="up" data-gmv="'+i+',-1">▲</button><button class="up" data-gmv="'+i+',1">▼</button><button class="up" data-grm="'+i+'" style="color:#ff8a65">✕</button></div>'; }).join('') : '<p class="muted">No gallery photos yet — add from the library.</p>';
+    var pane=document.getElementById('panePhotos');
+    [].forEach.call(el.querySelectorAll('[data-gmv]'),function(b){ b.onclick=function(){ syncFrom(pane); var p=b.getAttribute('data-gmv').split(','); swap(g.images,+p[0],+p[0]+ +p[1]); renderGalEdit(); }; });
+    [].forEach.call(el.querySelectorAll('[data-grm]'),function(b){ b.onclick=function(){ syncFrom(pane); g.images.splice(+b.getAttribute('data-grm'),1); renderGalEdit(); }; }); }
+  function optimize(file,maxW,q){ return new Promise(function(res,rej){ var img=new Image(),url=URL.createObjectURL(file); img.onload=function(){ URL.revokeObjectURL(url); var sc=Math.min(1,maxW/img.width),cw=Math.round(img.width*sc),ch=Math.round(img.height*sc); var cv=document.createElement('canvas'); cv.width=cw;cv.height=ch; cv.getContext('2d').drawImage(img,0,0,cw,ch); res(cv.toDataURL('image/webp',q)); }; img.onerror=rej; img.src=url; }); }
+  function doUpload(file){ var m=document.querySelector('[data-up]'); if(m){m.textContent='Optimizing…';m.className='msg';}
+    if(!/^image\//.test(file.type)){ if(m){m.textContent='Please choose an image file.';m.className='msg err';} return; }
+    Promise.all([optimize(file,1600,0.82),optimize(file,480,0.72)]).then(function(a){ if(m)m.textContent='Uploading…'; return api('/api/media',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'upload',name:file.name,full:a[0],thumb:a[1]})}); }).then(function(d){ if(!d||d.error){ if(m){m.textContent=(d&&d.error)||'Upload failed';m.className='msg err';} return; } if(m){m.textContent='Uploaded ✓';m.className='msg ok';} loadLib(); }).catch(function(){ if(m){m.textContent='Could not process that image.';m.className='msg err';} }); }
+  function openPicker(cb){ modalOpen('<h2 style="margin-bottom:12px">Choose a photo</h2><div class="mgrid" id="pickGrid"><p class="muted">Loading…</p></div>'); api('/api/media').then(function(d){ var g=document.getElementById('pickGrid'); if(!g)return; var items=d.items||[]; g.innerHTML=items.length? items.map(function(it){ return '<div class="mcard"><img src="'+esc(it.thumb||it.full)+'" data-p="'+esc(it.full)+'" style="cursor:pointer;height:88px"></div>'; }).join('') : '<p class="muted">No photos. Upload some in the Photos tab first.</p>'; [].forEach.call(g.querySelectorAll('img[data-p]'),function(im){ im.onclick=function(){ cb(im.getAttribute('data-p')); modalClose(); }; }); }); }
+
+  /* ---------- SEO ---------- */
+  function renderSeo(){ var pane=document.getElementById('paneSeo'); pane.setAttribute('data-key','seo'); var se=draftOf('seo');
+    var html='<p class="muted" style="margin-top:0">Per-page title, description, social image and index setting. Note: these are applied when the page loads — for the strongest search-engine effect, keep the built-in defaults sensible too.</p>';
+    Object.keys(se.pages).forEach(function(p){ var x=se.pages[p]; html+='<div class="box"><h3>'+esc(p==='/'?'Home (/)':p)+'</h3>'+
+      '<div class="f"><label>Page title</label><input data-seo="'+p+'|title" value="'+esc(x.title)+'"></div>'+
+      '<div class="f"><label>Meta description</label><textarea data-seo="'+p+'|desc" rows="2">'+esc(x.desc)+'</textarea></div>'+
+      '<div class="f"><label>Open Graph image URL</label><input data-seo="'+p+'|og" value="'+esc(x.og)+'"></div>'+
+      '<div class="f"><label>Search engines</label><select data-seo="'+p+'|robots"><option value="index"'+(x.robots!=='noindex'?' selected':'')+'>Index — show in Google</option><option value="noindex"'+(x.robots==='noindex'?' selected':'')+'>Noindex — hide from Google</option></select></div></div>'; });
+    html+=toolbarHtml(); pane.innerHTML=html; wireToolbar(pane,'seo',Object.keys(se.pages)[0]||'/'); }
+
+  /* ---------- routing ---------- */
+  function render(tab){
+    if(tab==='content'){ if(!opened.content){ opened.content=true; renderSettings(); renderHome(); renderAbout(); wireContentSub(); } }
+    else if(tab==='menu'){ if(!opened.menu){ opened.menu=true; renderMenu(); } }
+    else if(tab==='photos'){ if(!opened.photos){ opened.photos=true; renderPhotos(); } }
+    else if(tab==='seo'){ if(!opened.seo){ opened.seo=true; renderSeo(); } }
+  }
+  function open(tab){ if(['content','menu','photos','seo'].indexOf(tab)<0) return; if(!loadedRows) loadRows().then(function(ok){ if(ok) render(tab); }); else render(tab); }
+  return { open: open };
 })();
 </script>
 </body>

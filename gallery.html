@@ -113,34 +113,46 @@
 </footer>
 
 <script>
-(function(){
-  var lb=document.getElementById('lb'), lbimg=document.getElementById('lb-img');
-  var closeBtn=lb.querySelector('.lb-close'), prevBtn=lb.querySelector('.lb-prev'), nextBtn=lb.querySelector('.lb-next');
-  var imgs=[].slice.call(document.querySelectorAll('#grid img'));
-  imgs.forEach(function(im){im.tabIndex=0;});                        // thumbnails keyboard-focusable
-  var idx=-1, opener=null;
-  function show(i){ idx=(i+imgs.length)%imgs.length; var im=imgs[idx];
+/* Lightbox is re-bindable: content.js may re-render #grid from published
+   gallery data, then calls BBTGallery.bind(). It also binds the static grid
+   as a fallback. imgs are re-collected each bind; listeners attach once. */
+window.BBTGallery=(function(){
+  var lb,lbimg,closeBtn,prevBtn,nextBtn,grid,imgs=[],idx=-1,opener=null,wired=false;
+  function show(i){ if(!imgs.length)return; idx=(i+imgs.length)%imgs.length; var im=imgs[idx];
     lbimg.src=im.getAttribute('data-full')||im.currentSrc||im.src; lbimg.alt=im.alt||''; }
   function open(i){ opener=imgs[i]; show(i); lb.classList.add('open'); lb.setAttribute('aria-hidden','false');
     document.documentElement.style.overflow='hidden'; closeBtn.focus(); }
   function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true');
     document.documentElement.style.overflow=''; if(opener&&opener.focus) opener.focus(); }
-  var grid=document.getElementById('grid');
-  grid.addEventListener('click',function(e){var im=e.target.closest('img');if(im)open(imgs.indexOf(im));});
-  grid.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var im=e.target.closest('img');if(im){e.preventDefault();open(imgs.indexOf(im));}}});
-  closeBtn.addEventListener('click',close);
-  prevBtn.addEventListener('click',function(){show(idx-1);});
-  nextBtn.addEventListener('click',function(){show(idx+1);});
-  lb.addEventListener('click',function(e){if(e.target===lb)close();});   // click backdrop to close
-  document.addEventListener('keydown',function(e){
-    if(!lb.classList.contains('open'))return;
-    if(e.key==='Escape'){close();}
-    else if(e.key==='ArrowLeft'){show(idx-1);prevBtn.focus();}
-    else if(e.key==='ArrowRight'){show(idx+1);nextBtn.focus();}
-    else if(e.key==='Tab'){var f=[prevBtn,nextBtn,closeBtn],i=f.indexOf(document.activeElement);e.preventDefault();
-      f[e.shiftKey?(i<=0?f.length-1:i-1):(i>=f.length-1?0:i+1)].focus();}
-  });
+  function bind(){
+    grid=document.getElementById('grid'); if(!grid) return;
+    imgs=[].slice.call(document.querySelectorAll('#grid img'));
+    imgs.forEach(function(im){im.tabIndex=0;});                        // thumbnails keyboard-focusable
+    if(wired) return; wired=true;
+    lb=document.getElementById('lb'); lbimg=document.getElementById('lb-img');
+    closeBtn=lb.querySelector('.lb-close'); prevBtn=lb.querySelector('.lb-prev'); nextBtn=lb.querySelector('.lb-next');
+    grid.addEventListener('click',function(e){var im=e.target.closest('img');if(im)open(imgs.indexOf(im));});
+    grid.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var im=e.target.closest('img');if(im){e.preventDefault();open(imgs.indexOf(im));}}});
+    closeBtn.addEventListener('click',close);
+    prevBtn.addEventListener('click',function(){show(idx-1);});
+    nextBtn.addEventListener('click',function(){show(idx+1);});
+    lb.addEventListener('click',function(e){if(e.target===lb)close();});   // click backdrop to close
+    document.addEventListener('keydown',function(e){
+      if(!lb.classList.contains('open'))return;
+      if(e.key==='Escape'){close();}
+      else if(e.key==='ArrowLeft'){show(idx-1);prevBtn.focus();}
+      else if(e.key==='ArrowRight'){show(idx+1);nextBtn.focus();}
+      else if(e.key==='Tab'){var f=[prevBtn,nextBtn,closeBtn],i=f.indexOf(document.activeElement);e.preventDefault();
+        f[e.shiftKey?(i<=0?f.length-1:i-1):(i>=f.length-1?0:i+1)].focus();}
+    });
+  }
+  return { bind: bind };
 })();
+</script>
+<script src="assets/content.js" defer></script>
+<script>
+(function(){ var done=false; function go(){ if(done)return; done=true; try{window.BBTGallery.bind();}catch(e){} }
+  document.addEventListener('bbt:content', go); setTimeout(go, 2000); })();
 </script>
 <script src="assets/actionbar.js" defer></script>
 </body>

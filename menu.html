@@ -285,14 +285,18 @@
 </div>
 
 <script>
-(function(){
+/* Menu behaviours are DEFINED here and initialised AFTER content.js renders
+   the (published) menu — or on the static menu as a fallback if the API is
+   unavailable. See the bootstrap block below. */
+window.BBTMenu = {
+  initModal: function(){
   var SET=new Set(["cashew-chicken","chicken-lemongrass-salad","coconut-pancakes","crispy-chicken-wings","crispy-rice-lettuce-wraps","fresh-spring-rolls","fried-banana-with-ice-cream","fried-rice","fried-shrimp-cakes","fried-spring-rolls","garlic-bok-choy","green-curry","green-papaya-salad","grilled-beef-salad","grilled-prawns","larb-mushroom","mango-sticky-rice","massaman-curry","morning-glory","mushroom-trio","pad-krapow","pad-thai","red-curry","royal-golden-curry","satay-chicken","seafood-bucket","seafood-skewers","steamed-mussels","stir-fried-mussels","tom-kha-gai","tom-yum","yellow-curry","thairita","sabai-sabai","white-elephant","the-sapparot","green-honey-lime-tea","lime-iced-tea","classic-thai-milk-tea","thai-iced-coffee"]);
   function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
   function cleanName(el){var c=el.cloneNode(true);var b=c.querySelector('.m-new');if(b)b.remove();return c.textContent.trim();}
   var modal=document.getElementById('dish-modal');
   var dImg=modal.querySelector('.dm-img'),dName=modal.querySelector('.dm-name'),
       dPrice=modal.querySelector('.dm-price'),dDesc=modal.querySelector('.dm-desc'),dMeta=modal.querySelector('.dm-meta');
-  function open(it,sl){
+  function open(it,sl,img){
     var nm=cleanName(it.querySelector('.m-name'));
     var isNew=!!it.querySelector('.m-new');
     dName.innerHTML=nm+(isNew?' <span class="dm-new">New</span>':'');
@@ -301,7 +305,7 @@
     dDesc.innerHTML=(it.querySelector('.m-desc')||{}).innerHTML||'';
     var meta=it.querySelector('.m-meta');dMeta.innerHTML=meta?meta.innerHTML:'';
     dImg.style.display='';dImg.onerror=function(){dImg.style.display='none';};
-    dImg.src='assets/dishes/'+sl+'.jpg?v=4';dImg.alt=nm;
+    dImg.src=img||('assets/dishes/'+sl+'.jpg?v=4');dImg.alt=nm;
     modal.scrollTop=0;modal.querySelector('.sheet').scrollTop=0;
     modal.classList.add('open');document.body.style.overflow='hidden';
   }
@@ -310,16 +314,15 @@
   document.querySelectorAll('.m-item').forEach(function(it){
     var n=it.querySelector('.m-name');if(!n)return;
     var sl=slug(cleanName(n));
-    if(SET.has(sl)){it.classList.add('haspic');it.addEventListener('click',function(){open(it,sl);});BY[sl]=it;}
+    var img=it.getAttribute('data-img');
+    if(img||SET.has(sl)){it.classList.add('haspic');it.addEventListener('click',function(){open(it,sl,img);});BY[sl]=it;}
   });
   modal.addEventListener('click',function(e){if(e.target.hasAttribute('data-close'))close();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
   var hm=(location.hash||'').match(/^#d-(.+)$/);
-  if(hm&&BY[hm[1]]) setTimeout(function(){open(BY[hm[1]],hm[1]);},80);
-})();
-</script>
-<script>
-(function(){
+  if(hm&&BY[hm[1]]) setTimeout(function(){open(BY[hm[1]],hm[1],BY[hm[1]].getAttribute('data-img'));},80);
+  },
+  initCatbar: function(){
   var bar=document.getElementById('catbar'); if(!bar) return;
   var nav=document.querySelector('.nav');
   var links={}; [].forEach.call(bar.querySelectorAll('a'),function(a){links[a.getAttribute('href').slice(1)]=a;});
@@ -353,10 +356,8 @@
   }
   window.addEventListener('scroll',atBottom,{passive:true});
   var t; window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(function(){build();atBottom();},200);});
-})();
-</script>
-<script>
-(function(){
+  },
+  initCurrency: function(){
   var sw=document.querySelector('.cur-switch'); if(!sw) return;
   var note=document.querySelector('.cur-approx');
   var FALLBACK={USD:0.0175,EUR:0.016}, rates={PHP:1,USD:FALLBACK.USD,EUR:FALLBACK.EUR};
@@ -383,6 +384,22 @@
     [].forEach.call(sw.children,function(b){b.classList.toggle('on',b.getAttribute('data-cur')===cur);});
   }
   sw.addEventListener('click',function(e){var b=e.target.closest('button');if(b)convert(b.getAttribute('data-cur'));});
+  }
+};
+</script>
+<script src="assets/content.js" defer></script>
+<script>
+/* Initialise the menu behaviours once — after content.js has rendered the
+   published menu (bbt:content), or after a short fallback if the API is down. */
+(function(){
+  var done=false;
+  function go(){ if(done) return; done=true;
+    try{ window.BBTMenu.initModal(); }catch(e){}
+    try{ window.BBTMenu.initCatbar(); }catch(e){}
+    try{ window.BBTMenu.initCurrency(); }catch(e){}
+  }
+  document.addEventListener('bbt:content', go);
+  setTimeout(go, 2000);
 })();
 </script>
 <script src="assets/actionbar.js" defer></script>
