@@ -138,6 +138,24 @@ window.BBTGallery=(function(){
     prevBtn.addEventListener('click',function(){show(idx-1);});
     nextBtn.addEventListener('click',function(){show(idx+1);});
     lb.addEventListener('click',function(e){if(e.target===lb)close();});   // click backdrop to close
+    /* touch: swipe left/right between photos, swipe down to close.
+       The arrows work on desktop, but on a phone swiping is the natural gesture
+       and there was nothing listening for it. */
+    var tx=0,ty=0,tt=0;
+    lb.addEventListener('touchstart',function(e){
+      if(e.touches.length!==1) return;
+      tx=e.touches[0].clientX; ty=e.touches[0].clientY; tt=Date.now();
+    },{passive:true});
+    lb.addEventListener('touchend',function(e){
+      if(!lb.classList.contains('open')||!e.changedTouches.length) return;
+      var t=e.changedTouches[0], dx=t.clientX-tx, dy=t.clientY-ty, dt=Date.now()-tt;
+      if(dt>700) return;                                   // slow drag, not a swipe
+      if(Math.abs(dx)>44 && Math.abs(dx)>Math.abs(dy)){    // mostly horizontal
+        show(dx<0 ? idx+1 : idx-1);                        // swipe left = next photo
+      } else if(dy>70 && Math.abs(dy)>Math.abs(dx)){       // decisive swipe down
+        close();
+      }
+    },{passive:true});
     document.addEventListener('keydown',function(e){
       if(!lb.classList.contains('open'))return;
       if(e.key==='Escape'){close();}
@@ -150,10 +168,10 @@ window.BBTGallery=(function(){
   return { bind: bind };
 })();
 </script>
-<script src="assets/content.js?v=653fc275" defer></script>
+<script src="assets/content.js?v=3ca8c5f9" defer></script>
 <script>
 (function(){ var done=false; function go(){ if(done)return; done=true; try{window.BBTGallery.bind();}catch(e){} }
-  document.addEventListener('bbt:content', go); setTimeout(go, 2000); })();
+  document.addEventListener('bbt:content', go); setTimeout(go, 4000); })();
 </script>
 <script src="assets/actionbar.js?v=77106232" defer></script>
 <script src="assets/track.js?v=0ddb177f" defer></script>

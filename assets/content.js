@@ -156,6 +156,27 @@ window.BBTContent = (function () {
     try { document.dispatchEvent(new CustomEvent("bbt:content", { detail: data })); } catch (e) {}
   }
 
+  /* Real content that arrives AFTER we've already settled.
+     This matters: on the homepage the hero video saturates the connection, so
+     /api/content can start at ~1.5s and take ~8s. The old code hit its timeout,
+     applied {}, and then THREW AWAY the real response — so published settings
+     (footer, hours, links) never appeared on the homepage while they worked fine
+     on the lighter subpages.
+
+     Text/link/SEO updates are idempotent DOM writes, so applying them late is
+     safe. We deliberately do NOT re-render the menu/gallery late: menu.html and
+     gallery.html bind their behaviours (modal, currency, lightbox) to the DOM
+     once, and swapping it underneath them would break those bindings. Those
+     pages are light and win the race in practice; if a published menu ever loses
+     it, that visitor simply sees the built-in menu for that load. */
+  function lateUpdate(c) {
+    if (!c || !Object.keys(c).length) return;
+    data = c;
+    try { applySettings(c.settings); } catch (e) {}
+    try { applySEO(c.seo); } catch (e) {}
+    try { applySlots(c); } catch (e) {}
+  }
+
   // ---------- boot ----------
   // preview: render the admin's in-editor draft
   if (/bbtpreview/.test(location.hash)) {
@@ -176,10 +197,18 @@ window.BBTContent = (function () {
   var cd = null; try { cd = JSON.parse(localStorage.getItem(CACHE) || "null"); } catch (e) {}
   if (cd && cd.d) { try { applySettings(cd.d.settings); applySEO(cd.d.seo); applySlots(cd.d); } catch (e) {} }
 
-  var to = setTimeout(function () { finish((cd && cd.d) || {}); }, 1500);
+  // Settle after 2.5s so pages waiting on bbt:content (menu/gallery) aren't held
+  // up by a slow API — but the real response is applied whenever it lands, even
+  // if it's late (see lateUpdate).
+  var to = setTimeout(function () { finish((cd && cd.d) || {}); }, 2500);
   fetch(API, { headers: { accept: "application/json" } })
     .then(function (r) { return r.json(); })
-    .then(function (d) { clearTimeout(to); try { localStorage.setItem(CACHE, JSON.stringify({ t: Date.now(), d: d })); } catch (e) {} finish(d); })
+    .then(function (d) {
+      clearTimeout(to);
+      try { localStorage.setItem(CACHE, JSON.stringify({ t: Date.now(), d: d })); } catch (e) {}
+      if (ready) lateUpdate(d);   // we already settled (slow page) — apply it anyway
+      else finish(d);
+    })
     .catch(function () { clearTimeout(to); finish((cd && cd.d) || {}); });
 
   return {
