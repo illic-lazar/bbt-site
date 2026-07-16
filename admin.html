@@ -518,8 +518,9 @@ window.CMS=(function(){
 <script>
 /* ===== Stage 7 — Insights dashboard (Reach tab) =====
    Reads /api/insights (events table). Date ranges + previous-period
-   comparison + filters. The pre-Stage-7 page_hits archive still exists and
-   is still served by /api/reach (untouched). */
+   comparison + filters. The pre-Stage-7 page_hits archive still exists in the
+   database (query it directly); /api/reach was removed once this replaced it,
+   to stay under Vercel Hobby's 12-function limit. */
 window.INSIGHTS=(function(){
   function tok(){ return sessionStorage.getItem('bbtAdmin')||''; }
   function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -671,7 +672,7 @@ window.INSIGHTS=(function(){
 /* ===== Stage 8 — Maintenance tab =====
    Uptime comes from Supabase-side probes (separate infra from Vercel, so a
    failure here means the site really is unreachable). Everything else is a
-   live deep check via /api/health. */
+   live deep check via /api/ops?action=health. */
 window.OPS=(function(){
   function tok(){ return sessionStorage.getItem('bbtAdmin')||''; }
   function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -754,7 +755,7 @@ window.OPS=(function(){
     var msg=p.querySelector('[data-opsmsg]');
     p.querySelector('#opsBackupNow').onclick=function(){
       msg.textContent='Backing up…'; msg.className='msg';
-      fetch('/api/backup',{method:'POST',headers:{'x-admin-token':tok(),'content-type':'application/json'},body:JSON.stringify({action:'run'})})
+      fetch('/api/ops',{method:'POST',headers:{'x-admin-token':tok(),'content-type':'application/json'},body:JSON.stringify({action:'backup'})})
         .then(function(r){return r.json();}).then(function(j){
           if(j.error){ msg.textContent=j.error; msg.className='msg err'; return; }
           msg.textContent='Snapshot saved ✓'; msg.className='msg ok'; setTimeout(load,600);
@@ -764,7 +765,7 @@ window.OPS=(function(){
       e.preventDefault();
       // token can't go in a URL — fetch with the header, then save the blob
       msg.textContent='Preparing…'; msg.className='msg';
-      fetch('/api/backup?download=1',{headers:{'x-admin-token':tok()}}).then(function(r){return r.blob();}).then(function(b){
+      fetch('/api/ops?action=download',{headers:{'x-admin-token':tok()}}).then(function(r){return r.blob();}).then(function(b){
         var a=document.createElement('a'), u=URL.createObjectURL(b);
         a.href=u; a.download='bbt-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
         URL.revokeObjectURL(u); msg.textContent='Downloaded ✓'; msg.className='msg ok';
@@ -775,7 +776,7 @@ window.OPS=(function(){
   function load(){
     var p=document.getElementById('paneOps');
     p.innerHTML='<p class="muted">Running checks… (probing pages, links, chatbot and backups — a few seconds)</p>';
-    fetch('/api/health',{headers:{'x-admin-token':tok()}}).then(function(r){return r.json();}).then(render)
+    fetch('/api/ops?action=health',{headers:{'x-admin-token':tok()}}).then(function(r){return r.json();}).then(render)
       .catch(function(){ p.innerHTML='<p class="muted">Couldn’t run health checks.</p>'; });
   }
   return { load: load };
