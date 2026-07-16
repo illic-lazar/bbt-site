@@ -4,6 +4,23 @@
 
 const STOP = new Set(("a an and are as at be but by can could do does for from get had has have how i id im is it its just me my no not of on or our so that the their them then there these they this to up us was we what when where which who why will with would you your could would should about any are can do have me my".split(" ")));
 
+/* Stage 8: record failed admin logins (the admin gate authenticates here).
+   Coarse only — country + endpoint. The attempted secret is NEVER stored. */
+async function audit(req, event, detail) {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const sk = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !sk) return;
+  const h = (req && req.headers) || {};
+  try {
+    await fetch(url.replace(/\/+$/, "") + "/rest/v1/admin_audit", {
+      method: "POST",
+      headers: { apikey: sk, authorization: "Bearer " + sk, "content-type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ event, detail: String(detail || "").slice(0, 200),
+                             country: String(h["x-vercel-ip-country"] || "").slice(0, 4) || null })
+    });
+  } catch (e) { /* auditing must never break the admin */ }
+}
+
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
 
@@ -13,7 +30,11 @@ module.exports = async (req, res) => {
   const token = (req.headers && (req.headers["x-admin-token"] || req.headers["X-Admin-Token"])) || (req.query && req.query.token) || "";
 
   if (!ADMIN) { res.status(503).json({ error: "ADMIN_TOKEN not set" }); return; }
-  if (!token || String(token).trim() !== String(ADMIN).trim()) { res.status(401).json({ error: "unauthorized" }); return; }
+  if (!token || String(token).trim() !== String(ADMIN).trim()) {
+    if (token) await audit(req, "login_failed", "wrong password at /api/stats");   // ignore empty = not a login attempt
+    res.status(401).json({ error: "unauthorized" }); return;
+  }
+  audit(req, "login_ok", "/api/stats");   // fire-and-forget
   if (!url || !sk) { res.status(200).json({ configured: false }); return; }
 
   const base = url.replace(/\/+$/, "");

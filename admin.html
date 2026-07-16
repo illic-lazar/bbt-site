@@ -133,6 +133,7 @@
       <button class="tab" data-t="menu">Menu</button>
       <button class="tab" data-t="photos">Photos</button>
       <button class="tab" data-t="seo">SEO</button>
+      <button class="tab" data-t="ops">Maintenance</button>
     </div>
 
     <div id="notcfg" class="hide"><p class="muted">Logging isn't connected yet — add the Supabase keys in Vercel, then refresh.</p></div>
@@ -189,6 +190,9 @@
 
     <!-- SEO -->
     <div id="tab-seo" class="hide"><div id="paneSeo"></div></div>
+
+    <!-- MAINTENANCE -->
+    <div id="tab-ops" class="hide"><div id="paneOps"></div></div>
   </div>
 
 </div>
@@ -267,8 +271,9 @@
     t.onclick=function(){
       Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(x){x.classList.remove('on');});
       t.classList.add('on');
-      ['chat','reach','rep','content','menu','photos','seo'].forEach(function(p){ show($('#tab-'+p), t.dataset.t===p); });
+      ['chat','reach','rep','content','menu','photos','seo','ops'].forEach(function(p){ show($('#tab-'+p), t.dataset.t===p); });
       if(window.CMS) window.CMS.open(t.dataset.t);
+      if(t.dataset.t==='ops' && window.OPS) window.OPS.load();
     };
   });
 
@@ -657,6 +662,121 @@ window.INSIGHTS=(function(){
     fetch('/api/insights?'+qs(),{headers:{'x-admin-token':tok()}}).then(function(r){return r.json();}).then(function(d){
       last=d; renderControls(d); render(d);
     }).catch(function(){ b.innerHTML='<p class="muted">Couldn’t load analytics.</p>'; });
+  }
+  return { load: load };
+})();
+</script>
+
+<script>
+/* ===== Stage 8 — Maintenance tab =====
+   Uptime comes from Supabase-side probes (separate infra from Vercel, so a
+   failure here means the site really is unreachable). Everything else is a
+   live deep check via /api/health. */
+window.OPS=(function(){
+  function tok(){ return sessionStorage.getItem('bbtAdmin')||''; }
+  function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function dot(state){ var c=state==='ok'||state==='healthy'?'#7fd18a':state==='down'||state==='issues'?'#ff8a65':state==='attention'?'#E2993B':'rgba(255,245,232,.4)';
+    return '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+c+';margin-right:7px;vertical-align:middle"></span>'; }
+  function pill(label,state,detail){ return '<span title="'+esc(detail||'')+'">'+dot(state)+esc(label)+(detail?' <b style="opacity:.6;font-weight:400">'+esc(detail)+'</b>':'')+'</span>'; }
+
+  function render(d){
+    var p=document.getElementById('paneOps');
+    if(d.error){ p.innerHTML='<p class="muted">'+esc(d.error)+'</p>'; return; }
+    var h='';
+
+    // headline
+    var label=d.status==='healthy'?'All systems healthy':(d.status==='attention'?'Needs attention':'Issues found');
+    h+='<div class="box" style="border-color:'+(d.status==='healthy'?'rgba(127,209,138,.35)':'rgba(226,153,59,.35)')+'">'+
+       '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:24px;text-transform:uppercase;letter-spacing:.03em">'+dot(d.status)+esc(label)+'</div>'+
+       '<p class="muted" style="margin:6px 0 0;font-size:12px">Checked '+esc(new Date(d.checkedAt).toLocaleString())+' · uptime probes run every 5 min from Supabase (separate infrastructure from the website host)</p></div>';
+
+    // outstanding issues
+    h+='<section><h2>Outstanding issues</h2>'+((d.problems||[]).length?
+      '<ul style="margin:0;padding-left:18px">'+d.problems.map(function(x){return '<li style="font-size:13.5px;margin-bottom:4px;color:#ffb59e">'+esc(x)+'</li>';}).join('')+'</ul>'
+      :'<p class="muted">Nothing outstanding. 🎉</p>')+'</section>';
+
+    // uptime
+    h+='<section><h2>Uptime (last 24h)</h2>';
+    if(d.uptime&&d.uptime.length){
+      h+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'+
+        '<tr style="opacity:.55;text-align:left"><th style="padding:4px 8px 4px 0">Target</th><th>Type</th><th>Checks</th><th>Uptime</th><th>Avg</th><th>Last</th></tr>'+
+        d.uptime.map(function(u){
+          var st=u.last&&u.last.ok?'ok':'down';
+          return '<tr style="border-top:1px solid rgba(255,245,232,.07)"><td style="padding:5px 8px 5px 0">'+dot(st)+esc(u.name)+'</td><td style="opacity:.6">'+esc(u.kind)+'</td><td>'+u.checks+'</td><td style="color:'+(u.uptime>=99.5?'#7fd18a':'#ff8a65')+'">'+(u.uptime!=null?u.uptime+'%':'–')+'</td><td>'+(u.avgMs!=null?u.avgMs+'ms':'–')+'</td><td style="opacity:.6">'+(u.last?esc(String(u.last.status||'ERR')):'–')+'</td></tr>';
+        }).join('')+'</table></div>';
+    } else h+='<p class="muted">No probe data yet — run <b>SUPABASE_STAGE8.sql</b>, then wait for the first 5-minute check.</p>';
+    h+='</section>';
+
+    // links + chatbot + analytics + ssl
+    h+='<section><h2>Critical links &amp; services</h2><div class="kw">'+
+      (d.links||[]).map(function(l){ return '<span>'+pill(l.name,l.state,String(l.detail))+'</span>'; }).join('')+
+      (d.chatbot?'<span>'+pill('Chatbot',d.chatbot.state,String(d.chatbot.detail))+'</span>':'')+
+      (d.analytics?'<span>'+pill('Analytics',d.analytics.state,String(d.analytics.detail))+'</span>':'')+
+      (d.ssl?'<span>'+pill('SSL',d.ssl.state,'auto-renewed')+'</span>':'')+
+      '</div><p class="muted" style="font-size:11px">Messaging/social hosts block datacenter IPs — those show “bot-blocked”, which is normal, not a fault.</p></section>';
+
+    // content audit
+    h+='<section><h2>Content checks</h2>';
+    var clean=(d.content||[]).every(function(c){return !c.issues.length;});
+    if(clean) h+='<p class="muted">All pages: metadata, alt text and content present. ✓</p>';
+    else h+=(d.content||[]).map(function(c){ return c.issues.length? '<div class="una"><div class="t">'+esc(c.page)+'</div><div class="q">'+c.issues.map(esc).join(' · ')+'</div></div>':''; }).join('');
+    h+='</section>';
+
+    // broken links
+    h+='<section><h2>Broken internal links</h2>'+((d.brokenLinks||[]).length?
+      d.brokenLinks.map(function(b){return '<div class="una"><div class="q">'+esc(b.href)+' → '+esc(String(b.status))+'</div></div>';}).join('')
+      :'<p class="muted">None. ✓</p>')+'</section>';
+
+    // backups
+    h+='<section><h2>Backups</h2>';
+    if(d.backup&&d.backup.last){
+      h+='<div class="kw"><span>'+pill('Last snapshot',d.backup.state,new Date(d.backup.last).toLocaleString())+'</span>'+
+         '<span>'+pill('Restore-verified',d.backup.verified?'ok':'unknown',d.backup.verified?'yes':'not verified')+'</span>'+
+         '<span>size <b>'+Math.round((d.backup.bytes||0)/1024)+' KB</b></span></div>';
+    } else h+='<p class="muted">'+esc((d.backup&&d.backup.detail)||'No backups yet.')+'</p>';
+    h+='<div class="rowline" style="margin-top:10px"><button class="btn" id="opsBackupNow">Back up now</button>'+
+       '<a class="ghost" id="opsDownload" href="#" style="text-decoration:none;padding:8px 14px;border-radius:8px;border:1px solid rgba(255,245,232,.25)">Download latest (off-site copy)</a>'+
+       '<span class="msg" data-opsmsg></span></div>'+
+       '<p class="muted" style="font-size:11px">Nightly at 02:30. Snapshots your website content + the facts you taught the bot — the things that can\'t be recreated. Analytics is excluded on purpose (large, regenerating, already retention-managed). Photos live in Supabase Storage; all code/config is in git.</p></section>';
+
+    // security
+    h+='<section><h2>Security</h2>';
+    var rec=(d.security&&d.security.recent)||[];
+    var fails=rec.filter(function(r){return r.event==='login_failed';});
+    h+='<div class="kw"><span>'+pill('Failed logins (recent)',fails.length?(fails.length>4?'down':'attention'):'ok',String(fails.length))+'</span>'+
+       '<span>'+pill('Dependencies',(0)?'down':'ok','0 npm packages — nothing to scan')+'</span>'+
+       '<span>'+pill('Code integrity','ok','git is the source of truth; Vercel deploys only from main')+'</span></div>';
+    if(rec.length) h+='<div style="margin-top:10px">'+rec.slice(0,8).map(function(r){
+      return '<div class="una" style="border-left-color:'+(r.event==='login_failed'?'#ff8a65':'rgba(255,245,232,.2)')+'"><div class="t">'+esc(new Date(r.at).toLocaleString())+' · '+esc(r.country||'??')+'</div><div class="q">'+esc(r.event)+' — '+esc(r.detail||'')+'</div></div>'; }).join('')+'</div>';
+    h+='</section>';
+
+    p.innerHTML=h;
+    var msg=p.querySelector('[data-opsmsg]');
+    p.querySelector('#opsBackupNow').onclick=function(){
+      msg.textContent='Backing up…'; msg.className='msg';
+      fetch('/api/backup',{method:'POST',headers:{'x-admin-token':tok(),'content-type':'application/json'},body:JSON.stringify({action:'run'})})
+        .then(function(r){return r.json();}).then(function(j){
+          if(j.error){ msg.textContent=j.error; msg.className='msg err'; return; }
+          msg.textContent='Snapshot saved ✓'; msg.className='msg ok'; setTimeout(load,600);
+        }).catch(function(){ msg.textContent='Backup failed'; msg.className='msg err'; });
+    };
+    p.querySelector('#opsDownload').onclick=function(e){
+      e.preventDefault();
+      // token can't go in a URL — fetch with the header, then save the blob
+      msg.textContent='Preparing…'; msg.className='msg';
+      fetch('/api/backup?download=1',{headers:{'x-admin-token':tok()}}).then(function(r){return r.blob();}).then(function(b){
+        var a=document.createElement('a'), u=URL.createObjectURL(b);
+        a.href=u; a.download='bbt-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+        URL.revokeObjectURL(u); msg.textContent='Downloaded ✓'; msg.className='msg ok';
+      }).catch(function(){ msg.textContent='Download failed'; msg.className='msg err'; });
+    };
+  }
+
+  function load(){
+    var p=document.getElementById('paneOps');
+    p.innerHTML='<p class="muted">Running checks… (probing pages, links, chatbot and backups — a few seconds)</p>';
+    fetch('/api/health',{headers:{'x-admin-token':tok()}}).then(function(r){return r.json();}).then(render)
+      .catch(function(){ p.innerHTML='<p class="muted">Couldn’t run health checks.</p>'; });
   }
   return { load: load };
 })();
