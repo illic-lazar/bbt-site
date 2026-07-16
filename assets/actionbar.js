@@ -203,5 +203,5 @@
   },true);
 
   /* ---------------- chat assistant ---------------- */
-  var bbtChat=document.createElement('script');bbtChat.src='assets/chat.js';bbtChat.defer=true;document.body.appendChild(bbtChat);
+  var bbtChat=document.createElement('script');bbtChat.src='assets/chat.js?v=bbdbe392';bbtChat.defer=true;document.body.appendChild(bbtChat);
 })();
