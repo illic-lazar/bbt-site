@@ -47,7 +47,11 @@ a{color:inherit;text-decoration:none;}
 .nav-links a.nav-reserve{display:none;}
 .nav-cta{font-family:'Space Mono',monospace;font-size:10px;height:38px;padding:0 22px;}
 .nav-cta-m{display:none;}
-.nav-ham{display:none;flex-direction:column;gap:4.5px;cursor:pointer;background:none;border:none;}
+.nav-ham{display:none;flex-direction:column;gap:4.5px;cursor:pointer;background:none;border:none;position:relative;}
+/* The bars are only 22x14 — too small to tap (WCAG 2.2 SC 2.5.8 wants >=24x24;
+   Apple/Material want 44x44). This invisible overlay enlarges the TAP TARGET to
+   44x44 without changing the layout or how the icon looks. */
+.nav-ham::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;}
 .nav-ham span{display:block;width:22px;height:1.5px;background:var(--night);border-radius:1px;}
 @media(max-width:760px){
   .nav{height:56px;padding:0 22px;}

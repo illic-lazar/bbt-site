@@ -23,7 +23,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&family=Kanit:wght@700&display=swap"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&family=Kanit:wght@700&display=swap" rel="stylesheet" media="print" onload="this.media=&#39;all&#39;"><noscript><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&family=Kanit:wght@700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<!-- pinned: @latest let a third party push arbitrary CSS/font code into this page.
+     2.47.0 is byte-identical to what @latest served on 2026-07-13 (sha256 f14b2b40…). -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <style>
 
 @font-face {
@@ -210,7 +212,10 @@ body {
 .m-menu a { padding:16px 24px; font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--bamboo); text-decoration:none; border-top:1px solid rgba(24,24,24,.06); }
 .m-menu a:first-child { border-top:none; }
 .m-menu a.reserve { background:var(--clay); color:var(--cream); text-align:center; }
-.ham { display:flex; flex-direction:column; gap:4.5px; background:none; border:none; }
+.ham { display:flex; flex-direction:column; gap:4.5px; background:none; border:none; position:relative; }
+/* invisible 44x44 tap target — the icon itself is only ~28x22 (WCAG 2.2 SC 2.5.8
+   wants >=24x24). Does not affect layout or appearance. */
+.ham::after { content:""; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:44px; height:44px; }
 .ham span { display:block; width:20px; height:1.5px; background:var(--night); border-radius:1px; }
 
 </style>
