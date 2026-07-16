@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page not found — Big Bad Thai · El Nido</title>
+<meta name="description" content="That page doesn't exist — but the menu, the bay and the table are still here.">
+<!-- a 404 must never be indexed, and must never be treated as a real page -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#181818">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css?v=8857dccc">
+<style>
+  @font-face{font-family:'Brandford';src:url('assets/brandford.otf') format('opentype');font-display:swap;}
+  .nf{background:var(--night);color:var(--cream);min-height:78vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:clamp(60px,10vw,120px) 22px;position:relative;overflow:hidden;}
+  .nf .in{position:relative;max-width:60ch;}
+  .nf .code{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:18px;}
+  .nf h1{font-family:'Brandford','Barlow Condensed',sans-serif;text-transform:uppercase;color:var(--cream);
+    font-size:clamp(52px,11vw,132px);line-height:.84;letter-spacing:.01em;margin:0 0 22px;}
+  .nf p{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:clamp(15px,2vw,18px);
+    color:rgba(255,245,232,.72);line-height:1.7;margin:0 auto 32px;max-width:44ch;}
+  .nf .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .nf .elephant{position:absolute;inset:0;background:url('assets/elephant.png') no-repeat center/contain;opacity:.05;pointer-events:none;}
+  .nf .links{margin-top:34px;padding-top:22px;border-top:1px solid rgba(255,245,232,.12);}
+  .nf .links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:rgba(255,245,232,.5);margin:0 10px;text-decoration:none;}
+  .nf .links a:hover{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">Big Bad Thai</a>
+  <div class="nav-links" id="navlinks">
+    <a href="index.html" class="nav-home">Home</a>
+    <a href="menu.html">Menu</a>
+    <a href="about.html">About</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="visit.html">Find Us</a>
+    <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" class="nav-reserve" data-cta="reserve">Reserve a Table</a>
+  </div>
+  <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" data-cta="reserve" class="btn btn-clay nav-cta nav-cta-d">Reserve a Table</a>
+  <a href="menu.html" class="btn btn-clay nav-cta nav-cta-m">Menu</a>
+  <button class="nav-ham" aria-label="Menu" onclick="document.getElementById('navlinks').classList.toggle('open')"><span></span><span></span><span></span></button>
+</nav>
+
+<main class="nf" id="main">
+  <div class="elephant" aria-hidden="true"></div>
+  <div class="in">
+    <span class="code">Error 404</span>
+    <h1>Lost in<br>the bay</h1>
+    <p>This page isn't on the menu. It may have moved, or the link might have a typo — but the kitchen's still open and the table's still yours.</p>
+    <div class="btns">
+      <a href="menu.html" data-cta="menu" class="btn btn-clay" style="color:var(--cream)">View the Menu</a>
+      <a href="index.html" class="btn btn-ghost">Back to Home</a>
+    </div>
+    <div class="links">
+      <a href="about.html">Our Story</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="visit.html">Find Us</a>
+      <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" data-cta="reserve">Reserve</a>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <span class="footer-logo">Big Bad Thai</span>
+  <div class="footer-links">
+    <a href="menu.html">Menu</a>
+    <a href="about.html">About</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="visit.html">Find Us</a>
+    <a href="privacy.html">Privacy</a>
+  </div>
+  <span class="footer-copy">© 2026 Big Bad Thai · El Nido</span>
+</footer>
+
+<script src="assets/content.js?v=653fc275" defer></script>
+<script src="assets/actionbar.js?v=77106232" defer></script>
+<script src="assets/track.js?v=0ddb177f" defer></script>
+</body>
+</html>

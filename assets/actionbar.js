@@ -170,16 +170,14 @@
   [['apple-mobile-web-app-capable','yes'],['apple-mobile-web-app-status-bar-style','default'],['apple-mobile-web-app-title','Big Bad Thai'],['mobile-web-app-capable','yes']].forEach(function(m){var mt=document.createElement('meta');mt.name=m[0];mt.content=m[1];document.head.appendChild(mt);});
   if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}
 
-  /* ---------------- page-view beacon (privacy-friendly, no cookies) ---------------- */
-  if(!/editor|studio|admin/i.test(location.pathname)){
-    try{
-      var _sk='bbtSid', _sid=sessionStorage.getItem(_sk);
-      if(!_sid){ _sid=Date.now().toString(36)+Math.random().toString(36).slice(2,8); sessionStorage.setItem(_sk,_sid); }
-      var _hit=JSON.stringify({p:location.pathname,r:document.referrer||'',s:_sid});
-      if(navigator.sendBeacon){ navigator.sendBeacon('/api/hit', new Blob([_hit],{type:'application/json'})); }
-      else{ fetch('/api/hit',{method:'POST',headers:{'content-type':'application/json'},body:_hit,keepalive:true}).catch(function(){}); }
-    }catch(e){}
-  }
+  /* ---------------- page views ----------------
+     Retired in Stage 9. This used to beacon /api/hit -> the page_hits table.
+     Stage 7's tracker now records page_view into `events` with far more detail
+     (device, language, campaign/UTM, source), and Stage 8 removed the last
+     reader of page_hits (/api/reach) — so this was writing data nobody read.
+     The tracker creates the shared `bbtSid` session id lazily, exactly as this
+     did, so the chatbot<->analytics session join is unaffected.
+     Historical page_hits data is kept as an archive; see ANALYTICS.md. */
 
   /* ---------------- click tracking hooks (menu / reserve / directions / whatsapp / messenger / phone / email) ---------------- */
   document.addEventListener('click',function(e){
