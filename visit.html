@@ -22,28 +22,70 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css?v=8af78784">
-<!-- pinned: @latest let a third party push arbitrary CSS/font code into this page.
-     2.47.0 is byte-identical to what @latest served on 2026-07-13 (sha256 f14b2b40…). -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/site.css?v=28a449f8">
+<!-- The Tabler icon webfont (a third-party CDN) used to be loaded here for four
+     icons. Replaced with inline SVG: one less external dependency on this page,
+     nothing to pin, and no render-blocking request. -->
 <style>
-.visit{display:grid;grid-template-columns:0.9fr 1.1fr;gap:clamp(32px,5vw,72px);align-items:start;}
-@media(max-width:820px){.visit{grid-template-columns:1fr;}}
-.info{display:flex;flex-direction:column;gap:34px;}
-.blk{display:flex;flex-direction:column;gap:9px;}
-.blk .ic{width:40px;height:40px;border:1px solid rgba(24,24,24,.16);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--night);margin-bottom:4px;}
-.blk .lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;font-size:19px;color:var(--night);}
-.blk p,.blk a{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:15.5px;color:var(--bamboo);line-height:1.8;}
-.blk a:hover{color:var(--clay);}
-.map{width:100%;aspect-ratio:4/3;border:0;border-radius:6px;box-shadow:0 12px 40px rgba(0,0,0,.12);min-height:340px;}
-.visit-cta{margin-top:8px;}
-.subnote{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;color:#5b5f43;text-transform:uppercase;margin-top:4px;}
-.primary-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;}
-.blk.secondary{gap:12px;margin-top:2px;}
-.blk .lbl-sm{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#5b5f43;}
-.contact-list{list-style:none;display:flex;flex-direction:column;gap:7px;}
-.contact-list a{font-family:'Roboto Condensed',sans-serif;font-weight:400;font-size:13.5px;color:#5b5f43;line-height:1.6;}
-.contact-list a:hover{color:var(--clay);}
+  @font-face{font-family:'Brandford';src:url('assets/brandford.otf') format('opentype');font-display:swap;}
+  .eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);}
+
+  /* ── hero: full-bleed, same art direction as the homepage / About ── */
+  .vhero{position:relative;height:min(62vh,520px);min-height:340px;display:flex;align-items:flex-end;overflow:hidden;background:var(--night);}
+  .vhero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 58%;}
+  .vhero .grd{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,6,4,.94),rgba(8,6,4,.15) 62%,rgba(8,6,4,.55));}
+  .vhero .in{position:relative;width:100%;padding:clamp(24px,5vw,72px);}
+  .vhero .eyebrow{display:block;margin-bottom:12px;}
+  .vhero h1{font-family:'Brandford','Barlow Condensed',sans-serif;text-transform:uppercase;color:var(--cream);
+    font-size:clamp(58px,14vw,150px);line-height:.82;letter-spacing:.01em;margin:0;}
+  .vhero .lede{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:clamp(14px,2vw,17px);
+    color:rgba(255,245,232,.8);margin:14px 0 0;max-width:38ch;line-height:1.6;}
+
+  /* ── map: full-bleed band, straight after the hero — it's what this page is for ── */
+  .vmap{position:relative;background:var(--night);line-height:0;}
+  .vmap iframe{width:100%;height:clamp(260px,42vh,420px);border:0;display:block;}
+  .vmap .maplink{position:absolute;right:clamp(12px,3vw,22px);top:clamp(12px,3vw,22px);z-index:2;
+    display:inline-flex;align-items:center;gap:8px;background:var(--cream);color:var(--night);
+    font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:11px 16px;border-radius:22px;text-decoration:none;box-shadow:0 8px 26px rgba(0,0,0,.35);
+    min-height:44px;line-height:1;}
+  .vmap .maplink:hover{background:var(--gold);}
+  .vmap .maplink svg{width:14px;height:14px;flex:0 0 14px;}
+
+  /* ── the card that matters: address · hours · actions ── */
+  .vcard{background:var(--night);padding:0 clamp(16px,5vw,72px) clamp(40px,7vw,80px);}
+  .vcard .inner{background:#211f18;border:1px solid rgba(255,245,232,.09);border-radius:14px;
+    padding:clamp(22px,4vw,38px);display:grid;gap:clamp(20px,3vw,30px);grid-template-columns:1fr;
+    max-width:1100px;margin:-34px auto 0;position:relative;z-index:3;box-shadow:0 24px 60px rgba(0,0,0,.4);}
+  @media(min-width:820px){ .vcard .inner{grid-template-columns:1fr 1fr;} .vcard .acts,.vcard .note{grid-column:1/-1;} }
+  .vcard .k{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:9px;}
+  .vcard p{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:16px;line-height:1.65;color:var(--cream);margin:0;}
+  .vcard .sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(255,245,232,.62);margin-top:12px;display:inline-block;text-decoration:none;min-height:44px;line-height:44px;}
+  .vcard .sub:hover{color:var(--gold);}
+  .vcard .acts{display:flex;gap:12px;flex-wrap:wrap;padding-top:24px;border-top:1px solid rgba(255,245,232,.1);}
+  .vcard .acts .btn{flex:1 1 auto;min-width:170px;justify-content:center;}
+  .vcard .note{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(255,245,232,.62);margin:-8px 0 0;}
+
+  /* ── contact ── */
+  .vcontact{background:var(--cream);padding:clamp(40px,7vw,80px) clamp(16px,5vw,72px);}
+  .vcontact .h{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;
+    font-size:clamp(26px,4.4vw,44px);color:var(--night);line-height:1;margin:0 0 6px;letter-spacing:.01em;}
+  .vcontact .s{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:15px;color:var(--bamboo);margin:0 0 26px;}
+  .vlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;max-width:1100px;}
+  .vlist a{display:flex;align-items:center;gap:13px;min-height:60px;padding:12px 16px;border-radius:11px;
+    border:1px solid rgba(24,24,24,.14);text-decoration:none;background:rgba(255,255,255,.4);
+    transition:border-color .15s,background .15s,transform .15s;}
+  .vlist a:hover{border-color:var(--clay);background:#fff;transform:translateY(-1px);}
+  .vlist .ico{width:34px;height:34px;flex:0 0 34px;border-radius:9px;background:var(--night);color:var(--cream);
+    display:flex;align-items:center;justify-content:center;}
+  .vlist .ico svg{width:17px;height:17px;}
+  .vlist .tx{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .vlist .t{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;font-size:15px;
+    color:var(--night);letter-spacing:.02em;line-height:1;}
+  .vlist .d{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:12.5px;color:#5b5f43;
+    line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -63,56 +105,82 @@
   <button class="nav-ham" aria-label="Menu" onclick="document.getElementById('navlinks').classList.toggle('open')"><span></span><span></span><span></span></button>
 </nav>
 
-<main class="page">
-  <div class="page-head">
-    <span class="mo">Visit</span>
-    <h1>Find Us</h1>
-    <p>Right in the heart of El Nido, on the Bacuit Bay waterfront. Walk-ins welcome — reservations recommended for peak hours.</p>
-  </div>
+<main id="main">
 
-  <div class="visit">
-    <div class="info">
-      <div class="blk">
-        <div class="ic"><i class="ti ti-map-pin" style="font-size:19px"></i></div>
-        <div class="lbl">Location</div>
-        <p data-c-html="settings.address_html">Hama Street, Barangay Masagana<br>El Nido, 5313 Palawan<br>Philippines</p>
-        <p><a href="https://www.google.com/maps/place/?q=place_id:ChIJj-thjxVVtjMRdmsUeV7mG_E" target="_blank" rel="noopener">View on Google Maps &rarr;</a></p>
-      </div>
-      <div class="blk">
-        <div class="ic"><i class="ti ti-clock" style="font-size:19px"></i></div>
-        <div class="lbl">Hours</div>
-        <p data-c-html="settings.hours.label">Open daily<br>11:00 AM – 11:00 PM</p>
-        <span data-open-status style="margin-top:8px"></span>
-      </div>
-      <div class="blk">
-        <div class="ic"><i class="ti ti-calendar-check" style="font-size:19px"></i></div>
-        <div class="lbl">Reservations</div>
-        <div class="primary-cta">
-          <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" data-cta="reserve" class="btn btn-clay" style="color:var(--cream)">Reserve a Table</a>
-          <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Bad+Thai+Restaurant+El+Nido&amp;destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&amp;travelmode=walking" target="_blank" rel="noopener" data-cta="directions" class="btn btn-line">Get Directions</a>
-        </div>
-        <div class="subnote">Booking via Messenger · we reply fast</div>
-      </div>
-      <div class="blk secondary">
-        <div class="lbl-sm">Other ways to contact us</div>
-        <ul class="contact-list">
-          <li><a href="https://wa.me/639452994225" target="_blank" rel="noopener">WhatsApp</a></li>
-          <li><a href="https://m.me/bigbadthai" target="_blank" rel="noopener">Messenger</a></li>
-          <li><a href="tel:+639452994225">Call &middot; <span data-c="settings.phone">+63 945 299 4225</span></a></li>
-          <li><a href="mailto:info.elnido@bigbadthai.com">Email &middot; <span data-c="settings.email">info.elnido@bigbadthai.com</span></a></li>
-        </ul>
-      </div>
-      <div class="blk">
-        <div class="ic"><i class="ti ti-brand-instagram" style="font-size:19px"></i></div>
-        <div class="lbl">Follow</div>
-        <p><a href="https://www.instagram.com/bigbadthairestaurant" target="_blank" rel="noopener">Instagram &mdash; @bigbadthairestaurant</a><br><a href="https://www.facebook.com/bigbadthai" target="_blank" rel="noopener">Facebook &mdash; Big Bad Thai</a></p>
-      </div>
+  <!-- HERO — swap this photo any time with the editor tool -->
+  <section class="vhero">
+    <img src="storefront-night.jpg" alt="The Big Bad Thai storefront lit up at night on Hama Street, El Nido">
+    <div class="grd"></div>
+    <div class="in">
+      <span class="eyebrow">El Nido · Palawan</span>
+      <h1>Find Us</h1>
+      <p class="lede">On Hama Street, a minute from the Bacuit Bay waterfront. Walk-ins welcome — reservations recommended for peak hours.</p>
     </div>
+  </section>
 
+  <!-- MAP — immediately after the hero, not buried at the bottom.
+       No overlay button here on purpose: Google's embed renders its own
+       "Open in Maps" link, and the card below already has "View on Google Maps"
+       plus the Get Directions CTA. A third link was just clutter. -->
+  <section class="vmap">
     <iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
       src="https://www.google.com/maps?q=Big%20Bad%20Thai%20Restaurant%20El%20Nido%20Hama%20Street&output=embed"
       title="Big Bad Thai on the map"></iframe>
-  </div>
+  </section>
+
+  <!-- ADDRESS · HOURS · ACTIONS -->
+  <section class="vcard">
+    <div class="inner">
+      <div>
+        <div class="k">Address</div>
+        <p data-c-html="settings.address_html">Hama Street, Barangay Masagana<br>El Nido, 5313 Palawan<br>Philippines</p>
+        <a class="sub" href="https://www.google.com/maps/place/?q=place_id:ChIJj-thjxVVtjMRdmsUeV7mG_E" target="_blank" rel="noopener">View on Google Maps &rarr;</a>
+      </div>
+      <div>
+        <div class="k">Hours</div>
+        <p data-c-html="settings.hours.label">Open daily<br>11:00 AM – 11:00 PM</p>
+        <span data-open-status style="margin-top:12px;display:inline-flex"></span>
+      </div>
+      <div class="acts">
+        <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" data-cta="reserve" class="btn btn-clay" style="color:var(--cream)">Reserve a Table</a>
+        <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Bad+Thai+Restaurant+El+Nido&amp;destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&amp;travelmode=walking" target="_blank" rel="noopener" data-cta="directions" class="btn btn-ghost">Get Directions</a>
+      </div>
+      <p class="note">Booking via Messenger · we reply fast</p>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="vcontact">
+    <h2 class="h">Talk to us</h2>
+    <p class="s">Whichever way is easiest — we answer all of them.</p>
+    <div class="vlist">
+      <a href="https://wa.me/639452994225" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.2 4.79 1.2h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.4 1.3-1.93 1.38-.49.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.65-.61-2.9-1.25-4.79-4.17-4.94-4.36-.14-.19-1.18-1.57-1.18-2.99 0-1.42.74-2.12 1.01-2.41.27-.29.58-.36.78-.36.19 0 .39 0 .56.01.18.01.42-.07.66.5.24.59.82 2.04.89 2.19.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.38-.42.5-.14.14-.28.29-.12.56.16.27.71 1.17 1.53 1.9 1.05.94 1.94 1.24 2.21 1.38.27.14.43.12.59-.07.16-.19.68-.79.86-1.06.18-.27.36-.22.61-.13.25.09 1.59.75 1.86.89.27.14.45.2.52.31.07.12.07.66-.17 1.34z"/></svg></span>
+        <span class="tx"><span class="t">WhatsApp</span><span class="d">Fastest reply</span></span>
+      </a>
+      <a href="https://m.me/bigbadthai" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+        <span class="tx"><span class="t">Messenger</span><span class="d">Book a table</span></span>
+      </a>
+      <a href="tel:+639452994225">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+        <span class="tx"><span class="t">Call</span><span class="d" data-c="settings.phone">+63 945 299 4225</span></span>
+      </a>
+      <a href="mailto:info.elnido@bigbadthai.com">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="m22 6-10 7L2 6"/></svg></span>
+        <span class="tx"><span class="t">Email</span><span class="d" data-c="settings.email">info.elnido@bigbadthai.com</span></span>
+      </a>
+      <a href="https://www.instagram.com/bigbadthairestaurant" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></span>
+        <span class="tx"><span class="t">Instagram</span><span class="d">@bigbadthairestaurant</span></span>
+      </a>
+      <a href="https://www.facebook.com/bigbadthai" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12z"/></svg></span>
+        <span class="tx"><span class="t">Facebook</span><span class="d">Big Bad Thai</span></span>
+      </a>
+    </div>
+  </section>
+
 </main>
 
 <footer class="footer">
