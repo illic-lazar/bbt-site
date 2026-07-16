@@ -75,9 +75,17 @@ a{color:inherit;text-decoration:none;}
 .footer>*{position:relative;z-index:1;}
 .footer-logo{display:inline-flex;align-items:center;gap:9px;font-family:'Brandford','Barlow Condensed',sans-serif;text-transform:uppercase;font-size:20px;letter-spacing:.02em;}
 .footer-links{display:flex;gap:30px;flex-wrap:wrap;}
-.footer-links a{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,245,232,.28);}
+/* Footer text matches the homepage footer (.62) — and that is also the only
+   value that passes contrast. Stage 3's accessibility fix lifted faint cream
+   text to .62, but it did so with an attribute selector targeting INLINE styles
+   ([style*="rgba(255,245,232,.16)"]). The homepage footer is styled inline, so
+   it got fixed; these subpage rules are classes, so the selector never matched
+   and they stayed faint — links .28 = 2.43:1 and copyright .16 = 1.59:1 on
+   #181818, both well under the 4.5:1 AA minimum (the copyright was effectively
+   invisible). Fixed at the source so the two footers are identical. */
+.footer-links a{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,245,232,.62);}
 .footer-links a:hover{color:var(--gold);}
-.footer-copy{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.05em;color:rgba(255,245,232,.16);}
+.footer-copy{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(255,245,232,.62);}
 
 /* page shell */
 .page{max-width:1180px;margin:0 auto;padding:clamp(40px,7vw,96px) clamp(20px,5vw,80px);}
