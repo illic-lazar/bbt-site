@@ -157,20 +157,10 @@
       <section><h2>Recent questions</h2><div id="recent"></div><p class="muted" id="winnote"></p></section>
     </div>
 
-    <!-- REACH -->
+    <!-- REACH / INSIGHTS -->
     <div id="tab-reach" class="hide">
-      <div id="reachBody">
-        <div class="cards">
-          <div class="card"><div class="n" id="rViews">–</div><div class="l">Page views</div></div>
-          <div class="card"><div class="n" id="rVisits">–</div><div class="l">Visits</div></div>
-          <div class="card"><div class="n" id="rToday">–</div><div class="l">Views today</div></div>
-        </div>
-        <section><h2>Last 14 days</h2><div class="days" id="rDays"></div></section>
-        <section><h2>Top pages</h2><div id="rPages"></div></section>
-        <section><h2>Where visitors are from</h2><div class="kw" id="rCountries"></div></section>
-        <section><h2>How they found you</h2><div id="rRefs"></div></section>
-        <p class="muted" id="rNote"></p>
-      </div>
+      <div id="insControls"></div>
+      <div id="reachBody"></div>
     </div>
 
     <!-- REPUTATION -->
@@ -255,21 +245,8 @@
   function faqAction(b){ fetch('/api/admin',{method:'POST',headers:{'x-admin-token':TOKEN,'content-type':'application/json'},body:JSON.stringify(b)}).then(function(){ loadFaq(); }); }
   $('#faqAdd').onclick=function(){ var v=$('#faqIn').value.trim(); if(!v) return; $('#faqIn').value=''; faqAction({action:'add',content:v}); };
 
-  // ---- REACH ----
-  function loadReach(){
-    fetch('/api/reach',{headers:{'x-admin-token':TOKEN}}).then(function(r){return r.json();}).then(function(d){
-      if(!d||d.configured===false){ $('#reachBody').innerHTML='<p class="muted">Connect Supabase first.</p>'; return; }
-      if(d.needsTable){ $('#reachBody').innerHTML='<p class="muted">One-time setup: create the <b>page_hits</b> table in Supabase, then visit the site once and refresh.</p>'; return; }
-      $('#rViews').textContent=d.total!=null?d.total:'–';
-      $('#rVisits').textContent=d.visits!=null?d.visits:'–';
-      $('#rToday').textContent=d.today!=null?d.today:'–';
-      $('#rDays').innerHTML=daysHtml(d.byDay);
-      $('#rPages').innerHTML=barList(d.topPages);
-      $('#rRefs').innerHTML=barList(d.topReferrers);
-      $('#rCountries').innerHTML=(d.topCountries||[]).length? (d.topCountries).map(function(c){return '<span>'+flag(c.k)+' '+esc(cname(c.k))+' <b>'+c.c+'</b></span>';}).join('') : '<p class="muted">No location data yet.</p>';
-      $('#rNote').textContent=d.windowSize?('Based on the most recent '+d.windowSize+' page views.'):'';
-    }).catch(function(){ $('#reachBody').innerHTML='<p class="muted">Couldn’t load traffic.</p>'; });
-  }
+  // ---- REACH / INSIGHTS (Stage 7 dashboard lives in window.INSIGHTS) ----
+  function loadReach(){ if(window.INSIGHTS) window.INSIGHTS.load(); }
 
   // ---- REPUTATION ----
   function loadReviews(){
@@ -530,6 +507,158 @@ window.CMS=(function(){
   }
   function open(tab){ if(['content','menu','photos','seo'].indexOf(tab)<0) return; if(!loadedRows) loadRows().then(function(ok){ if(ok) render(tab); }); else render(tab); }
   return { open: open };
+})();
+</script>
+
+<script>
+/* ===== Stage 7 — Insights dashboard (Reach tab) =====
+   Reads /api/insights (events table). Date ranges + previous-period
+   comparison + filters. The pre-Stage-7 page_hits archive still exists and
+   is still served by /api/reach (untouched). */
+window.INSIGHTS=(function(){
+  function tok(){ return sessionStorage.getItem('bbtAdmin')||''; }
+  function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  var RN; try{ RN=new Intl.DisplayNames(['en'],{type:'region'}); }catch(e){ RN=null; }
+  function cname(cc){ try{ return (RN&&RN.of(cc))||cc; }catch(e){ return cc; } }
+  function flag(cc){ if(!cc||cc.length!==2) return '🏳️'; try{ return String.fromCodePoint.apply(null, cc.toUpperCase().split('').map(function(c){return 127397+c.charCodeAt(0);})); }catch(e){ return '🏳️'; } }
+  function pct(n){ return (n==null?'–':n+'%'); }
+  function delta(cur,prev){ if(prev==null||prev===0) return ''; var d=Math.round(((cur-prev)/prev)*100);
+    var col=d>0?'#7fd18a':(d<0?'#ff8a65':'rgba(255,245,232,.5)'); var sign=d>0?'+':'';
+    return '<span style="font-size:12px;color:'+col+';margin-left:6px">'+sign+d+'%</span>'; }
+  function barList(items,labelFn,valFn){ if(!items||!items.length) return '<p class="muted">—</p>';
+    var mx=Math.max.apply(null,items.map(function(i){return valFn?valFn(i):i.c;}))||1;
+    return items.map(function(it){ var v=valFn?valFn(it):it.c;
+      return '<div class="q"><div class="qt"><span>'+esc(labelFn?labelFn(it):it.k)+'</span><b>'+v+'</b></div><div class="bar"><i style="width:'+Math.round(v/mx*100)+'%"></i></div></div>'; }).join(''); }
+
+  var S={range:'7d',from:'',to:'',compare:true,country:'',device:'',path:'',source:''};
+  var last=null;
+
+  function qs(){ var p=['range='+S.range]; if(S.range==='custom'){ if(S.from)p.push('from='+S.from); if(S.to)p.push('to='+S.to); }
+    if(S.compare) p.push('compare=1');
+    ['country','device','path','source'].forEach(function(k){ if(S[k]) p.push(k+'='+encodeURIComponent(S[k])); });
+    return p.join('&'); }
+
+  function sel(id,label,val,opts,fmt){
+    return '<div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;opacity:.5">'+esc(label)+'</label>'+
+      '<select data-f="'+id+'" style="background:#222;border:1px solid rgba(255,245,232,.2);color:var(--cream);border-radius:7px;padding:6px 9px;font-family:inherit;font-size:13px">'+
+      '<option value="">All</option>'+opts.map(function(o){ var v=o.k;
+        return '<option value="'+esc(v)+'"'+(val===v?' selected':'')+'>'+esc(fmt?fmt(o):v)+' ('+o.c+')</option>'; }).join('')+'</select></div>'; }
+
+  function renderControls(d){
+    var c=d&&d.current||{};
+    var ranges=[['today','Today'],['7d','Last 7 days'],['30d','Last 30 days'],['custom','Custom']];
+    var h='<div class="cms-sub" style="margin-bottom:12px">'+ranges.map(function(r){
+      return '<button data-r="'+r[0]+'"'+(S.range===r[0]?' class="on"':'')+'>'+r[1]+'</button>'; }).join('')+
+      '<label class="mono" style="display:flex;align-items:center;gap:6px;margin-left:8px;opacity:.8"><input type="checkbox" id="insCmp"'+(S.compare?' checked':'')+'> compare to previous</label></div>';
+    if(S.range==='custom'){
+      h+='<div class="rowline" style="margin-bottom:12px"><input type="date" id="insFrom" value="'+esc(S.from)+'" style="background:#222;border:1px solid rgba(255,245,232,.2);color:var(--cream);border-radius:7px;padding:6px 9px">'+
+         '<span class="muted">to</span><input type="date" id="insTo" value="'+esc(S.to)+'" style="background:#222;border:1px solid rgba(255,245,232,.2);color:var(--cream);border-radius:7px;padding:6px 9px">'+
+         '<button class="ghost" id="insApply">Apply</button></div>';
+    }
+    h+='<div class="rowline" style="gap:10px;margin-bottom:18px">'+
+        sel('country','Country',S.country,c.countries||[],function(o){return cname(o.k);})+
+        sel('device','Device',S.device,c.devices||[])+
+        sel('source','Source',S.source,c.sources||[])+
+        sel('path','Page',S.path,c.pages||[])+
+        '<button class="ghost" id="insClear" style="align-self:flex-end">Clear filters</button></div>';
+    document.getElementById('insControls').innerHTML=h;
+    var ctl=document.getElementById('insControls');
+    [].forEach.call(ctl.querySelectorAll('[data-r]'),function(b){ b.onclick=function(){ S.range=b.getAttribute('data-r'); load(); }; });
+    ctl.querySelector('#insCmp').onchange=function(e){ S.compare=e.target.checked; load(); };
+    [].forEach.call(ctl.querySelectorAll('[data-f]'),function(s){ s.onchange=function(){ S[s.getAttribute('data-f')]=s.value; load(); }; });
+    ctl.querySelector('#insClear').onclick=function(){ S.country=S.device=S.path=S.source=''; load(); };
+    var ap=ctl.querySelector('#insApply');
+    if(ap) ap.onclick=function(){ S.from=ctl.querySelector('#insFrom').value; S.to=ctl.querySelector('#insTo').value; load(); };
+  }
+
+  function render(d){
+    var b=document.getElementById('reachBody');
+    if(d.configured===false){ b.innerHTML='<p class="muted">Connect Supabase first.</p>'; return; }
+    if(d.ready===false){ b.innerHTML='<p class="muted">One-time setup: run <b>SUPABASE_STAGE7.sql</b> in Supabase, then browse the site once and refresh.</p>'; return; }
+    var c=d.current, p=d.previous, t=c.totals;
+    var h='';
+    h+='<div class="cards">'+
+      '<div class="card"><div class="n">'+t.views+(p?delta(t.views,p.views):'')+'</div><div class="l">Page views</div></div>'+
+      '<div class="card"><div class="n">'+t.sessions+(p?delta(t.sessions,p.sessions):'')+'</div><div class="l">Visits</div></div>'+
+      '<div class="card"><div class="n">'+t.conversions+(p?delta(t.conversions,p.conversions):'')+'</div><div class="l">Conversions</div></div>'+
+      '<div class="card"><div class="n">'+pct(t.conversionRate)+(p?delta(t.conversionRate,p.conversionRate):'')+'</div><div class="l">Conversion rate</div></div></div>';
+
+    // daily views + conversions
+    var bd=c.byDay||[]; var mx=Math.max(1,Math.max.apply(null,bd.map(function(x){return x.views;})));
+    h+='<section><h2>Daily views &amp; conversions</h2><div class="days">'+bd.map(function(x){
+      var hv=Math.round(x.views/mx*100), hc=Math.round(x.conversions/mx*100);
+      return '<div class="d" title="'+x.date+': '+x.views+' views, '+x.conversions+' conversions"><u>'+(x.views||'')+'</u>'+
+        '<i style="height:'+hv+'%;position:relative"><b style="position:absolute;left:0;right:0;bottom:0;height:'+(x.views?Math.round(hc/Math.max(hv,1)*100):0)+'%;background:var(--gold);display:block"></b></i>'+
+        '<em>'+x.date.slice(8)+'/'+x.date.slice(5,7)+'</em></div>'; }).join('')+'</div>'+
+      '<p class="muted" style="font-size:11px">Clay = views · gold = conversions</p></section>';
+
+    // conversions
+    var cv=c.conversions||{};
+    h+='<section><h2>Primary conversions</h2><div class="kw">'+
+      ['reservation','directions','phone','messaging'].map(function(k){ return '<span>'+k+' <b>'+(cv[k]||0)+'</b></span>'; }).join('')+
+      '</div><p class="muted" style="font-size:11px">A conversion = a guest clicking a real booking/contact action. Clicks — not confirmed reservations.</p></section>';
+
+    h+='<section><h2>Most used contact methods</h2>'+barList(c.contacts)+'</section>';
+    h+='<section><h2>Traffic sources</h2>'+barList(c.sources)+'</section>';
+    h+='<section><h2>Visitors by country</h2><div class="kw">'+((c.countries||[]).length?c.countries.map(function(x){return '<span>'+flag(x.k)+' '+esc(cname(x.k))+' <b>'+x.c+'</b></span>';}).join(''):'<p class="muted">—</p>')+'</div></section>';
+    h+='<section><h2>Visitors by device</h2><div class="kw">'+((c.devices||[]).length?c.devices.map(function(x){return '<span>'+esc(x.k)+' <b>'+x.c+'</b></span>';}).join(''):'<p class="muted">—</p>')+'</div></section>';
+    h+='<section><h2>Most viewed pages</h2>'+barList(c.pages)+'</section>';
+    h+='<section><h2>Most viewed menu categories</h2>'+barList(c.categories)+'</section>';
+    h+='<section><h2>Most viewed dishes</h2>'+barList(c.dishes)+'</section>';
+
+    function rateTable(rows,label){
+      if(!rows||!rows.length) return '<p class="muted">—</p>';
+      return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'+
+        '<tr style="opacity:.55;text-align:left"><th style="padding:4px 8px 4px 0">'+esc(label)+'</th><th>Visits</th><th>Conv.</th><th>Rate</th></tr>'+
+        rows.map(function(r){ return '<tr style="border-top:1px solid rgba(255,245,232,.07)"><td style="padding:5px 8px 5px 0">'+esc(label==='Country'?cname(r.k):r.k)+'</td><td>'+r.sessions+'</td><td>'+r.conversions+'</td><td style="color:var(--gold)">'+pct(r.rate)+'</td></tr>'; }).join('')+'</table></div>';
+    }
+    h+='<section><h2>Conversion rate by page</h2>'+rateTable(c.convByPage,'Page')+'</section>';
+    h+='<section><h2>Conversion rate by country</h2>'+rateTable(c.convByCountry,'Country')+'</section>';
+    h+='<section><h2>Conversion rate by device</h2>'+rateTable(c.convByDevice,'Device')+'</section>';
+
+    // chatbot correlation
+    var ch=c.chat||{};
+    h+='<section><h2>Chatbot</h2><div class="cards" style="margin-bottom:14px">'+
+      '<div class="card"><div class="n">'+(ch.opens||0)+'</div><div class="l">Chat opens</div></div>'+
+      '<div class="card"><div class="n">'+(ch.questions||0)+'</div><div class="l">Questions</div></div>'+
+      '<div class="card"><div class="n">'+pct(ch.chatConversionRate)+'</div><div class="l">Chatted → converted</div></div></div>'+
+      '<h2>Questions by topic</h2>'+barList(ch.topics)+
+      '<h2 style="margin-top:14px">Pages that trigger the chatbot</h2>'+barList(ch.triggerPages)+
+      '<h2 style="margin-top:14px">Answer buttons used</h2>'+barList(ch.answerActions)+'</section>';
+
+    h+='<section><h2>Chatbot questions with no useful answer</h2>'+((d.unanswered||[]).length?
+      d.unanswered.map(function(u){ return '<div class="una"><div class="t">'+esc(new Date(u.at).toLocaleString())+'</div><div class="q">'+esc(u.q)+'</div></div>'; }).join('')
+      : '<p class="muted">None — the bot answered everything itself. 🎉</p>')+'</section>';
+
+    var en=c.engagement||{};
+    h+='<section><h2>Engagement</h2><div class="kw">'+
+      (en.scroll||[]).map(function(s){return '<span>scrolled '+esc(s.k)+'% <b>'+s.c+'</b></span>';}).join('')+
+      '<span>gallery opens <b>'+(en.galleryOpens||0)+'</b></span>'+
+      '<span>currency switches <b>'+(en.currencyChanges||0)+'</b></span>'+
+      '<span>median time to first action <b>'+(en.medianTimeToFirstAction!=null?Math.round(en.medianTimeToFirstAction/1000)+'s':'–')+'</b></span></div></section>';
+
+    // health
+    var hl=d.health||{};
+    var expect=['page_view','reservation_click','directions_click','chatbot_open'];
+    var missing=expect.filter(function(n){ return !(hl.byName&&hl.byName[n]); });
+    h+='<section><h2>Analytics health</h2><div class="kw">'+
+      '<span>event types seen <b>'+(hl.eventTypesSeen||0)+'</b></span>'+
+      '<span>last event <b>'+(hl.lastEventAt?new Date(hl.lastEventAt).toLocaleString():'never')+'</b></span>'+
+      (missing.length?'<span style="border-color:rgba(255,120,90,.5)">no data yet for: <b>'+missing.join(', ')+'</b></span>':'<span style="border-color:rgba(127,209,138,.5)">all key events flowing ✓</span>')+
+      (d.capped?'<span style="border-color:rgba(226,153,59,.5)">range capped at 20k events — narrow the dates</span>':'')+
+      '</div></section>';
+
+    b.innerHTML=h;
+  }
+
+  function load(){
+    var b=document.getElementById('reachBody');
+    b.innerHTML='<p class="muted">Loading…</p>';
+    fetch('/api/insights?'+qs(),{headers:{'x-admin-token':tok()}}).then(function(r){return r.json();}).then(function(d){
+      last=d; renderControls(d); render(d);
+    }).catch(function(){ b.innerHTML='<p class="muted">Couldn’t load analytics.</p>'; });
+  }
+  return { load: load };
 })();
 </script>
 </body>
