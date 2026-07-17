@@ -23,8 +23,35 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&family=Kanit:wght@700&display=swap"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&family=Kanit:wght@700&display=swap" rel="stylesheet" media="print" onload="this.media=&#39;all&#39;"><noscript><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&family=Kanit:wght@700&display=swap" rel="stylesheet"></noscript>
-<!-- pinned: @latest let a third party push arbitrary CSS/font code into this page.
-     2.47.0 is byte-identical to what @latest served on 2026-07-13 (sha256 f14b2b40…). -->
+<!-- Shared tokens/reset/type/buttons — the SAME file the subpages get, so the two
+     can no longer drift. _build_site.sh replaces this <link> with the file's
+     contents inlined, keeping index.html free of external CSS requests.
+     The <link> is here so this mockup still renders correctly opened on its own. -->
+<style id="base">
+:root{
+  --clay:#A9531F; --gold:#E2993B; --night:#181818; --cream:#FFF5E8;
+  --bamboo:#54583D; --tam:#412A19; --cream2:#F0E4D2; --cream3:#E8DDD0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'Roboto Condensed',sans-serif;-webkit-font-smoothing:antialiased;color:var(--night);}
+.bf{font-family:'Brandford','Barlow Condensed',sans-serif;font-weight:normal;text-transform:uppercase;line-height:.84;letter-spacing:.01em;}
+.bc{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;line-height:.93;}
+.bs{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;line-height:1.02;}
+.rb{font-family:'Roboto Condensed',sans-serif;font-weight:400;line-height:1.65;}
+.rl{font-family:'Roboto Condensed',sans-serif;font-weight:300;line-height:1.65;}
+.mo{font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;}
+.btn{display:inline-flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;letter-spacing:.08em;
+  text-transform:uppercase;border-radius:2px;cursor:pointer;white-space:nowrap;height:46px;padding:0 30px;font-size:10px;
+  transition:opacity .15s,background .15s,transform .15s;}
+.btn:hover{opacity:.85;transform:translateY(-1px);}
+.btn-clay{background:var(--clay);color:var(--cream);border:none;}
+.btn-ghost{background:transparent;color:var(--cream);border:1.5px solid rgba(255,245,232,.28);}
+.btn-line{background:transparent;color:var(--night);border:1.5px solid rgba(24,24,24,.26);}
+.tag{display:inline-block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.07em;text-transform:uppercase;
+  padding:3px 11px;border:1px solid rgba(189,94,38,.38);color:var(--clay);border-radius:20px;}
+.accent{width:28px;height:2px;background:var(--gold);flex-shrink:0;}
+.eyebrow{display:flex;align-items:center;gap:12px;}
+</style>
 <style>
 
 @font-face {
@@ -35,26 +62,11 @@
   font-display: swap;
 }
 
-/* ══ TOKENS ══════════════════════════════════════════════ */
-:root {
-  --clay:   #A9531F;
-  --gold:   #E2993B;
-  --night:  #181818;
-  --cream:  #FFF5E8;
-  --bamboo: #54583D;
-  --tam:    #412A19;
-  --cream2: #F0E4D2;
-  --cream3: #E8DDD0;
-}
-
-/* ══ RESET ═══════════════════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: var(--cream);
-  font-family: 'Roboto Condensed', sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
+/* ══ TOKENS · RESET · TYPE · BUTTONS ═════════════════════
+   All in public/assets/_base.css now — the single source shared with the
+   subpages, <link>ed above so this file still opens standalone in a browser.
+   The build inlines it here, so index.html still fetches no external CSS.
+   Add nothing token-, reset-, type- or button-shaped below; put it there. */
 
 /* ══ IMAGE UTILITIES ═════════════════════════════════════ */
 .cover {
@@ -100,36 +112,14 @@ body {
   border:1px solid rgba(255,245,232,.07); padding:6px 14px; border-radius:3px;
 }
 
-/* ══ TYPE ════════════════════════════════════════════════ */
-.bf  { font-family:'Brandford','Barlow Condensed',sans-serif; font-weight:normal; text-transform:uppercase; line-height:.84; letter-spacing:.01em; }
-.bc  { font-family:'Barlow Condensed',sans-serif; font-weight:800; text-transform:uppercase; line-height:.93; }
-.bs  { font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; line-height:1.02; }
-.rb  { font-family:'Roboto Condensed',sans-serif; font-weight:400; line-height:1.65; }
-.rl  { font-family:'Roboto Condensed',sans-serif; font-weight:300; line-height:1.65; }
-.mo  { font-family:'Space Mono',monospace; letter-spacing:.1em; text-transform:uppercase; }
-
-/* ══ BUTTONS ═════════════════════════════════════════════ */
-.btn {
-  display:inline-flex; align-items:center; justify-content:center;
-  font-family:'Space Mono',monospace; letter-spacing:.08em; text-transform:uppercase;
-  border-radius:2px; cursor:pointer; white-space:nowrap; transition:opacity .15s, transform .15s;
-}
-.btn:hover { opacity:.85; transform:translateY(-1px); }
+/* ══ BUTTONS · homepage-only ═════════════════════════════ */
+/* .btn, .btn:hover, .btn-clay, .btn-ghost, .btn-line are in _base.css */
 .d-nav-links a:hover { color:var(--clay) !important; }
-.btn-clay  { background:var(--clay); color:var(--cream); border:none; }
-.btn-ghost { background:transparent; color:var(--cream); border:1.5px solid rgba(255,245,232,.28); }
-.btn-line  { background:transparent; color:var(--night); border:1.5px solid rgba(24,24,24,.26); }
 .btn-fw    { display:flex; width:100%; }
 
 /* ══ SHARED ══════════════════════════════════════════════ */
-.accent  { width:28px; height:2px; background:var(--gold); flex-shrink:0; }
+/* .accent, .eyebrow, .tag are in _base.css */
 .stars   { color:var(--gold); letter-spacing:2px; }
-.eyebrow { display:flex; align-items:center; gap:12px; }
-.tag {
-  display:inline-block; font-family:'Space Mono',monospace; font-size:9px;
-  letter-spacing:.07em; text-transform:uppercase;
-  padding:3px 11px; border:1px solid rgba(189,94,38,.38); color:var(--clay); border-radius:20px;
-}
 .scale-row { display:flex; border-top:1px solid rgba(24,24,24,.09); border-bottom:1px solid rgba(24,24,24,.09); }
 .scale-cell { flex:1; padding:20px 0; border-right:1px solid rgba(24,24,24,.09); }
 .scale-cell:last-child { border-right:none; }
