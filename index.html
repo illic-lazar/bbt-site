@@ -25,7 +25,6 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&family=Kanit:wght@700&display=swap"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&family=Kanit:wght@700&display=swap" rel="stylesheet" media="print" onload="this.media=&#39;all&#39;"><noscript><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&family=Kanit:wght@700&display=swap" rel="stylesheet"></noscript>
 <!-- pinned: @latest let a third party push arbitrary CSS/font code into this page.
      2.47.0 is byte-identical to what @latest served on 2026-07-13 (sha256 f14b2b40…). -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <style>
 
 @font-face {
@@ -135,7 +134,6 @@ body {
 .scale-cell { flex:1; padding:20px 0; border-right:1px solid rgba(24,24,24,.09); }
 .scale-cell:last-child { border-right:none; }
 .review-tile { background:var(--cream2); border-radius:3px; padding:22px; display:flex; flex-direction:column; gap:10px; }
-.v-icon { width:40px; height:40px; flex-shrink:0; border:1px solid rgba(24,24,24,.14); border-radius:7px; display:flex; align-items:center; justify-content:center; }
 
 /* ══ SITE ════════════════════════════════════════════════ */
 .site { background:var(--cream); }
@@ -196,10 +194,48 @@ body {
 .d-isan { display:grid; grid-template-columns:1fr 1fr; min-height:620px; }
 .d-isan-r { background:var(--night); padding:96px 72px; display:flex; flex-direction:column; justify-content:center; }
 
-/* ══ D: VISIT ════════════════════════════════════════════ */
-.d-visit { background:var(--cream2); padding:112px 88px; }
-.d-visit-grid { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start; margin-bottom:64px; }
-.d-visit-info { display:grid; grid-template-columns:1fr 1fr 1fr; gap:48px; }
+/* ══ D + M: VISIT ═════════════════════════════════════════
+   Same design language as visit.html (the Find Us page): full-bleed map, dark
+   card lifted over it, gold labels. These mirror .vmap / .vcard there.
+
+   They are duplicated rather than shared because the homepage is a standalone
+   built page and deliberately does not load site.css — it inlines everything to
+   keep the LCP request count down. If you restyle one, restyle the other. */
+.d-visit { background:var(--cream2); padding:112px 0 112px; }
+.d-visit > .eyebrow { padding:0 88px; }
+
+.hv-map { position:relative; background:var(--cream2); line-height:0; }
+.hv-map iframe { width:100%; height:clamp(260px,42vh,420px); border:0; display:block; }
+
+.hv-card { padding:0 88px; }
+/* Cream palette. --gold is only 2.20:1 on cream so labels are clay (4.94:1); the card is
+   --cream lifted off a --cream2 section, with a border carrying the edge since the two
+   surfaces are only 1.16:1 apart. A dark variant of this block is the natural dark mode. */
+.hv-card .inner { background:var(--cream); border:1px solid rgba(24,24,24,.12); border-radius:14px; padding:38px;
+  display:grid; gap:30px; grid-template-columns:1fr 1fr 1fr; max-width:1100px; margin:-34px auto 0;
+  position:relative; z-index:3; box-shadow:0 24px 60px rgba(24,24,24,.14); }
+.hv-card .k { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--clay); margin-bottom:9px; }
+.hv-card p { font-family:'Roboto Condensed',sans-serif; font-weight:300; font-size:16px; line-height:1.65;
+  color:var(--night); margin:0; }
+.hv-card .sub { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--bamboo); margin-top:8px; display:inline-block; text-decoration:none; min-height:44px; line-height:44px; }
+.hv-card .sub:hover { color:var(--clay); }
+.hv-card .acts { grid-column:1/-1; display:flex; gap:12px; flex-wrap:wrap; padding-top:24px;
+  border-top:1px solid rgba(24,24,24,.1); }
+.hv-card .acts .btn { flex:1 1 auto; min-width:170px; justify-content:center; }
+
+.hv-photo { padding:40px 88px 0; }
+.hv-photo .frame { max-width:1100px; margin:0 auto; height:340px; border-radius:14px; }
+
+/* M: the same section, stacked */
+.m-visit { background:var(--cream2); padding:64px 0; }
+.m-visit > .eyebrow { padding:0 24px; }
+.m-visit .hv-card { padding:0 16px; }
+.m-visit .hv-card .inner { grid-template-columns:1fr; padding:24px; gap:22px; }
+.m-visit .hv-photo { padding:32px 24px 0; }
+.m-visit .hv-photo .frame { height:200px; }
+.m-visit .hv-map iframe { height:260px; }
 
 /* ══ D: FOOTER ════════════════════════════════════════════ */
 .d-footer { background:var(--night); padding:40px 88px; display:flex; align-items:center; justify-content:space-between; }
@@ -465,46 +501,47 @@ picture{display:contents;}
       </div>
     </section>
 
-    <!-- ── 7. VISIT — TKC01354: exterior night signage ──── -->
+    <!-- ── 7. VISIT — mirrors visit.html: map first, card lifted over it ──── -->
     <section class="d-visit">
-      <div class="eyebrow" style="margin-bottom:64px">
+      <div class="eyebrow" style="margin-bottom:40px">
         <div class="accent"></div>
         <div class="mo" style="font-size:10px;color:var(--bamboo)">Find Us</div>
       </div>
-      <div class="d-visit-grid">
-        <!-- Info columns -->
-        <div class="d-visit-info">
-          <div style="display:flex;flex-direction:column;gap:16px">
-            <div class="v-icon"><i class="ti ti-map-pin" style="font-size:18px;color:var(--night)" aria-hidden="true"></i></div>
-            <div class="bs" style="font-size:19px;margin-top:6px">Location</div>
-            <div class="rl" style="font-size:15px;color:var(--bamboo);line-height:1.85">Hama Street, Barangay Masagana<br>El Nido, 5313 Palawan<br>Philippines</div>
+
+      <div class="hv-map">
+        <iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Big Bad Thai map"
+          src="https://maps.google.com/maps?cid=17373733280944515958&output=embed&t=k"></iframe>
+      </div>
+
+      <div class="hv-card">
+        <div class="inner">
+          <div>
+            <div class="k">Location</div>
+            <p data-c-html="settings.address_html">Hama Street, Barangay Masagana<br>El Nido, 5313 Palawan<br>Philippines</p>
           </div>
-          <div style="display:flex;flex-direction:column;gap:16px">
-            <div class="v-icon"><i class="ti ti-clock" style="font-size:18px;color:var(--night)" aria-hidden="true"></i></div>
-            <div class="bs" style="font-size:19px;margin-top:6px">Hours</div>
-            <div class="rl" style="font-size:15px;color:var(--bamboo);line-height:1.85">Open daily<br>11:00 AM – 11:00 PM<br><span style="color:rgba(84,88,61,.36)">Walk-ins &amp; reservations welcome</span></div>
+          <div>
+            <div class="k">Hours</div>
+            <p data-c-html="settings.hours.label">Open daily<br>11:00 AM – 11:00 PM</p>
             <span data-open-status style="margin-top:12px;display:inline-flex"></span>
           </div>
-          <div style="display:flex;flex-direction:column;gap:16px">
-            <div class="v-icon"><i class="ti ti-phone" style="font-size:18px;color:var(--night)" aria-hidden="true"></i></div>
-            <div class="bs" style="font-size:19px;margin-top:6px">Reservations</div>
-            <div class="rl" style="font-size:15px;color:var(--bamboo);line-height:1.85;margin-bottom:4px">+63 945 299 4225</div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
-              <a class="btn btn-clay" data-cta="reserve" style="height:46px;padding:0 26px;font-size:10px;text-decoration:none;cursor:pointer" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve a Table</a>
-              <a class="btn btn-line" data-cta="directions" style="height:46px;padding:0 26px;font-size:10px;text-decoration:none;cursor:pointer" href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Bad+Thai&amp;destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&amp;travelmode=walking" target="_blank" rel="noopener">Get Directions</a>
-            </div>
+          <div>
+            <div class="k">Reservations</div>
+            <p>+63 945 299 4225</p>
+            <a class="sub" href="tel:+639452994225">Call us &rarr;</a>
+          </div>
+          <div class="acts">
+            <a class="btn btn-clay" data-cta="reserve" style="height:46px;padding:0 26px;font-size:10px;text-decoration:none;cursor:pointer" href="https://m.me/bigbadthai" target="_blank" rel="noopener">Reserve a Table</a>
+            <a class="btn btn-line" data-cta="directions" style="height:46px;padding:0 26px;font-size:10px;text-decoration:none;cursor:pointer" href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Bad+Thai&amp;destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&amp;travelmode=walking" target="_blank" rel="noopener">Get Directions</a>
           </div>
         </div>
-        <!-- Exterior photo -->
-        <div class="frame" style="border-radius:3px;min-height:280px">
+      </div>
+
+      <div class="hv-photo">
+        <div class="frame">
           <picture><source type="image/avif" srcset="storefront-night.avif"><img loading="lazy" decoding="async" class="cover" src="storefront-night.jpg" alt="Big Bad Thai storefront at night"
                style="object-position:50% 42%"></picture>
-          <div style="position:absolute;inset:0;background:rgba(10,5,0,.06)"></div>
         </div>
       </div>
-      <iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Big Bad Thai map"
-        style="width:100%;height:220px;border:0;border-radius:3px;display:block"
-        src="https://maps.google.com/maps?cid=17373733280944515958&output=embed"></iframe>
     </section>
 
     <!-- ── 8. FOOTER ─────────────────────────────────────── -->
@@ -750,40 +787,48 @@ picture{display:contents;}
       </div>
     </div>
 
-    <!-- M: VISIT — TKC01354 exterior photo + centered info -->
-    <div style="background:var(--cream2);padding:64px 24px">
+    <!-- M: VISIT — mirrors visit.html and the desktop view: map, then the card over it -->
+    <div class="m-visit">
 
-      <!-- Exterior photo top -->
-      <div style="height:200px;position:relative;overflow:hidden;border-radius:3px;margin-bottom:40px">
-        <picture><source type="image/avif" srcset="storefront-night.avif"><img loading="lazy" decoding="async" src="storefront-night.jpg" alt="Big Bad Thai storefront at night"
-             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 64%;display:block"></picture>
-        <div style="position:absolute;inset:0;background:rgba(10,5,0,.08)"></div>
-      </div>
-
-      <div class="eyebrow" style="margin-bottom:36px;justify-content:center">
+      <div class="eyebrow" style="margin-bottom:28px;justify-content:center">
         <div class="accent"></div>
         <div class="mo" style="font-size:9px;color:var(--bamboo)">Find Us</div>
       </div>
 
-      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid rgba(24,24,24,.08)">
-        <div class="v-icon"><i class="ti ti-map-pin" style="font-size:17px;color:var(--night)" aria-hidden="true"></i></div>
-        <div class="bs" style="font-size:17px;margin-top:4px">Location</div>
-        <div class="rl" style="font-size:14px;color:var(--bamboo);line-height:1.85">Hama Street, Barangay Masagana<br>El Nido, 5313 Palawan</div>
+      <div class="hv-map">
+        <iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Big Bad Thai map"
+          src="https://maps.google.com/maps?cid=17373733280944515958&output=embed&t=k"></iframe>
       </div>
 
-      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;margin-bottom:36px;padding-bottom:36px;border-bottom:1px solid rgba(24,24,24,.08)">
-        <div class="v-icon"><i class="ti ti-clock" style="font-size:17px;color:var(--night)" aria-hidden="true"></i></div>
-        <div class="bs" style="font-size:17px;margin-top:4px">Hours</div>
-        <div class="rl" style="font-size:14px;color:var(--bamboo);line-height:1.85">Open daily &nbsp;&middot;&nbsp; 11:00 AM – 11:00 PM<br><span style="color:rgba(84,88,61,.36)">Walk-ins &amp; reservations welcome</span></div>
-        <span data-open-status style="margin-top:12px;display:inline-flex"></span>
+      <div class="hv-card">
+        <div class="inner">
+          <div>
+            <div class="k">Location</div>
+            <p data-c-html="settings.address_html">Hama Street, Barangay Masagana<br>El Nido, 5313 Palawan</p>
+          </div>
+          <div>
+            <div class="k">Hours</div>
+            <p data-c-html="settings.hours.label">Open daily<br>11:00 AM – 11:00 PM</p>
+            <span data-open-status style="margin-top:12px;display:inline-flex"></span>
+          </div>
+          <div>
+            <div class="k">Reservations</div>
+            <p>+63 945 299 4225</p>
+            <a class="sub" href="tel:+639452994225">Call us &rarr;</a>
+          </div>
+          <div class="acts">
+            <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" data-cta="reserve" class="btn btn-clay" style="height:50px;font-size:10px;text-decoration:none">Reserve a Table</a>
+            <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Bad+Thai&amp;destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&amp;travelmode=walking" target="_blank" rel="noopener" data-cta="directions" class="btn btn-line" style="height:50px;font-size:10px;text-decoration:none">Get Directions</a>
+          </div>
+        </div>
       </div>
 
-      <iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Big Bad Thai map"
-        style="width:100%;height:150px;border:0;border-radius:3px;margin-bottom:32px;display:block"
-        src="https://maps.google.com/maps?cid=17373733280944515958&output=embed"></iframe>
-
-      <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" data-cta="reserve" class="btn btn-clay btn-fw" style="height:50px;font-size:10px;text-decoration:none">Reserve a Table</a>
-      <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Bad+Thai&amp;destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&amp;travelmode=walking" target="_blank" rel="noopener" data-cta="directions" class="btn btn-line btn-fw" style="height:50px;font-size:10px;margin-top:10px;text-decoration:none">Get Directions</a>
+      <div class="hv-photo">
+        <div class="frame">
+          <picture><source type="image/avif" srcset="storefront-night.avif"><img loading="lazy" decoding="async" class="cover" src="storefront-night.jpg" alt="Big Bad Thai storefront at night"
+               style="object-position:50% 64%"></picture>
+        </div>
+      </div>
     </div>
 
     </main>
@@ -806,7 +851,7 @@ picture{display:contents;}
 
 
 <script src="assets/content.js?v=05876271" defer></script>
-<script src="assets/actionbar.js?v=ff9e529c" defer></script>
+<script src="assets/actionbar.js?v=cc921b7c" defer></script>
 <script src="assets/track.js?v=0ddb177f" defer></script>
 
 <div id="dish-modal-home" aria-hidden="true">

@@ -29,6 +29,10 @@
   + "}"
   + ".open-badge{display:inline-flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase}"
   + ".open-badge .od{width:8px;height:8px;border-radius:50%;display:inline-block}"
+  /* Every badge sits on the cream card (#FFF5E8) — on the Find Us page and on the homepage.
+     These score 5.93:1 and 5.05:1 there, clear of the 4.5:1 AA floor for 10px text.
+     They are tuned for CREAM: on a dark panel they drop to 2.58:1 / 3.03:1 and fail.
+     If a dark mode lands, this pair needs a light counterpart (#5cb97a / #e2825c). */
   + ".open-badge.is-open{color:#2e6b3d}.open-badge.is-open .od{background:#3c8a4e;box-shadow:0 0 0 3px rgba(60,138,78,.18)}"
   + ".open-badge.is-closed{color:#b04a2b}.open-badge.is-closed .od{background:#b04a2b}"
   + "#bbt-lang{position:fixed;left:16px;bottom:18px;z-index:490}"

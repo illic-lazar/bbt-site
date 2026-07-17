@@ -28,44 +28,40 @@
      nothing to pin, and no render-blocking request. -->
 <style>
   @font-face{font-family:'Brandford';src:url('assets/brandford.otf') format('opentype');font-display:swap;}
-  .eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);}
+  .eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--clay);}
 
   /* ── hero: typographic, no photo.
      A hero image here would just push the map down — and the map is the whole
      point of this page. The type carries the brand; the map does the work. ── */
-  .vhero{background:var(--night);padding:clamp(44px,8vw,96px) clamp(24px,5vw,72px) clamp(34px,5vw,64px);}
+  /* --cream, not --cream2: the clay eyebrow measures 4.94:1 here but only 4.24:1 on
+     --cream2, which is under the 4.5:1 AA floor. --cream2 stays as the band framing
+     the map and card below. */
+  .vhero{background:var(--cream);padding:clamp(44px,8vw,96px) clamp(24px,5vw,72px) clamp(34px,5vw,64px);}
   .vhero .eyebrow{display:block;margin-bottom:14px;}
-  .vhero h1{font-family:'Brandford','Barlow Condensed',sans-serif;text-transform:uppercase;color:var(--cream);
+  .vhero h1{font-family:'Brandford','Barlow Condensed',sans-serif;text-transform:uppercase;color:var(--night);
     font-size:clamp(58px,14vw,150px);line-height:.82;letter-spacing:.01em;margin:0;}
   .vhero .lede{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:clamp(14px,2vw,17px);
-    color:rgba(255,245,232,.8);margin:18px 0 0;max-width:44ch;line-height:1.6;}
+    color:var(--bamboo);margin:18px 0 0;max-width:44ch;line-height:1.6;}
 
   /* ── map: full-bleed band, straight after the hero — it's what this page is for ── */
-  .vmap{position:relative;background:var(--night);line-height:0;}
+  .vmap{position:relative;background:var(--cream2);line-height:0;}
   .vmap iframe{width:100%;height:clamp(260px,42vh,420px);border:0;display:block;}
-  .vmap .maplink{position:absolute;right:clamp(12px,3vw,22px);top:clamp(12px,3vw,22px);z-index:2;
-    display:inline-flex;align-items:center;gap:8px;background:var(--cream);color:var(--night);
-    font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-    padding:11px 16px;border-radius:22px;text-decoration:none;box-shadow:0 8px 26px rgba(0,0,0,.35);
-    min-height:44px;line-height:1;}
-  .vmap .maplink:hover{background:var(--gold);}
-  .vmap .maplink svg{width:14px;height:14px;flex:0 0 14px;}
 
   /* ── the card that matters: address · hours · actions ── */
-  .vcard{background:var(--night);padding:0 clamp(16px,5vw,72px) clamp(40px,7vw,80px);}
-  .vcard .inner{background:#211f18;border:1px solid rgba(255,245,232,.09);border-radius:14px;
+  .vcard{background:var(--cream2);padding:0 clamp(16px,5vw,72px) clamp(40px,7vw,80px);}
+  .vcard .inner{background:var(--cream);border:1px solid rgba(24,24,24,.12);border-radius:14px;
     padding:clamp(22px,4vw,38px);display:grid;gap:clamp(20px,3vw,30px);grid-template-columns:1fr;
-    max-width:1100px;margin:-34px auto 0;position:relative;z-index:3;box-shadow:0 24px 60px rgba(0,0,0,.4);}
+    max-width:1100px;margin:-34px auto 0;position:relative;z-index:3;box-shadow:0 24px 60px rgba(24,24,24,.14);}
   @media(min-width:820px){ .vcard .inner{grid-template-columns:1fr 1fr;} .vcard .acts,.vcard .note{grid-column:1/-1;} }
-  .vcard .k{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:9px;}
-  .vcard p{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:16px;line-height:1.65;color:var(--cream);margin:0;}
+  .vcard .k{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--clay);margin-bottom:9px;}
+  .vcard p{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:16px;line-height:1.65;color:var(--night);margin:0;}
   .vcard .sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
-    color:rgba(255,245,232,.62);margin-top:12px;display:inline-block;text-decoration:none;min-height:44px;line-height:44px;}
-  .vcard .sub:hover{color:var(--gold);}
-  .vcard .acts{display:flex;gap:12px;flex-wrap:wrap;padding-top:24px;border-top:1px solid rgba(255,245,232,.1);}
+    color:var(--bamboo);margin-top:12px;display:inline-block;text-decoration:none;min-height:44px;line-height:44px;}
+  .vcard .sub:hover{color:var(--clay);}
+  .vcard .acts{display:flex;gap:12px;flex-wrap:wrap;padding-top:24px;border-top:1px solid rgba(24,24,24,.1);}
   .vcard .acts .btn{flex:1 1 auto;min-width:170px;justify-content:center;}
   .vcard .note{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;
-    color:rgba(255,245,232,.62);margin:-8px 0 0;}
+    color:var(--bamboo);margin:-8px 0 0;}
 
   /* ── contact ── */
   .vcontact{background:var(--cream);padding:clamp(40px,7vw,80px) clamp(16px,5vw,72px);}
@@ -119,7 +115,7 @@
        plus the Get Directions CTA. A third link was just clutter. -->
   <section class="vmap">
     <iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-      src="https://maps.google.com/maps?cid=17373733280944515958&output=embed"
+      src="https://maps.google.com/maps?cid=17373733280944515958&output=embed&t=k"
       title="Big Bad Thai on the map"></iframe>
   </section>
 
@@ -138,7 +134,7 @@
       </div>
       <div class="acts">
         <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" data-cta="reserve" class="btn btn-clay" style="color:var(--cream)">Reserve a Table</a>
-        <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Bad+Thai&amp;destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&amp;travelmode=walking" target="_blank" rel="noopener" data-cta="directions" class="btn btn-ghost">Get Directions</a>
+        <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Big+Bad+Thai&amp;destination_place_id=ChIJj-thjxVVtjMRdmsUeV7mG_E&amp;travelmode=walking" target="_blank" rel="noopener" data-cta="directions" class="btn btn-line">Get Directions</a>
       </div>
       <p class="note">Booking via Messenger · we reply fast</p>
     </div>
@@ -192,7 +188,7 @@
 </footer>
 
 <script src="assets/content.js?v=05876271" defer></script>
-<script src="assets/actionbar.js?v=ff9e529c" defer></script>
+<script src="assets/actionbar.js?v=cc921b7c" defer></script>
 <script src="assets/track.js?v=0ddb177f" defer></script>
 </body>
 </html>
