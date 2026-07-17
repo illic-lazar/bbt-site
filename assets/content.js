@@ -66,6 +66,11 @@ window.BBTContent = (function () {
     if (s.footer_copy) qsa(".footer-copy").forEach(function (el) { el.textContent = s.footer_copy; });
     // expose for other scripts (e.g. open-now / action bar) that may want authoritative values
     window.BBTSettings = s;
+    // the open-now badge reads these hours; re-render here so it updates on the late path too,
+    // which never re-fires bbt:content
+    if (window.BBTOpenNow && typeof window.BBTOpenNow.render === "function") {
+      try { window.BBTOpenNow.render(); } catch (e) {}
+    }
   }
 
   // ---------- SEO: title / meta (runtime) ----------

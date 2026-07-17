@@ -153,16 +153,29 @@
   document.addEventListener('click',function(e){if(!lang.contains(e.target))setLangOpen(false);});
   lang.addEventListener('keydown',function(e){if(e.key==='Escape'&&lang.classList.contains('open')){setLangOpen(false);langBtn.focus();}});
 
-  /* ---------------- open-now badge (Asia/Manila, 11:00–23:00 daily) ---------------- */
-  try{
+  /* ---------------- open-now badge (Asia/Manila; hours come from the CMS) ----------------
+     Re-runnable: content.js calls BBTOpenNow.render() whenever settings land, on both the
+     fast path and the late path, so the badge never contradicts the hours label beside it. */
+  var OPEN_FALLBACK='11:00', CLOSE_FALLBACK='23:00';
+  function hhmm(v){var m=/^\s*(\d{1,2}):(\d{2})\s*$/.exec(String(v||''));if(!m)return null;var h=+m[1],i=+m[2];return(h<24&&i<60)?h*60+i:null;}
+  function ampm(v){var t=hhmm(v);if(t===null)return'';var h=Math.floor(t/60),i=t%60,ap=h>=12?'PM':'AM',h12=h%12||12;return h12+(i?':'+(i<10?'0':'')+i:'')+' '+ap;}
+  function renderOpenNow(){
+    var els=document.querySelectorAll('[data-open-status]'); if(!els.length) return;
+    var hrs=(window.BBTSettings&&window.BBTSettings.hours)||{};
+    var openStr=hhmm(hrs.open)!==null?hrs.open:OPEN_FALLBACK, closeStr=hhmm(hrs.close)!==null?hrs.close:CLOSE_FALLBACK;
+    var o=hhmm(openStr), c=hhmm(closeStr);
     var parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
     var pv=function(t){var x=parts.find(function(o){return o.type===t;});return x?parseInt(x.value,10):0;};
-    var mins=pv('hour')*60+pv('minute'), isOpen=mins>=660&&mins<1380;
-    document.querySelectorAll('[data-open-status]').forEach(function(el){
-      el.className=(el.className+' open-badge '+(isOpen?'is-open':'is-closed')).trim();
-      el.innerHTML='<span class="od"></span>'+(isOpen?'Open now · until 11 PM':'Closed · opens 11 AM');
+    var mins=pv('hour')*60+pv('minute');
+    /* close<=open means the service wraps past midnight, e.g. 17:00–02:00 */
+    var isOpen=(c>o)?(mins>=o&&mins<c):(mins>=o||mins<c);
+    [].forEach.call(els,function(el){
+      el.className=(el.className.replace(/\b(?:open-badge|is-open|is-closed)\b/g,'')+' open-badge '+(isOpen?'is-open':'is-closed')).replace(/\s+/g,' ').trim();
+      el.innerHTML='<span class="od"></span>'+(isOpen?'Open now · until '+ampm(closeStr):'Closed · opens '+ampm(openStr));
     });
-  }catch(e){}
+  }
+  window.BBTOpenNow={render:renderOpenNow};
+  try{renderOpenNow();}catch(e){}
 
   /* ---------------- PWA: manifest + apple meta + service worker ---------------- */
   if(!document.querySelector('link[rel="manifest"]')){var lm=document.createElement('link');lm.rel='manifest';lm.href='/manifest.webmanifest';document.head.appendChild(lm);}
