@@ -71,7 +71,48 @@ window.BBTContent = (function () {
     if (window.BBTOpenNow && typeof window.BBTOpenNow.render === "function") {
       try { window.BBTOpenNow.render(); } catch (e) {}
     }
+    try { applyBrand(s.brand); } catch (e) {}
   }
+
+  // ---------- brand: the decorative homepage statement band (owner-controlled) ----------
+  // Editable in the admin's Branding tab as settings.brand.band:
+  //   { show, element:'pattern'|'elephant', tone:'gold'|'subtle', strength:0-100, asset:url }
+  // Absent -> the band keeps its built-in CSS look (pattern / gold / 45%). Present -> we take
+  // it over with inline styles, so the owner's choice always wins.
+  var _brand = null;
+  function applyBrand(brand) {
+    if (brand) _brand = brand;
+    var b = _brand && _brand.band; if (!b) return;
+    var marks = qsa(".brand-pattern"); if (!marks.length) return;
+    var rgb = (b.tone === "subtle") ? "255,245,232" : "226,153,59";
+    var strength = Math.max(5, Math.min(100, parseInt(b.strength, 10) || 45)) / 100;
+    var bg = "rgba(" + rgb + "," + strength + ")";
+    var isEle = b.element === "elephant";
+    var asset = b.asset || "";
+    marks.forEach(function (el) {
+      var parent = el.parentElement;
+      if (b.show === false) { if (parent) parent.style.display = "none"; return; }
+      if (parent) parent.style.display = "";
+      el.style.background = bg;
+      function setMask(url, repeat, size) {
+        el.style.webkitMaskImage = el.style.maskImage = url ? "url('" + url + "')" : "";
+        el.style.webkitMaskRepeat = el.style.maskRepeat = repeat;
+        el.style.webkitMaskPosition = el.style.maskPosition = "center";
+        el.style.webkitMaskSize = el.style.maskSize = size;
+      }
+      if (isEle) {
+        setMask(asset || "/assets/brand/elephant-ornate.webp", "no-repeat", "auto 74%");
+      } else if (asset) {
+        setMask(asset, "repeat", (window.innerWidth <= 860 ? "300px" : "560px") + " auto");
+      } else {
+        setMask("", "", "");  // default pattern -> clear inline, let the responsive versioned CSS win
+      }
+    });
+  }
+  // custom tiled asset needs its tile re-sized across the mobile/desktop breakpoint
+  var _rz; window.addEventListener("resize", function () {
+    if (!_brand) return; clearTimeout(_rz); _rz = setTimeout(function () { try { applyBrand(); } catch (e) {} }, 150);
+  });
 
   // ---------- SEO: title / meta (runtime) ----------
   function metaEnsure(attr, key) {

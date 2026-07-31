@@ -130,6 +130,7 @@
       <button class="tab" data-t="reach">Reach</button>
       <button class="tab" data-t="rep">Reputation</button>
       <button class="tab" data-t="content">Content</button>
+      <button class="tab" data-t="brand">Branding</button>
       <button class="tab" data-t="menu">Menu</button>
       <button class="tab" data-t="photos">Photos</button>
       <button class="tab" data-t="seo">SEO</button>
@@ -183,6 +184,7 @@
     </div>
 
     <!-- MENU -->
+    <div id="tab-brand" class="hide"><div id="paneBrand"></div></div>
     <div id="tab-menu" class="hide"><div id="paneMenu"></div></div>
 
     <!-- PHOTOS (media library + gallery) -->
@@ -271,7 +273,7 @@
     t.onclick=function(){
       Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(x){x.classList.remove('on');});
       t.classList.add('on');
-      ['chat','reach','rep','content','menu','photos','seo','ops'].forEach(function(p){ show($('#tab-'+p), t.dataset.t===p); });
+      ['chat','reach','rep','content','brand','menu','photos','seo','ops'].forEach(function(p){ show($('#tab-'+p), t.dataset.t===p); });
       if(window.CMS) window.CMS.open(t.dataset.t);
       if(t.dataset.t==='ops' && window.OPS) window.OPS.load();
     };
@@ -378,6 +380,10 @@ window.CMS=(function(){
   /* ---------- field helpers ---------- */
   function fIn(label,path,val,ph){ return '<div class="f"><label>'+esc(label)+'</label><input data-path="'+path+'" value="'+esc(val)+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'></div>'; }
   function fTa(label,path,val,rows,ph){ return '<div class="f"><label>'+esc(label)+'</label><textarea data-path="'+path+'" rows="'+(rows||3)+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'>'+esc(val)+'</textarea></div>'; }
+  function fSel(label,path,val,opts){ return '<div class="f"><label>'+esc(label)+'</label><select data-path="'+path+'">'+opts.map(function(o){ return '<option value="'+esc(o[0])+'"'+(String(val)===o[0]?' selected':'')+'>'+esc(o[1])+'</option>'; }).join('')+'</select></div>'; }
+  function fCheck(label,path,val){ return '<div class="f" style="flex-direction:row;align-items:center;gap:10px"><input type="checkbox" data-path="'+path+'"'+(val?' checked':'')+' style="width:auto"><label style="margin:0">'+esc(label)+'</label></div>'; }
+  function fRange(label,path,val,min,max){ return '<div class="f"><label>'+esc(label)+' — <span class="mono" data-rv>'+esc(val)+'</span></label><input type="range" data-path="'+path+'" min="'+min+'" max="'+max+'" value="'+esc(val)+'" oninput="var s=this.parentNode.querySelector(\'[data-rv]\'); if(s)s.textContent=this.value"></div>'; }
+  function fAsset(label,path,val){ return '<div class="f"><label>'+esc(label)+'</label><div class="rowline" style="gap:8px;align-items:center">'+(val?'<img src="'+esc(val)+'" style="width:44px;height:44px;object-fit:cover;border-radius:6px;background:#181818">':'')+'<input class="grow" data-path="'+path+'" value="'+esc(val||'')+'" placeholder="Using the default" readonly style="opacity:.75"><button class="ghost" type="button" data-pick="'+path+'">Choose…</button>'+(val?'<button class="ghost" type="button" data-clr="'+path+'">Default</button>':'')+'</div><small class="muted">Upload images in the Photos tab first, then choose one here.</small></div>'; }
   function toolbarHtml(){ return '<div class="toolbar"><button class="btn" data-act="save">Save draft</button><button class="ghost" data-act="preview">Preview</button><button class="btn" data-act="publish" style="background:#3a7d44">Publish…</button><button class="ghost" data-act="history">History</button><span class="msg" data-msg></span></div>'; }
   function msg(pane,text,cls){ var m=pane.querySelector('[data-msg]'); if(m){ m.textContent=text; m.className='msg '+(cls||''); } }
   function showErrs(pane,list,title){ var box=pane.querySelector('[data-errs]'); if(!box){ box=document.createElement('div'); box.setAttribute('data-errs',''); box.className='errs'; pane.insertBefore(box,pane.firstChild); } box.innerHTML='<b>'+esc(title||'')+'</b><ul>'+list.map(function(e){return '<li>'+esc(e)+'</li>';}).join('')+'</ul>'; box.scrollIntoView({block:'nearest'}); }
@@ -503,14 +509,30 @@ window.CMS=(function(){
       '<div class="f"><label>Search engines</label><select data-seo="'+p+'|robots"><option value="index"'+(x.robots!=='noindex'?' selected':'')+'>Index — show in Google</option><option value="noindex"'+(x.robots==='noindex'?' selected':'')+'>Noindex — hide from Google</option></select></div></div>'; });
     html+=toolbarHtml(); pane.innerHTML=html; wireToolbar(pane,'seo',Object.keys(se.pages)[0]||'/'); }
 
+  /* ---------- BRANDING: the homepage brand band (lives in the settings doc) ---------- */
+  function renderBrand(){ var pane=document.getElementById('paneBrand'); pane.setAttribute('data-key','settings'); var s=draftOf('settings');
+    s.brand=s.brand||{}; var b=s.brand.band=s.brand.band||{show:true,element:'pattern',tone:'gold',strength:45,asset:''};
+    pane.innerHTML='<div class="box"><h3>Homepage brand band</h3>'+
+      '<p class="muted" style="margin-top:0">The decorative band on the homepage (between the reviews and the photos). Turn it off, switch the motif, change its tone and strength, or use your own image. Preview before you publish.</p>'+
+      fCheck('Show the band','brand.band.show',b.show!==false)+
+      '<div class="grid2">'+fSel('Motif','brand.band.element',b.element||'pattern',[['pattern','Pattern — all motifs'],['elephant','Single elephant']])+
+      fSel('Tone','brand.band.tone',b.tone||'gold',[['gold','Gold'],['subtle','Subtle cream']])+'</div>'+
+      fRange('Strength (%)','brand.band.strength',b.strength||45,15,100)+
+      fAsset('Your own image (optional)','brand.band.asset',b.asset)+
+      '</div>'+toolbarHtml();
+    wireToolbar(pane,'settings','/');
+    [].forEach.call(pane.querySelectorAll('[data-pick]'),function(btn){ btn.onclick=function(){ syncFrom(pane); openPicker(function(url){ setPath(state.settings,btn.getAttribute('data-pick'),url); renderBrand(); }); }; });
+    [].forEach.call(pane.querySelectorAll('[data-clr]'),function(btn){ btn.onclick=function(){ syncFrom(pane); setPath(state.settings,btn.getAttribute('data-clr'),''); renderBrand(); }; }); }
+
   /* ---------- routing ---------- */
   function render(tab){
     if(tab==='content'){ if(!opened.content){ opened.content=true; renderSettings(); renderHome(); renderAbout(); wireContentSub(); } }
+    else if(tab==='brand'){ if(!opened.brand){ opened.brand=true; renderBrand(); } }
     else if(tab==='menu'){ if(!opened.menu){ opened.menu=true; renderMenu(); } }
     else if(tab==='photos'){ if(!opened.photos){ opened.photos=true; renderPhotos(); } }
     else if(tab==='seo'){ if(!opened.seo){ opened.seo=true; renderSeo(); } }
   }
-  function open(tab){ if(['content','menu','photos','seo'].indexOf(tab)<0) return; if(!loadedRows) loadRows().then(function(ok){ if(ok) render(tab); }); else render(tab); }
+  function open(tab){ if(['content','brand','menu','photos','seo'].indexOf(tab)<0) return; if(!loadedRows) loadRows().then(function(ok){ if(ok) render(tab); }); else render(tab); }
   return { open: open };
 })();
 </script>
