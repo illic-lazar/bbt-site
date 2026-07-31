@@ -166,7 +166,12 @@ body{background:var(--cream);font-family:'Roboto Condensed',sans-serif;-webkit-f
 }
 
 /* ══ D: STATEMENT ════════════════════════════════════════ */
-.d-stmt { background:var(--night); padding:160px 88px; display:flex; align-items:center; justify-content:center; }
+.d-stmt { background:var(--night); padding:104px 88px; display:flex; align-items:center; justify-content:center; }
+/* Brand moment — the ornate elephant as a CSS mask, so it recolours to any brand tone
+   (the source PNG is dark filigree; on the night band it must be tinted, not placed as-is). */
+.brandmark { width:clamp(260px,42vw,620px); aspect-ratio:1200/931; background:var(--gold);
+  -webkit-mask:url('assets/brand/elephant-ornate.webp') center/contain no-repeat;
+          mask:url('assets/brand/elephant-ornate.webp') center/contain no-repeat; }
 
 /* ══ D: ATMOSPHERE ════════════════════════════════════════ */
 .d-atmo { display:grid; grid-template-columns:1.6fr 0.4fr; height:560px; gap:3px; background:#0E0E0E; }
@@ -342,9 +347,7 @@ picture{display:contents;}
 
     <!-- ── 3. BRAND STATEMENT ────────────────────────────── -->
     <section class="d-stmt">
-      <div class="bf" style="font-size:108px;color:var(--cream);text-align:center;max-width:1040px;line-height:.83">
-        If you're not Thai,<br>don't tell me how to cook.
-      </div>
+      <div class="brandmark" role="img" aria-label="Big Bad Thai"></div>
     </section>
 
     <!-- ── 4. ATMOSPHERE ─────────────────────────────────── -->
@@ -626,11 +629,9 @@ picture{display:contents;}
       <a data-rev-link href="https://share.google/jTkxRK6gXJpO9uube" target="_blank" rel="noopener" class="btn btn-line btn-fw" style="height:44px;font-size:9px;margin-top:14px;text-decoration:none">Read all reviews on Google &rarr;</a>
     </div>
 
-    <!-- M: BRAND STATEMENT -->
-    <div style="background:var(--night);padding:88px 26px;display:flex;justify-content:center">
-      <div class="bf" style="font-size:44px;color:var(--cream);text-align:center;line-height:.85">
-        If you're not Thai,<br>don't tell me how to cook.
-      </div>
+    <!-- M: BRAND MOMENT — ornate elephant (design only) -->
+    <div style="background:var(--night);padding:72px 26px;display:flex;justify-content:center">
+      <div class="brandmark" role="img" aria-label="Big Bad Thai"></div>
     </div>
 
     <!-- M: ATMOSPHERE
