@@ -171,9 +171,15 @@ body{background:var(--cream);font-family:'Roboto Condensed',sans-serif;-webkit-f
    textile band. A dark-mode variant is a one-line colour change. cover, not tiled, so the
    motifs stay legible and there are no seams. */
 .d-stmt { background:var(--night); height:clamp(240px,32vh,360px); position:relative; overflow:hidden; }
+/* Tiled, NOT cover — a fixed 560px tile stays crisp (downscaled from a 1400px source, not
+   stretched) and keeps the motifs a consistent size on every screen. Smaller tile on phones
+   so motifs don't look oversized. */
 .brand-pattern { position:absolute; inset:0; background:rgba(226,153,59,.45);
-  -webkit-mask:url('assets/brand/pattern.webp') center/cover no-repeat;
-          mask:url('assets/brand/pattern.webp') center/cover no-repeat; }
+  -webkit-mask:url('assets/brand/pattern.webp'); mask:url('assets/brand/pattern.webp');
+  -webkit-mask-repeat:repeat; mask-repeat:repeat;
+  -webkit-mask-size:560px auto; mask-size:560px auto;
+  -webkit-mask-position:center; mask-position:center; }
+@media(max-width:860px){ .brand-pattern{ -webkit-mask-size:300px auto; mask-size:300px auto; } }
 
 /* ══ D: ATMOSPHERE ════════════════════════════════════════ */
 .d-atmo { display:grid; grid-template-columns:1.6fr 0.4fr; height:560px; gap:3px; background:#0E0E0E; }
