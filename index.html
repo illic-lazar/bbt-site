@@ -171,18 +171,13 @@ body{background:var(--cream);font-family:'Roboto Condensed',sans-serif;-webkit-f
    textile band. A dark-mode variant is a one-line colour change. cover, not tiled, so the
    motifs stay legible and there are no seams. */
 .d-stmt { background:var(--night); height:clamp(240px,32vh,360px); position:relative; overflow:hidden; }
-/* Tiled, NOT cover — a fixed 560px tile stays crisp (downscaled from a 1400px source) and
-   keeps motifs a consistent, legible size on EVERY screen. pattern.webp is the whole
-   multi-motif sheet, so a smaller tile crushes all the motifs into cramped, faint noise —
-   560px is right on mobile too. Do NOT re-add a smaller phone override. */
+/* ONE copy that covers the band — NOT tiled. The source pattern isn't edge-matched, so
+   repeating it collides/garbles the motifs at every seam (harmless on a phone where the tile
+   is wider than the screen, but obvious across the wide desktop band). cover = a single copy,
+   zero seams on any width, crisp from the 2000px source, big legible motifs. */
 .brand-pattern { position:absolute; inset:0; background:rgba(226,153,59,.45);
-  -webkit-mask:url('assets/brand/pattern.webp?v=df4f377d'); mask:url('assets/brand/pattern.webp?v=df4f377d');
-  -webkit-mask-repeat:repeat; mask-repeat:repeat;
-  -webkit-mask-size:560px auto; mask-size:560px auto;
-  -webkit-mask-position:center; mask-position:center; }
-/* the band is much wider on desktop, so use a bigger tile — otherwise the same 560px sheet
-   repeats many times over and the motifs read as small, dense noise (fine on a phone). */
-@media(min-width:861px){ .brand-pattern{ -webkit-mask-size:800px auto; mask-size:800px auto; } }
+  -webkit-mask:url('assets/brand/pattern.webp?v=8f67e671') center/cover no-repeat;
+          mask:url('assets/brand/pattern.webp?v=8f67e671') center/cover no-repeat; }
 
 /* ══ D: ATMOSPHERE ════════════════════════════════════════ */
 .d-atmo { display:grid; grid-template-columns:1.6fr 0.4fr; height:560px; gap:3px; background:#0E0E0E; }
@@ -853,7 +848,7 @@ picture{display:contents;}
 </div>
 
 
-<script src="assets/content.js?v=9bb40cf9" defer></script>
+<script src="assets/content.js?v=b0cc8629" defer></script>
 <script src="assets/actionbar.js?v=b8961d76" defer></script>
 <script src="assets/track.js?v=0ddb177f" defer></script>
 

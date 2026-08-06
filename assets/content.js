@@ -103,7 +103,7 @@ window.BBTContent = (function () {
       if (isEle) {
         setMask(asset || "/assets/brand/elephant-ornate.webp", "no-repeat", "auto 74%");
       } else if (asset) {
-        setMask(asset, "repeat", (window.innerWidth > 860 ? "800px" : "560px") + " auto");
+        setMask(asset, "no-repeat", "cover");  // one copy, no seams (matches the default band)
       } else {
         setMask("", "", "");  // default pattern -> clear inline, let the responsive versioned CSS win
       }
