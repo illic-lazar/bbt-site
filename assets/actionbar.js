@@ -35,6 +35,7 @@
      If a dark mode lands, this pair needs a light counterpart (#5cb97a / #e2825c). */
   + ".open-badge.is-open{color:#2e6b3d}.open-badge.is-open .od{background:#3c8a4e;box-shadow:0 0 0 3px rgba(60,138,78,.18)}"
   + ".open-badge.is-closed{color:#b04a2b}.open-badge.is-closed .od{background:#b04a2b}"
+  + ".open-badge.is-soon{color:#8a5a12}.open-badge.is-soon .od{background:#c8892b;box-shadow:0 0 0 3px rgba(200,137,43,.18)}"
   + "#bbt-lang{position:fixed;left:16px;bottom:18px;z-index:490}"
   + "@media(max-width:760px){#bbt-lang{bottom:calc(80px + env(safe-area-inset-bottom));left:12px}}"
   + "#bbt-lang .lang-btn{width:42px;height:42px;border-radius:50%;background:var(--night,#181818);color:var(--cream,#FFF5E8);"
@@ -184,9 +185,19 @@
     var mins=pv('hour')*60+pv('minute');
     /* close<=open means the service wraps past midnight, e.g. 17:00–02:00 */
     var isOpen=(c>o)?(mins>=o&&mins<c):(mins>=o||mins<c);
+    /* Live status, none of it repeating the hours line above the badge:
+         open, >1h to close  -> "Open now · last order 10:30 PM"  (the last order is useful, not shown elsewhere)
+         open, within 1h      -> "Closing soon"
+         closed, opens <1h     -> "Opening soon"
+         closed otherwise      -> "Closed now"                                                        */
+    var SOON=60, fwd=function(t){return (t-mins+1440)%1440;};  // minutes from now forward to time t
+    var state,label;
+    if(isOpen){ if(fwd(c)<=SOON){state='soon';label='Closing soon';} else {state='open';label='Open now · last order '+ampm(loStr);} }
+    else { if(fwd(o)<=SOON){state='soon';label='Opening soon';} else {state='closed';label='Closed now';} }
+    var cls=state==='open'?'is-open':(state==='soon'?'is-soon':'is-closed');
     [].forEach.call(els,function(el){
-      el.className=(el.className.replace(/\b(?:open-badge|is-open|is-closed)\b/g,'')+' open-badge '+(isOpen?'is-open':'is-closed')).replace(/\s+/g,' ').trim();
-      el.innerHTML='<span class="od"></span>'+(isOpen?'Open now · last order '+ampm(loStr):'Closed · opens '+ampm(openStr));
+      el.className=(el.className.replace(/\b(?:open-badge|is-open|is-soon|is-closed)\b/g,'')+' open-badge '+cls).replace(/\s+/g,' ').trim();
+      el.innerHTML='<span class="od"></span>'+label;
     });
   }
   window.BBTOpenNow={render:renderOpenNow};
