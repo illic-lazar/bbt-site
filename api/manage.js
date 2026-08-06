@@ -37,6 +37,7 @@ function validate(key, doc) {
     if (doc.hours) {
       if (doc.hours.open && !isTime(doc.hours.open)) e.push("Opening time must be HH:MM (24h).");
       if (doc.hours.close && !isTime(doc.hours.close)) e.push("Closing time must be HH:MM (24h).");
+      if (doc.hours.last_order && !isTime(doc.hours.last_order)) e.push("Kitchen last-order time must be HH:MM (24h).");
       if (!nonEmpty(doc.hours.label)) e.push("Hours label is required (e.g. “Open daily · 11:00 AM – 11:00 PM”).");
     }
   }

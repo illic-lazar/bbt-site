@@ -163,11 +163,15 @@
   var OPEN_FALLBACK='11:00', CLOSE_FALLBACK='23:00';
   function hhmm(v){var m=/^\s*(\d{1,2}):(\d{2})\s*$/.exec(String(v||''));if(!m)return null;var h=+m[1],i=+m[2];return(h<24&&i<60)?h*60+i:null;}
   function ampm(v){var t=hhmm(v);if(t===null)return'';var h=Math.floor(t/60),i=t%60,ap=h>=12?'PM':'AM',h12=h%12||12;return h12+(i?':'+(i<10?'0':'')+i:'')+' '+ap;}
+  function minsToHHMM(m){var h=Math.floor(m/60),i=m%60;return (h<10?'0':'')+h+':'+(i<10?'0':'')+i;}
   function renderOpenNow(){
     var els=document.querySelectorAll('[data-open-status]'); if(!els.length) return;
     var hrs=(window.BBTSettings&&window.BBTSettings.hours)||{};
     var openStr=hhmm(hrs.open)!==null?hrs.open:OPEN_FALLBACK, closeStr=hhmm(hrs.close)!==null?hrs.close:CLOSE_FALLBACK;
     var o=hhmm(openStr), c=hhmm(closeStr);
+    /* last order in the kitchen — the setting if given, else 30 min before close. Shown
+       instead of the closing time, which would just repeat the hours line above the badge. */
+    var loStr=hhmm(hrs.last_order)!==null?hrs.last_order:minsToHHMM((c-30+1440)%1440);
     var parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
     var pv=function(t){var x=parts.find(function(o){return o.type===t;});return x?parseInt(x.value,10):0;};
     var mins=pv('hour')*60+pv('minute');
@@ -175,7 +179,7 @@
     var isOpen=(c>o)?(mins>=o&&mins<c):(mins>=o||mins<c);
     [].forEach.call(els,function(el){
       el.className=(el.className.replace(/\b(?:open-badge|is-open|is-closed)\b/g,'')+' open-badge '+(isOpen?'is-open':'is-closed')).replace(/\s+/g,' ').trim();
-      el.innerHTML='<span class="od"></span>'+(isOpen?'Open now · until '+ampm(closeStr):'Closed · opens '+ampm(openStr));
+      el.innerHTML='<span class="od"></span>'+(isOpen?'Open now · last order '+ampm(loStr):'Closed · opens '+ampm(openStr));
     });
   }
   window.BBTOpenNow={render:renderOpenNow};
