@@ -103,16 +103,12 @@ window.BBTContent = (function () {
       if (isEle) {
         setMask(asset || "/assets/brand/elephant-ornate.webp", "no-repeat", "auto 74%");
       } else if (asset) {
-        setMask(asset, "repeat", (window.innerWidth <= 860 ? "300px" : "560px") + " auto");
+        setMask(asset, "repeat", "560px auto");  // one legible tile size on every screen
       } else {
         setMask("", "", "");  // default pattern -> clear inline, let the responsive versioned CSS win
       }
     });
   }
-  // custom tiled asset needs its tile re-sized across the mobile/desktop breakpoint
-  var _rz; window.addEventListener("resize", function () {
-    if (!_brand) return; clearTimeout(_rz); _rz = setTimeout(function () { try { applyBrand(); } catch (e) {} }, 150);
-  });
 
   // ---------- SEO: title / meta (runtime) ----------
   function metaEnsure(attr, key) {
