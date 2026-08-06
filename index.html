@@ -204,8 +204,7 @@ body{background:var(--cream);font-family:'Roboto Condensed',sans-serif;-webkit-f
    They are duplicated rather than shared because the homepage is a standalone
    built page and deliberately does not load site.css — it inlines everything to
    keep the LCP request count down. If you restyle one, restyle the other. */
-.d-visit { background:var(--cream2); padding:112px 0 112px; }
-.d-visit > .eyebrow { padding:0 88px; }
+.d-visit { background:var(--cream2); padding:0 0 96px; }
 
 .hv-map { position:relative; background:var(--cream2); line-height:0; }
 .hv-map iframe { width:100%; height:clamp(260px,42vh,420px); border:0; display:block; }
@@ -232,8 +231,7 @@ body{background:var(--cream);font-family:'Roboto Condensed',sans-serif;-webkit-f
 .hv-photo .frame { max-width:1100px; margin:0 auto; height:340px; border-radius:14px; }
 
 /* M: the same section, stacked */
-.m-visit { background:var(--cream2); padding:64px 0; }
-.m-visit > .eyebrow { padding:0 24px; }
+.m-visit { background:var(--cream2); padding:0 0 40px; }
 .m-visit .hv-card { padding:0 16px; }
 .m-visit .hv-card .inner { grid-template-columns:1fr; padding:24px; gap:22px; }
 .m-visit .hv-photo { padding:32px 24px 0; }
@@ -497,17 +495,13 @@ picture{display:contents;}
         <div style="display:flex;flex-direction:column;gap:2px">
           <div class="bf" style="font-size:78px;color:var(--cream)">Made from scratch.</div>
           <div class="bf" style="font-size:78px;color:var(--cream)">Truly Thai.</div>
-          <div class="bf" style="font-size:70px;color:var(--clay)">Isan authenticity.</div>
+          <div class="bf" style="font-size:70px;color:var(--clay)">Straight from Isan.</div>
         </div>
       </div>
     </section>
 
     <!-- ── 7. VISIT — mirrors visit.html: map first, card lifted over it ──── -->
     <section class="d-visit">
-      <div class="eyebrow" style="margin-bottom:40px">
-        <div class="accent"></div>
-        <div class="mo" style="font-size:10px;color:var(--bamboo)">Find Us</div>
-      </div>
 
       <div class="hv-map">
         <iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Big Bad Thai map"
@@ -781,18 +775,13 @@ picture{display:contents;}
         <div style="display:flex;flex-direction:column;gap:2px">
           <div class="bf" style="font-size:56px;color:var(--cream)">Made from scratch.</div>
           <div class="bf" style="font-size:56px;color:var(--cream)">Truly Thai.</div>
-          <div class="bf" style="font-size:50px;color:var(--clay)">Isan authenticity.</div>
+          <div class="bf" style="font-size:50px;color:var(--clay)">Straight from Isan.</div>
         </div>
       </div>
     </div>
 
     <!-- M: VISIT — mirrors visit.html and the desktop view: map, then the card over it -->
     <div class="m-visit">
-
-      <div class="eyebrow" style="margin-bottom:28px;justify-content:center">
-        <div class="accent"></div>
-        <div class="mo" style="font-size:9px;color:var(--bamboo)">Find Us</div>
-      </div>
 
       <div class="hv-map">
         <iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Big Bad Thai map"
