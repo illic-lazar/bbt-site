@@ -244,11 +244,23 @@ body{background:var(--cream);font-family:'Roboto Condensed',sans-serif;-webkit-f
 /* ══ M: NAV ══════════════════════════════════════════════ */
 .m-nav { background:var(--cream); border-bottom:1px solid rgba(24,24,24,.07); display:flex; align-items:center; justify-content:space-between; padding:0 22px; height:56px; position:sticky; top:0; z-index:300; }
 .ham { cursor:pointer; padding:4px; }
-.m-menu { position:fixed; top:56px; left:0; right:0; background:var(--cream); display:flex; flex-direction:column; max-height:0; overflow:hidden; transition:max-height .28s ease; z-index:290; box-shadow:0 14px 26px rgba(0,0,0,.14); }
-.m-menu.open { max-height:380px; border-bottom:1px solid rgba(24,24,24,.1); }
-.m-menu a { padding:16px 24px; font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--bamboo); text-decoration:none; border-top:1px solid rgba(24,24,24,.06); }
-.m-menu a:first-child { border-top:none; }
-.m-menu a.reserve { background:var(--clay); color:var(--cream); text-align:center; }
+/* full-screen overlay menu (Apple-style): fills below the 56px bar, fades in, items stagger */
+.m-menu { position:fixed; inset:56px 0 0 0; background:var(--cream); z-index:290;
+  display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-start;
+  padding:36px 26px calc(40px + env(safe-area-inset-bottom)); overflow-y:auto;
+  opacity:0; visibility:hidden; transform:translateY(-6px); pointer-events:none;
+  transition:opacity .3s ease, transform .35s ease, visibility .3s; }
+.m-menu.open { opacity:1; visibility:visible; transform:none; pointer-events:auto; }
+.m-menu a { padding:9px 0; font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:clamp(30px,8.5vw,38px); line-height:1.1; letter-spacing:.01em; text-transform:uppercase; color:var(--night); text-decoration:none; border:none;
+  opacity:0; transform:translateY(16px); transition:opacity .45s ease, transform .45s ease; }
+.m-menu.open a { opacity:1; transform:none; }
+.m-menu.open a:nth-child(1){transition-delay:.06s}
+.m-menu.open a:nth-child(2){transition-delay:.11s}
+.m-menu.open a:nth-child(3){transition-delay:.16s}
+.m-menu.open a:nth-child(4){transition-delay:.21s}
+.m-menu.open a:nth-child(5){transition-delay:.26s}
+.m-menu.open a:nth-child(6){transition-delay:.31s}
+.m-menu a.reserve { color:var(--clay); }
 .ham { display:flex; flex-direction:column; gap:4.5px; background:none; border:none; position:relative; }
 /* invisible 44x44 tap target — the icon itself is only ~28x22 (WCAG 2.2 SC 2.5.8
    wants >=24x24). Does not affect layout or appearance. */
@@ -839,7 +851,7 @@ picture{display:contents;}
 
 
 <script src="assets/content.js?v=769b15f8" defer></script>
-<script src="assets/actionbar.js?v=b2317f7f" defer></script>
+<script src="assets/actionbar.js?v=b8961d76" defer></script>
 <script src="assets/track.js?v=0ddb177f" defer></script>
 
 <div id="dish-modal-home" aria-hidden="true">

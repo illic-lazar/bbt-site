@@ -47,7 +47,14 @@
   + "#bbt-lang .lang-menu button:hover{background:rgba(189,94,38,.1);color:var(--clay,#BD5E26)}"
   + ".goog-te-banner-frame,.goog-te-balloon-frame,#goog-gt-tt,.goog-tooltip{display:none!important}"
   + "#gt-host{position:absolute!important;left:-9999px!important;top:-9999px!important;width:1px;height:1px;overflow:hidden}"
-  + "body{top:0!important}";
+  + "body{top:0!important}"
+  /* mobile menu: hamburger morphs to an X, and the floating UI hides behind the full-screen overlay */
+  + ".nav-ham span,.ham span{transition:transform .3s ease,opacity .2s ease}"
+  + ".nav-ham.open span:nth-child(1),.ham.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}"
+  + ".nav-ham.open span:nth-child(2),.ham.open span:nth-child(2){opacity:0}"
+  + ".nav-ham.open span:nth-child(3),.ham.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}"
+  + "body.menu-open #bbt-bar,body.menu-open #bbt-lang,body.menu-open #bbt-chat-btn{opacity:0!important;pointer-events:none;transition:opacity .2s ease}"
+  + "@media(prefers-reduced-motion:reduce){.nav-links a,.m-menu a{transition-duration:.01ms!important;transform:none!important}.nav-ham span,.ham span{transition-duration:.01ms!important}}";
   var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 
   /* ---------------- icons ---------------- */
@@ -220,6 +227,25 @@
       document.dispatchEvent(new CustomEvent('bbt:cta',{detail:{cta:c,page:location.pathname}}));
     }catch(_){}
   },true);
+
+  /* ---------------- mobile menu: Apple-style full-screen overlay ----------------
+     The nav's inline onclick still toggles the menu's .open (works without JS changes to
+     the markup). We run right after to mirror that state onto the hamburger (-> X), the
+     <body> (hides the floating action bar/chat/lang behind the overlay), and aria-expanded,
+     and to close on Escape or when a link is tapped. Handles BOTH nav systems: the subpages'
+     #navlinks/.nav-ham and the homepage's #mMenu/.ham. */
+  (function(){
+    var btns=[].slice.call(document.querySelectorAll('.nav-ham,.ham'));
+    if(!btns.length) return;
+    function menuEl(){ return document.getElementById('navlinks')||document.getElementById('mMenu'); }
+    function sync(){ var m=menuEl(); var open=!!(m&&m.classList.contains('open'));
+      btns.forEach(function(b){ b.classList.toggle('open',open); b.setAttribute('aria-expanded',open?'true':'false'); });
+      document.body.classList.toggle('menu-open',open); }
+    function close(){ var m=menuEl(); if(m&&m.classList.contains('open')){ m.classList.remove('open'); sync(); } }
+    btns.forEach(function(b){ b.addEventListener('click',function(){ setTimeout(sync,0); }); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+    var m=menuEl(); if(m) m.addEventListener('click',function(e){ if(e.target.closest('a')) close(); });
+  })();
 
   /* ---------------- chat assistant ---------------- */
   var bbtChat=document.createElement('script');bbtChat.src='assets/chat.js?v=bbdbe392';bbtChat.defer=true;document.body.appendChild(bbtChat);
