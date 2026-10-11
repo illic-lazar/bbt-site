@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
     if (leg.data) { res.status(200).json(leg.data); return; }
     // Both Google endpoints failed — surface the clearest reason so the cause is
     // diagnosable from the response instead of a generic "fetch-failed".
-    res.status(200).json({ reviews: [], error: "fetch-failed", detail: leg.detail || neu.detail || null });
+    res.status(200).json({ reviews: [], error: "fetch-failed", detail: { newApi: neu.detail || null, legacyApi: leg.detail || null } });
   } catch (e) {
     res.status(200).json({ reviews: [], error: String((e && e.message) || e) });
   }
