@@ -37,9 +37,6 @@
   .chero h1{font-family:'Brandford','Barlow Condensed',sans-serif;text-transform:uppercase;color:var(--cream);font-size:clamp(64px,15vw,200px);line-height:.8;letter-spacing:.01em}
 
   /* lead statement */
-  .clead{background:var(--night);text-align:center;padding:clamp(64px,10vw,150px) clamp(22px,5vw,40px)}
-  .clead .big{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:clamp(30px,5.4vw,72px);line-height:.98;color:var(--cream);max-width:16ch;margin:0 auto}
-  .clead .big b{color:var(--gold)}
 
   /* scenes */
   .cscene{position:relative;min-height:80vh;display:flex;align-items:center;overflow:hidden;background:var(--night)}
@@ -55,7 +52,8 @@
   /* close */
   .cclose{background:var(--night);text-align:center;padding:clamp(70px,10vw,150px) 22px}
   .cclose .eyebrow{display:block;margin-bottom:22px}
-  .cclose .huge{font-family:'Brandford','Barlow Condensed',sans-serif;text-transform:uppercase;font-size:clamp(42px,8vw,116px);line-height:.86;color:var(--gold)}
+  .cclose .huge{font-family:'Brandford','Barlow Condensed',sans-serif;text-transform:uppercase;font-size:clamp(42px,8vw,116px);line-height:.86;color:var(--cream)}
+  .cclose .huge b{color:var(--gold);font-weight:inherit}
   .cclose .sub{font-family:'Roboto Condensed',sans-serif;font-weight:300;font-size:clamp(16px,2vw,20px);color:rgba(255,245,232,.7);margin:26px 0 30px}
   .cclose .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 
@@ -90,10 +88,6 @@
     <img src="assets/gallery/TKC00532.jpg" alt="Big Bad Thai overlooking Bacuit Bay">
     <div class="grd"></div>
     <div class="in"><span class="eyebrow" data-c="about.kicker">El Nido · Palawan · Est. 2017</span><h1 data-c="about.hero_title">Our Story</h1></div>
-  </section>
-
-  <section class="clead">
-    <div class="big" data-c-html="about.lead_html">More than a restaurant — a Thai dream on the shores of <b>El Nido</b>.</div>
   </section>
 
   <!-- SCENE 1 — FINAL PHOTO WANTED: Nelly & Apple together (the couple / founders) -->
@@ -142,7 +136,7 @@
 
   <section class="cclose">
     <span class="eyebrow" data-c="about.close_kicker">Join us in El Nido</span>
-    <div class="huge" data-c-html="about.close_title_html">Thai food.<br>Serbian&nbsp;hospitality.</div>
+    <div class="huge" data-c-html="about.close_title_html">Thai food.<br><b>Serbian&nbsp;hospitality.</b></div>
     <div class="sub" data-c="about.close_sub">Come taste the story.</div>
     <div class="btns">
       <a href="https://m.me/bigbadthai" target="_blank" rel="noopener" data-cta="reserve" class="btn btn-clay" style="color:var(--cream)">Reserve a Table</a>
