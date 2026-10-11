@@ -8,8 +8,13 @@ module.exports = async (req, res) => {
   const key = process.env.GOOGLE_PLACES_KEY;
   if (!key) { res.status(200).json({ reviews: [], error: "no-key" }); return; }
   try {
-    const data = (await fetchNew(key)) || (await fetchLegacy(key));
-    res.status(200).json(data || { reviews: [], error: "fetch-failed" });
+    const neu = await fetchNew(key);
+    if (neu.data) { res.status(200).json(neu.data); return; }
+    const leg = await fetchLegacy(key);
+    if (leg.data) { res.status(200).json(leg.data); return; }
+    // Both Google endpoints failed — surface the clearest reason so the cause is
+    // diagnosable from the response instead of a generic "fetch-failed".
+    res.status(200).json({ reviews: [], error: "fetch-failed", detail: leg.detail || neu.detail || null });
   } catch (e) {
     res.status(200).json({ reviews: [], error: String((e && e.message) || e) });
   }
@@ -24,38 +29,46 @@ function shape(rating, total, url, reviews) {
   };
 }
 
-// Places API (New)
+// Places API (New). Returns { data } on success, or { detail } describing the failure.
 async function fetchNew(key) {
-  const r = await fetch(`https://places.googleapis.com/v1/places/${PLACE_ID}?key=${key}`, {
-    headers: { "X-Goog-FieldMask": "rating,userRatingCount,googleMapsUri,reviews" },
-  });
-  if (!r.ok) return null;
-  const j = await r.json();
-  if (!j || !j.reviews) return null;
-  return shape(j.rating, j.userRatingCount, j.googleMapsUri, j.reviews.map(rv => ({
-    author: (rv.authorAttribution && rv.authorAttribution.displayName) || "Google user",
-    photo: (rv.authorAttribution && rv.authorAttribution.photoUri) || "",
-    rating: rv.rating || 5,
-    text: (rv.text && rv.text.text) || (rv.originalText && rv.originalText.text) || "",
-    relativeTime: rv.relativePublishTimeDescription || "",
-    url: (rv.authorAttribution && rv.authorAttribution.uri) || j.googleMapsUri || "",
-  })));
+  try {
+    const r = await fetch(`https://places.googleapis.com/v1/places/${PLACE_ID}?key=${key}`, {
+      headers: { "X-Goog-FieldMask": "rating,userRatingCount,googleMapsUri,reviews" },
+    });
+    const j = await r.json().catch(() => null);
+    if (!r.ok) {
+      const g = j && j.error ? ((j.error.status || "") + " — " + (j.error.message || "")) : "";
+      return { detail: ("new API: HTTP " + r.status + " " + g).trim().slice(0, 240) };
+    }
+    if (!j || !j.reviews) return { detail: "new API: ok but no reviews field returned" };
+    return { data: shape(j.rating, j.userRatingCount, j.googleMapsUri, j.reviews.map(rv => ({
+      author: (rv.authorAttribution && rv.authorAttribution.displayName) || "Google user",
+      photo: (rv.authorAttribution && rv.authorAttribution.photoUri) || "",
+      rating: rv.rating || 5,
+      text: (rv.text && rv.text.text) || (rv.originalText && rv.originalText.text) || "",
+      relativeTime: rv.relativePublishTimeDescription || "",
+      url: (rv.authorAttribution && rv.authorAttribution.uri) || j.googleMapsUri || "",
+    }))) };
+  } catch (e) { return { detail: "new API: " + String((e && e.message) || e) }; }
 }
 
-// Legacy Place Details (fallback)
+// Legacy Place Details (fallback). Returns { data } on success, or { detail } on failure.
 async function fetchLegacy(key) {
-  const u = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=rating,user_ratings_total,url,reviews&reviews_sort=newest&key=${key}`;
-  const r = await fetch(u);
-  if (!r.ok) return null;
-  const j = await r.json();
-  if (!j || j.status !== "OK" || !j.result) return null;
-  const p = j.result;
-  return shape(p.rating, p.user_ratings_total, p.url, (p.reviews || []).map(rv => ({
-    author: rv.author_name || "Google user",
-    photo: rv.profile_photo_url || "",
-    rating: rv.rating || 5,
-    text: rv.text || "",
-    relativeTime: rv.relative_time_description || "",
-    url: rv.author_url || p.url || "",
-  })));
+  try {
+    const u = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=rating,user_ratings_total,url,reviews&reviews_sort=newest&key=${key}`;
+    const r = await fetch(u);
+    const j = await r.json().catch(() => null);
+    if (!r.ok) return { detail: "legacy API: HTTP " + r.status };
+    if (!j) return { detail: "legacy API: empty response" };
+    if (j.status !== "OK") return { detail: ("legacy API: " + j.status + (j.error_message ? " — " + j.error_message : "")).slice(0, 240) };
+    const p = j.result;
+    return { data: shape(p.rating, p.user_ratings_total, p.url, (p.reviews || []).map(rv => ({
+      author: rv.author_name || "Google user",
+      photo: rv.profile_photo_url || "",
+      rating: rv.rating || 5,
+      text: rv.text || "",
+      relativeTime: rv.relative_time_description || "",
+      url: rv.author_url || p.url || "",
+    }))) };
+  } catch (e) { return { detail: "legacy API: " + String((e && e.message) || e) }; }
 }
