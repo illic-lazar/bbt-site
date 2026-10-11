@@ -1,5 +1,6 @@
 // GET /api/reviews — live Google reviews for Big Bad Thai, cached by Vercel's CDN.
 // Key is read from the GOOGLE_PLACES_KEY env var (set in Vercel). Place ID is public.
+// (diagnostics: reports both new + legacy Places API errors when a call fails)
 const PLACE_ID = "ChIJj-thjxVVtjMRdmsUeV7mG_E";
 
 module.exports = async (req, res) => {
