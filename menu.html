@@ -23,9 +23,24 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Roboto+Condensed:wght@300;400&family=Space+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css?v=e5a7fdca">
+<script>document.documentElement.classList.add('js');</script>
 <style>
-.menu-cols{display:block;}
+.menu-cols{display:block;overflow:hidden;}
+/* Tabbed categories: one panel shown at a time, directional slide-in.
+   Progressive enhancement — without JS (or before init) EVERY category stays
+   visible (the original long-scroll menu, so the page is never blank and still
+   works with JS off); the .js class, set in <head> the moment scripting is
+   confirmed, collapses it to one panel at a time. */
 .cat{margin-bottom:42px;}
+.js .cat{display:none;}
+.js .cat.active{display:block;}
+.cat.bbt-slide-right{animation:bbt-cat-in-right .32s ease both;}
+.cat.bbt-slide-left{animation:bbt-cat-in-left .32s ease both;}
+@keyframes bbt-cat-in-right{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:translateX(0)}}
+@keyframes bbt-cat-in-left{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){
+  .cat.bbt-slide-right,.cat.bbt-slide-left{animation:none;}
+}
 .cat-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:28px;color:var(--night);
   padding-bottom:11px;border-bottom:2px solid var(--clay);margin-bottom:18px;letter-spacing:.01em;}
 .m-item{padding:12px 0;border-bottom:1px solid rgba(24,24,24,.07);}
@@ -79,7 +94,15 @@
   .menu-layout{display:block;}
   .cat-title{scroll-margin-top:112px;}
   .catbar{position:sticky;top:56px;z-index:80;flex-direction:row;gap:8px;overflow-x:auto;background:var(--cream);
-    padding:10px 0;margin:0 0 22px;border-bottom:1px solid rgba(24,24,24,.08);scrollbar-width:none;}
+    margin:0 0 22px;border-bottom:1px solid rgba(24,24,24,.08);scrollbar-width:none;
+    /* Full-bleed to the screen edges, with the content gutter kept as padding,
+       and a soft fade at each edge so a pill dissolves into the margin as it
+       scrolls off instead of being sliced flat by the page side. */
+    margin-inline:calc(50% - 50vw);
+    padding:10px clamp(20px,5vw,80px);
+    scroll-padding-inline:clamp(20px,5vw,80px);
+    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 clamp(20px,5vw,80px),#000 calc(100% - clamp(20px,5vw,80px)),transparent 100%);
+            mask-image:linear-gradient(to right,transparent 0,#000 clamp(20px,5vw,80px),#000 calc(100% - clamp(20px,5vw,80px)),transparent 100%);}
   .catbar::-webkit-scrollbar{display:none;}
   .catbar a{flex:0 0 auto;border:1px solid rgba(24,24,24,.16);border-radius:20px;padding:7px 14px;font-size:10px;letter-spacing:.06em;}
   .catbar a.active{background:var(--clay);color:var(--cream);border-color:var(--clay);}
@@ -140,7 +163,7 @@
 
   <div class="menu-cols">
 
-    <section class="cat">
+    <section class="cat active">
       <h2 class="cat-title" id="starters">Starters</h2>
       <div class="m-item"><div class="m-head"><span class="m-name">Fried Shrimp Cakes</span><span class="m-price">420</span></div><div class="m-desc">Minced shrimp, crunchy crust, sweet chili dip.</div><div class="m-meta">Gluten, egg, soy</div></div>
       <div class="m-item"><div class="m-head"><span class="m-name">Satay Chicken</span><span class="m-price">380</span></div><div class="m-desc">Grilled chicken skewers, turmeric marinade, peanut sauce, cucumber chili relish.</div><div class="m-meta"><span class="m-spice">Mild spicy</span> · Nuts, dairy, shellfish, gluten</div></div>
@@ -321,42 +344,78 @@ window.BBTMenu = {
   modal.addEventListener('click',function(e){if(e.target.hasAttribute('data-close'))close();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
   var hm=(location.hash||'').match(/^#d-(.+)$/);
-  if(hm&&BY[hm[1]]) setTimeout(function(){open(BY[hm[1]],hm[1],BY[hm[1]].getAttribute('data-img'));},80);
+  if(hm&&BY[hm[1]]) setTimeout(function(){
+    var it=BY[hm[1]], sec=it.closest('.cat'), ct=sec&&sec.querySelector('.cat-title');
+    if(ct&&ct.id&&window.BBTMenu._showCat) window.BBTMenu._showCat(ct.id,{instant:true,scroll:false,hash:false});
+    open(it,hm[1],it.getAttribute('data-img'));
+  },80);
   },
   initCatbar: function(){
+  // Tabbed categories: tapping a chip swaps the single visible .cat panel with a
+  // directional horizontal slide (later cat -> in from right, earlier -> from left).
   var bar=document.getElementById('catbar'); if(!bar) return;
   var nav=document.querySelector('.nav');
-  var links={}; [].forEach.call(bar.querySelectorAll('a'),function(a){links[a.getAttribute('href').slice(1)]=a;});
-  var titles=[].slice.call(document.querySelectorAll('.cat-title')).filter(function(h){return h.id;});
-  var cur=null, io;
-  function topOffset(){
-    var nh=nav?nav.offsetHeight:64;
-    var horiz=getComputedStyle(bar).flexDirection==='row';
-    return nh+(horiz?bar.offsetHeight:0)+10;
-  }
+  var layout=document.querySelector('.menu-layout');
+  var links={}; [].forEach.call(bar.querySelectorAll('a'),function(a){
+    var h=a.getAttribute('href')||''; if(h.charAt(0)==='#') links[h.slice(1)]=a;
+  });
+  var order=[], byId={};
+  [].forEach.call(document.querySelectorAll('.cat'),function(sec){
+    var t=sec.querySelector('.cat-title'); if(!t||!t.id) return;
+    byId[t.id]={sec:sec,link:links[t.id],idx:order.length}; order.push(t.id);
+  });
+  if(!order.length) return;
+  var reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches);
+  var curLink=null, curId=null;
+  // pill highlight + aria-current + auto-center the active chip in the mobile bar
   function activate(a){
-    if(!a||a===cur) return;
-    if(cur) cur.classList.remove('active');
-    a.classList.add('active'); cur=a;
-    if(bar.scrollWidth>bar.clientWidth+4)
-      bar.scrollTo({left:a.offsetLeft-bar.clientWidth/2+a.clientWidth/2,behavior:'smooth'});
-  }
-  function build(){
-    if(io) io.disconnect();
-    io=new IntersectionObserver(function(es){
-      es.forEach(function(e){ if(e.isIntersecting) activate(links[e.target.id]); });
-    },{rootMargin:'-'+topOffset()+'px 0px -62% 0px',threshold:0});
-    titles.forEach(function(h){io.observe(h);});
-  }
-  build();
-  // last section (e.g. Spirits) is too short to reach the active-zone on tall screens — activate it at page bottom
-  function atBottom(){
-    if(window.innerHeight+window.scrollY >= document.documentElement.scrollHeight-2){
-      var last=titles[titles.length-1]; if(last) activate(links[last.id]);
+    if(a&&a!==curLink){
+      if(curLink){curLink.classList.remove('active');curLink.removeAttribute('aria-current');}
+      a.classList.add('active'); a.setAttribute('aria-current','true'); curLink=a;
     }
+    if(a&&bar.scrollWidth>bar.clientWidth+4)
+      bar.scrollTo({left:a.offsetLeft-bar.clientWidth/2+a.clientWidth/2,behavior:reduce?'auto':'smooth'});
   }
-  window.addEventListener('scroll',atBottom,{passive:true});
-  var t; window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(function(){build();atBottom();},200);});
+  // bring the viewport to the top of the menu panel area (no hash-jump)
+  function toTop(){
+    if(!layout) return;
+    var off=(nav?nav.offsetHeight:0)+8;
+    var y=layout.getBoundingClientRect().top+(window.pageYOffset||window.scrollY||0)-off;
+    if(y<0) y=0;
+    window.scrollTo({top:y,behavior:reduce?'auto':'smooth'});
+  }
+  function show(id,opts){
+    opts=opts||{};
+    var c=byId[id]; if(!c) return;
+    var prevIdx=(curId!=null&&byId[curId])?byId[curId].idx:-1;
+    [].forEach.call(document.querySelectorAll('.cat'),function(sec){
+      sec.classList.remove('active','bbt-slide-left','bbt-slide-right');
+    });
+    c.sec.classList.add('active');
+    if(!reduce&&!opts.instant&&prevIdx!==-1&&prevIdx!==c.idx)
+      c.sec.classList.add(c.idx>prevIdx?'bbt-slide-right':'bbt-slide-left');
+    curId=id; activate(c.link);
+    if(opts.hash!==false){ try{history.replaceState(null,'','#'+id);}catch(e){} }
+    if(opts.scroll) toTop();
+  }
+  // expose so the dish deep-link (initModal) can activate the owning panel
+  window.BBTMenu._showCat=show;
+  bar.addEventListener('click',function(e){
+    var a=e.target.closest('a'); if(!a||!bar.contains(a)) return;
+    var h=a.getAttribute('href')||''; if(h.charAt(0)!=='#') return;
+    var id=h.slice(1); if(!byId[id]) return;
+    e.preventDefault(); show(id,{scroll:true});
+  });
+  // initial tab: open a real #<category> hash if present, else the first category.
+  // Only (re)write the hash when the URL already had a valid category hash — never
+  // clobber a clean URL (no #starters spam), a #d-<dish> deep link, or #bbtpreview.
+  var raw=(location.hash||'').replace(/^#/,'');
+  var hadCat=!!(raw&&byId[raw]);
+  var initial=hadCat?raw:order[0];
+  show(initial,{instant:true,scroll:false,hash:hadCat});
+  var rt; window.addEventListener('resize',function(){
+    clearTimeout(rt); rt=setTimeout(function(){ if(curLink) activate(curLink); },200);
+  });
   },
   initCurrency: function(){
   var sw=document.querySelector('.cur-switch'); if(!sw) return;
